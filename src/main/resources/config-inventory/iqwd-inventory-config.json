@@ -1,0 +1,12 @@
+{
+  "customConfigurations": [
+    {
+      "configId": "IQWD_INVENTORY_CONFIG_1",
+      "configValue": ""
+    },
+    {
+      "configId": "IQWD_INVENTORY_CONFIG_2",
+      "configValue": "IQWD"
+    }
+  ]
+}

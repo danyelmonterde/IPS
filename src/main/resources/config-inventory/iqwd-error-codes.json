@@ -1,0 +1,20 @@
+{
+  "customConfigurations": [
+    {
+      "configId": "APP_ERROR_MESSAGE",
+      "configValue": "System Error Occurred!"
+    },
+    {
+      "configId": "APP_ERROR_CODE",
+      "configValue": "5001"
+    },
+    {
+      "configId": "API_ERROR_CODE",
+      "configValue": "5002"
+    },
+    {
+      "configId": "API_ERROR_MESSAGE",
+      "configValue": "Failed to Connect to API!"
+    }
+  ]
+}

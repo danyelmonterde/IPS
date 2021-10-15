@@ -1,0 +1,12 @@
+{
+  "customConfigurations": [
+    {
+      "configId": "API_URL",
+      "configValue": "http://localhost:8080"
+    },
+    {
+      "configId": "API_URL_2",
+      "configValue": "IQWD"
+    }
+  ]
+}

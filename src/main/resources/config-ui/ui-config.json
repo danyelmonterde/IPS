@@ -1,0 +1,96 @@
+{
+  "customConfigurations": [
+    {
+      "configId": "HOME_PAGE",
+      "configValue": "/com/monterdev/controller/Controller.fxml"
+    },
+    {
+      "configId": "CLIENT_NAME",
+      "configValue": "IQWD"
+    },
+    {
+      "configId": "WINDOW_TITLE",
+      "configValue": "Infanta Quezon Water District Inventory System"
+    },
+    {
+      "configId": "ITEMS_ADD_ITEM_BUTTON_NAME",
+      "configValue": "ADD ITEM"
+    },
+    {
+      "configId": "ITEMS_IMPORT_BUTTON_NAME",
+      "configValue": "IMPORT"
+    },
+    {
+      "configId": "ITEMS_EXPORT_BUTTON_NAME",
+      "configValue": "EXPORT"
+    },
+    {
+      "configId": "ITEMS_SETTINGS_BUTTON_NAME",
+      "configValue": "..."
+    },
+    {
+      "configId": "ITEMS_SEARCH_BUTTON_NAME",
+      "configValue": "SEARCH"
+    },
+    {
+      "configId": "ITEMS_PREV_BUTTON_NAME",
+      "configValue": "PREV"
+    },
+    {
+      "configId": "ITEMS_NEXT_BUTTON_NAME",
+      "configValue": "NEXT"
+    },
+    {
+      "configId": "BUTTON_CSS_CLASSES",
+      "configValue": ""
+    },
+    {
+      "configId": "ITEMS_ADD_ITEM_CSS_CLASS",
+      "configValue": "add-item"
+    },
+    {
+      "configId": "ITEMS_LABEL_CATEGORY_NAME",
+      "configValue": "Category"
+    },
+    {
+      "configId": "ITEMS_LABEL_STOCKALERT_NAME",
+      "configValue": "Stock alert"
+    },
+    {
+      "configId": "ITEMS_DROP_DOWN_CLASS",
+      "configValue": "item-drop-down"
+    },
+    {
+      "configId": "ITEMS_VBOX_CLASSES",
+      "configValue": ""
+    },
+    {
+      "configId": "ITEMS_DATATABLE_HEADER",
+      "configValue": ""
+    },
+    {
+      "configId": "ITEMS_TOP_HBOX_SPACING",
+      "configValue": "20.0"
+    },
+    {
+      "configId": "ITEMS_BOT_HBOX_FOOTER_PAGE_LABEL",
+      "configValue": "Page:"
+    },
+    {
+      "configId": "ITEMS_BOT_HBOX_FOOTER_ROWS_PER_PAGE_LABEL",
+      "configValue": "Rows per page:"
+    },
+    {
+      "configId": "ITEMS_STOCK_ALERTS",
+      "configValue": "All Items, Low Stock, Out of Stock"
+    },
+    {
+      "configId": "ITEMS_SETTINGS_CONTEXT_MENU",
+      "configValue": "Print QR Codes"
+    },
+    {
+      "configId": "ITEMS_ROWS_PER_PAGE",
+      "configValue": "10,25,50,100,1000"
+    }
+  ]
+}

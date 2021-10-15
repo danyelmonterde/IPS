@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.MainController">
+   <children>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <center>
+            <GridPane BorderPane.alignment="CENTER">
+               <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               </rowConstraints>
+               <children>
+                  <BorderPane>
+                     <center>
+                        <ImageView fx:id="btnInventory" fitHeight="150.0" fitWidth="200.0" nodeOrientation="INHERIT" onMouseClicked="#getInventoryModule" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+                           <image>
+                              <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Inventory-Main.jpg" />
+                           </image>
+                        </ImageView>
+                     </center>
+                  </BorderPane>
+                  <BorderPane GridPane.columnIndex="2">
+                     <center>
+                        <ImageView fx:id="btnConfigure" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#getConfigureModule" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Configure.jpg" />
+                           </image>
+                        </ImageView>
+                     </center>
+                  </BorderPane>
+                  <BorderPane GridPane.rowIndex="1">
+                     <center>
+                        <ImageView fx:id="btnTransactions" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#getTransactionsModule" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+                           <image>
+                              <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Transactions.jpg" />
+                           </image>
+                        </ImageView>
+                     </center>
+                  </BorderPane>
+                  <BorderPane GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <center>
+                        <ImageView fx:id="btnMaintenance" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#getMaintenanceModule" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Maintenance.jpg" />
+                           </image>
+                        </ImageView>
+                     </center>
+                  </BorderPane>
+                  <BorderPane GridPane.columnIndex="2" GridPane.rowIndex="1">
+                     <center>
+                        <ImageView fx:id="btnCredential" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#getCredentialModule" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Credential.jpg" />
+                           </image>
+                        </ImageView>
+                     </center>
+                  </BorderPane>
+                  <BorderPane GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <center>
+                        <ImageView fx:id="btnSecurity" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#getSecurityModule" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Security.jpg" />
+                           </image>
+                        </ImageView>
+                     </center>
+                  </BorderPane>
+                  <BorderPane GridPane.columnIndex="1">
+                     <center>
+                        <ImageView fx:id="btnReports" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#getReportsModule" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Reports.jpg" />
+                           </image>
+                        </ImageView>
+                     </center>
+                  </BorderPane>
+               </children>
+            </GridPane>
+         </center>
+         <top>
+            <MenuBar BorderPane.alignment="CENTER">
+               <menus>
+                  <Menu mnemonicParsing="false" text="File">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Close" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Edit">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Delete" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Help">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="About" />
+                     </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Logout">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Action 1" />
+                     </items>
+                  </Menu>
+               </menus>
+            </MenuBar>
+         </top>
+      </BorderPane>
+   </children>
+</AnchorPane>

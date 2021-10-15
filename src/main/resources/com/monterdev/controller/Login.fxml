@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url(file:/C:/Users/Daniel/Desktop/iqwd-app/src/main/resources/config-ui/IQWD-APP-RESOURCES/Login/bg-960x540px.png);" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.LoginController">
+   <children>
+      <Label fx:id="lblWelcome" layoutX="31.0" layoutY="26.0" prefHeight="109.0" prefWidth="549.0" text="WELCOME TO IQWD INVENTORY">
+         <font>
+            <Font size="35.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblUsername" layoutX="108.0" layoutY="175.0" text="Username:" />
+      <Label fx:id="lblPassword" layoutX="110.0" layoutY="224.0" text="Password:" />
+      <TextField fx:id="txtUsername" layoutX="206.0" layoutY="162.0" prefHeight="25.0" prefWidth="288.0" />
+      <TextField fx:id="txtPassword" layoutX="206.0" layoutY="211.0" prefHeight="26.0" prefWidth="288.0" />
+      <Button fx:id="btnForgotPassword" layoutX="22.0" layoutY="322.0" mnemonicParsing="false" onAction="#forgotPassword" styleClass="button-login" stylesheets="@../../../config-ui/IQWD-APP-RESOURCES/Login/login.css" text="FORGOT PASSWORD" />
+      <Button fx:id="btnLogin" layoutX="306.0" layoutY="322.0" mnemonicParsing="false" onAction="#login" text="LOGIN" />
+      <Button fx:id="btnExit" layoutX="526.0" layoutY="322.0" mnemonicParsing="false" onAction="#exitApplication" text="EXIT" />
+      <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Login/bg-960x540px.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>
