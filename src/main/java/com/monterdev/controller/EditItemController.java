@@ -1,6 +1,7 @@
 package com.monterdev.controller;
 
 import com.jfoenix.controls.*;
+import com.monterdev.constants.GlobalConfiguration;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
 import com.monterdev.util.Prompt;
@@ -34,8 +35,6 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.monterdev.constants.ItemsUIConfiguration.*;
-import static com.monterdev.constants.ItemsUIConfiguration.ITEMS_SEARCH_BUTTON_NAME;
-import static com.monterdev.util.ComponentCreator.addJFXButton;
 import static com.monterdev.util.ComponentCreator.createSearchBox;
 
 @Component
@@ -72,10 +71,13 @@ public class EditItemController {
     private JFXComboBox subCategoryDetail;
 
     @FXML
-    private JFXTextField price;
+    private JFXTextField quantity;
 
     @FXML
-    private JFXTextField cost;
+    private JFXTextField purchaseCost;
+
+    @FXML
+    private JFXTextField averageCost;
 
     @FXML
     private JFXTextField sku;
@@ -142,11 +144,33 @@ public class EditItemController {
 
         selectedItem = applicationContext.getBean(Item.class);
         name.setText(selectedItem.getItem_name());
-        price.setText(Double.toString(selectedItem.getPrice()));
-        cost.setText(Double.toString(selectedItem.getCost()));
+        quantity.setText("0");
+        purchaseCost.setText("0");
+        averageCost.setText(Double.toString(selectedItem.getCost()));
         sku.setText(Integer.toString(selectedItem.getSku()));
         inStock.setText(Integer.toString(selectedItem.getIn_stock()));
         lowStock.setText(Integer.toString(selectedItem.getLow_stock()));
+        checkIfItemNameExists();
+
+
+        SubCategoryDetail subCategoryDetail = subCategoryDetailsRepository.findBySubCategoryDetail(selectedItem.getSub_category_detail());
+        SubCategoryHeader subCategoryHeader = subCategoryHeaderRepository.findBySubCategoryHeader(subCategoryDetail.getSub_category_header());
+        Category category = categoryRepository.findByCategory(subCategoryHeader.getCategory());
+
+        loadCategories(subCategoryDetail, subCategoryHeader, category);
+
+        itemNameonChange();
+
+        quantityOnChange();
+
+        lowStockOnChange();
+
+        subCategoryDetailOnChange();
+
+        trackStockHbox.setVisible(false);
+    }
+
+    private void checkIfItemNameExists() {
         if (!ObjectUtils.isEmpty(name)) {
             if (name.getText().equalsIgnoreCase("")) {
                 delete.setText("CLEAR");
@@ -158,27 +182,6 @@ public class EditItemController {
             delete = new JFXButton();
             delete.setText("CLEAR");
         }
-
-
-        SubCategoryDetail subCategoryDetail = subCategoryDetailsRepository.findBySubCategoryDetail(selectedItem.getSub_category_detail());
-        SubCategoryHeader subCategoryHeader = subCategoryHeaderRepository.findBySubCategoryHeader(subCategoryDetail.getSub_category_header());
-        Category category = categoryRepository.findByCategory(subCategoryHeader.getCategory());
-
-        loadCategories(subCategoryDetail, subCategoryHeader, category);
-
-        itemNameonChange();
-
-        priceOnChange();
-
-        skuOnChange();
-
-        inStockOnChange();
-
-        lowStockOnChange();
-
-        subCategoryDetailOnChange();
-
-        trackStockHbox.setVisible(false);
     }
 
 
@@ -201,13 +204,6 @@ public class EditItemController {
         botHbox.setAlignment(Pos.TOP_LEFT);
         botHbox.setSpacing(Double.parseDouble(getItemsTopHboxSpacing()));
 
-        //TOP HBOX
-
-        JFXButton addItem = addJFXButton(ITEMS_ADD_ITEM_BUTTON_NAME, JFXButton.ButtonType.RAISED);
-        JFXButton importButton = addJFXButton(ITEMS_IMPORT_BUTTON_NAME, JFXButton.ButtonType.FLAT);
-        JFXButton export = addJFXButton(ITEMS_EXPORT_BUTTON_NAME, JFXButton.ButtonType.FLAT);
-        JFXButton settings = addJFXButton(ITEMS_SETTINGS_BUTTON_NAME, JFXButton.ButtonType.FLAT);
-        JFXButton searchItemsButton = addJFXButton(ITEMS_SEARCH_BUTTON_NAME, JFXButton.ButtonType.FLAT);
         new StageLoader().load(EditItemController.class, actionEvent, applicationContext);
     }
 
@@ -262,6 +258,7 @@ public class EditItemController {
 
             }else if(ObjectUtils.isEmpty(newvalue)){
                 searchGroupMainContainer.getChildren().remove(2);
+                resetFields();
                 responseList.clear();
             }
 
@@ -274,64 +271,54 @@ public class EditItemController {
         responseList.clear();
         StringBuilder regexTextBuilder = new StringBuilder();
         regexTextBuilder.setLength(0);
-        if(text.matches(".*\\s.*") && text.length()>=5){
-            String[] splittedText = text.split("\\s+");
-            regexTextBuilder.append(".*");
-            for(int ctr=0;ctr<splittedText.length;ctr++){
-                regexTextBuilder.append(splittedText[ctr].toCharArray()[1]);
-                regexTextBuilder.append(splittedText[ctr].toCharArray()[2]);
-                regexTextBuilder.append(".");
-                regexTextBuilder.append(splittedText[ctr].toCharArray()[4]);
+        try{
+            if(text.matches(".*\\s.*") && text.length()>=5){
+                String[] splittedText = text.split("\\s+");
                 regexTextBuilder.append(".*");
-                System.out.println(regexTextBuilder.toString());
+                for(int ctr=0;ctr<splittedText.length;ctr++){
+                    regexTextBuilder.append(splittedText[ctr].toCharArray()[1]);
+                    regexTextBuilder.append(splittedText[ctr].toCharArray()[2]);
+                    regexTextBuilder.append(".");
+                    regexTextBuilder.append(splittedText[ctr].toCharArray()[4]);
+                    regexTextBuilder.append(".*");
+                    System.out.println(regexTextBuilder.toString());
+                }
+            }else if(text.length()>=5){
+                regexTextBuilder.append(".*");
+                regexTextBuilder.append(text.toCharArray()[1]);
+                regexTextBuilder.append(text.toCharArray()[2]);
+                regexTextBuilder.append(".");
+                regexTextBuilder.append(text.toCharArray()[4]);
+                regexTextBuilder.append(".*");
             }
-        }else if(text.length()>=5){
-            regexTextBuilder.append(text.toCharArray()[1]);
-            regexTextBuilder.append(text.toCharArray()[2]);
-            regexTextBuilder.append(".");
-            regexTextBuilder.append(text.toCharArray()[4]);
-            regexTextBuilder.append(".*");
-        }
-        Pattern p = Pattern.compile(regexTextBuilder.toString(), Pattern.CASE_INSENSITIVE);
-        for (int ctr = 0; ctr < resultsList.size(); ctr++) {
-            Matcher m = p.matcher(resultsList.get(ctr).getItem_name());
-            if (m.matches()) {
+            Pattern p = Pattern.compile(regexTextBuilder.toString(), Pattern.CASE_INSENSITIVE);
+            for (int ctr = 0; ctr < resultsList.size(); ctr++) {
+                Matcher m = p.matcher(resultsList.get(ctr).getItem_name());
+                if (m.matches()) {
 
-                responseList.add(resultsList.get(ctr).getItem_name().concat("  |  ")
-                        .concat(Integer.toString(resultsList.get(ctr).getSku())));
-                Collections.sort(responseList);
-                //break;)
+                    responseList.add(resultsList.get(ctr).getItem_name().concat("  |  ")
+                            .concat(Integer.toString(resultsList.get(ctr).getSku())));
+                    Collections.sort(responseList);
+                    //break;)
+                }
             }
+        }catch(ArrayIndexOutOfBoundsException e){
+
         }
+
 
 
     }
 
-    private void priceOnChange() {
-        price.textProperty().addListener((observable, oldvalue, newvalue) -> {
+    private void quantityOnChange() {
+        quantity.textProperty().addListener((observable, oldvalue, newvalue) -> {
             if (oldvalue != newvalue) {
-                selectedItem.setPrice(Double.parseDouble(newvalue));
+                selectedItem.setQuantity(Integer.parseInt(newvalue));
             }
-
 
         });
     }
 
-    private void skuOnChange() {
-        sku.textProperty().addListener((obs, old, newv) -> {
-            if (old != newv) {
-                selectedItem.setPrice(Double.parseDouble(newv));
-            }
-        });
-    }
-
-    private void inStockOnChange() {
-        inStock.textProperty().addListener((obs, old, newv) -> {
-            if (old != newv) {
-                selectedItem.setIn_stock(Integer.parseInt(newv));
-            }
-        });
-    }
 
     private void lowStockOnChange() {
         lowStock.textProperty().addListener((obs, old, newv) -> {
@@ -388,12 +375,12 @@ public class EditItemController {
                 if (!buttonType.get().getButtonData().isCancelButton()) {
                     DeletedItems deletedItems = new DeletedItems().builder()
                             .cost(selectedItem.getCost())
+                            .quantity(Integer.parseInt(quantity.getText()))
                             .item_name(selectedItem.getItem_name())
                             .in_stock(selectedItem.getIn_stock())
                             .low_stock(selectedItem.getLow_stock())
                             .margin(selectedItem.getMargin())
                             .sku(selectedItem.getSku())
-                            .price(selectedItem.getPrice())
                             .sub_category_detail(selectedItem.getSub_category_detail())
                             .tag(selectedItem.getTag())
                             .build();
@@ -414,16 +401,17 @@ public class EditItemController {
         selectedItem.setTag(null);
         selectedItem.setItem_name("");
         selectedItem.setLow_stock(0);
-        selectedItem.setPrice(0.0);
+        selectedItem.setQuantity(0);
         selectedItem.setSku(0);
         selectedItem.setMargin(0.0);
         selectedItem.setCost(0.0);
         selectedItem.setIn_stock(0);
-        selectedItem.setSub_category_detail("TEST-CATEGORY-1");
+        selectedItem.setSub_category_detail(GlobalConfiguration.DEFAULT_CATEGORY_DATA);
         name.setText("");
         lowStock.setText("0");
-        price.setText("0");
-        cost.setText("0");
+        quantity.setText("0");
+        purchaseCost.setText("0");
+        averageCost.setText("0");
         inStock.setText("0");
     }
 
@@ -435,15 +423,39 @@ public class EditItemController {
 
     public void save(ActionEvent actionEvent) {
         selectedItem.setTag(null);
+        if(!sku.getText().equalsIgnoreCase("0")){
+            //EXISTING ITEM
+            double realAverageCost = Double.parseDouble(averageCost.getText());
+            double realPurchaseCost = Double.parseDouble(purchaseCost.getText());
+            int realQuantity = Integer.parseInt(quantity.getText());
+            int realInstock = Integer.parseInt(inStock.getText());
+            double totalQuantity = realInstock + realQuantity;
+            double productOfQuantityandPurchaseCost = realQuantity * realPurchaseCost;
+            double totalCost = realAverageCost + productOfQuantityandPurchaseCost;
+            double finalAverageCost =  totalCost /totalQuantity;
+            selectedItem.setCost(finalAverageCost);
+            selectedItem.setIn_stock(realInstock+realQuantity);
+        }
         Item item = itemsRepository.save(selectedItem);
         if (!ObjectUtils.isEmpty(item)) {
-            Prompt.success("Data updated!");
+            PurchaseOrder purchaseOrder = setPurchaseOrder(item);
+            Prompt.success("Data saved!");
             selectedItem = new Item();
             Stage stage = (Stage) save.getScene().getWindow();
             stage.close();
         } else {
-            Prompt.failed("Data was not updated successfully!");
+            Prompt.failed("Data did NOT save successfully!");
         }
+    }
+
+    private PurchaseOrder setPurchaseOrder(Item item){
+        PurchaseOrder purchaseOrder = new PurchaseOrder();
+        purchaseOrder.setPurchase_cost(selectedItem.getCost());
+        purchaseOrder.setItem_name(selectedItem.getItem_name());
+        purchaseOrder.setQuantity(Integer.parseInt(quantity.getText()));
+        purchaseOrder.setSku(item.getSku());
+        purchaseOrder.setAmount(Integer.parseInt(quantity.getText()) * Double.parseDouble(purchaseCost.getText()));
+        return  purchaseOrder;
     }
 
     public void showTrackStock(ActionEvent actionEvent) {

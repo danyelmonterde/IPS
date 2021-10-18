@@ -90,19 +90,14 @@
                <children>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <Label text="Price" />
-                        <JFXTextField fx:id="price" minWidth="-Infinity" text="0" />
-                        <Label minWidth="-Infinity" text="Leave the field blank to indicate the price upon sale">
-                           <VBox.margin>
-                              <Insets top="10.0" />
-                           </VBox.margin>
-                        </Label>
+                        <Label text="Quantity" />
+                        <JFXTextField fx:id="quantity" minWidth="-Infinity" text="0" />
                         <Label text="SKU">
                            <VBox.margin>
                               <Insets top="20.0" />
                            </VBox.margin>
                         </Label>
-                        <JFXTextField fx:id="sku">
+                        <JFXTextField fx:id="sku" editable="false">
                            <VBox.margin>
                               <Insets />
                            </VBox.margin>
@@ -120,13 +115,8 @@
                   </VBox>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <Label text="Average Cost" />
-                        <JFXTextField fx:id="cost" editable="false" minWidth="-Infinity" text="0" />
-                        <Label minWidth="-Infinity" text="Value updates automatically when you receive inventory">
-                           <VBox.margin>
-                              <Insets top="10.0" />
-                           </VBox.margin>
-                        </Label>
+                        <Label text="Purchase Cost" />
+                        <JFXTextField fx:id="purchaseCost" minWidth="-Infinity" text="0" />
                         <JFXToggleButton fx:id="trackStock" onAction="#showTrackStock" text="Track stock" textAlignment="JUSTIFY" toggleLineColor="#31b738">
                            <VBox.margin>
                               <Insets top="20.0" />
@@ -144,16 +134,57 @@
                      <children>
                         <JFXButton fx:id="view" buttonType="RAISED" minWidth="-Infinity" onAction="#viewHistory" style="-fx-background-color: white;" text="VIEW HISTORY" textFill="#218804">
                            <VBox.margin>
-                              <Insets top="20.0" />
+                              <Insets left="20.0" top="20.0" />
                            </VBox.margin>
                            <font>
                               <Font name="System Bold" size="15.0" />
                            </font>
                         </JFXButton>
+                        <Label text="Average Cost">
+                           <VBox.margin>
+                              <Insets left="20.0" top="20.0" />
+                           </VBox.margin>
+                        </Label>
+                        <JFXTextField fx:id="averageCost" editable="false" minWidth="-Infinity" text="0">
+                           <VBox.margin>
+                              <Insets left="20.0" />
+                           </VBox.margin>
+                        </JFXTextField>
+                        <Label minWidth="-Infinity" text="If item already exists, average cost is auto-computed">
+                           <VBox.margin>
+                              <Insets bottom="20.0" left="20.0" top="10.0" />
+                           </VBox.margin>
+                        </Label>
                      </children>
                      <padding>
                         <Insets right="20.0" />
                      </padding>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label text="Supplier">
+                           <VBox.margin>
+                              <Insets top="20.0" />
+                           </VBox.margin>
+                        </Label>
+                        <JFXTextField promptText="(OPTIONAL)" />
+                        <Label text="Receipt No.">
+                           <VBox.margin>
+                              <Insets top="20.0" />
+                           </VBox.margin>
+                        </Label>
+                        <JFXTextField promptText="(OPTIONAL)" />
+                        <Label text="P.O#">
+                           <VBox.margin>
+                              <Insets top="20.0" />
+                           </VBox.margin>
+                        </Label>
+                        <JFXTextField promptText="(OPTIONAL)">
+                           <VBox.margin>
+                              <Insets bottom="20.0" />
+                           </VBox.margin>
+                        </JFXTextField>
+                     </children>
                   </VBox>
                </children>
                <VBox.margin>
@@ -172,7 +203,7 @@
                               <Insets left="20.0" top="20.0" />
                            </VBox.margin>
                         </Label>
-                        <JFXTextField fx:id="inStock" text="0">
+                        <JFXTextField fx:id="inStock" editable="false" text="0">
                            <VBox.margin>
                               <Insets bottom="20.0" left="20.0" />
                            </VBox.margin>

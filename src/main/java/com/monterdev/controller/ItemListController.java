@@ -269,7 +269,7 @@ public class ItemListController {
 
     private void setAlignment(HBox topHbox, HBox midHbox, HBox botHbox) {
         VBox.setMargin(topHbox, new Insets(20.0, 0.0, 0.0, 20.0));
-        VBox.setMargin(midHbox, new Insets(20.0, 0.0, 0.0, 0.0));
+        VBox.setMargin(midHbox, new Insets(20.0, 0.0, 0.0, 20.0));
         VBox.setMargin(botHbox, new Insets(20.0, 0.0, 20.0, 20.0));
 
         AnchorPane.setLeftAnchor(vBox, 0.0);
@@ -291,6 +291,7 @@ public class ItemListController {
 
     private void createTableView() {
         this.tableView = new TableView<Item>();
+        this.tableView.setPrefHeight(275);
 
         TableColumn<Item, String> sku = new TableColumn<>("sku");
         sku.setCellValueFactory(new PropertyValueFactory<>("sku"));
@@ -298,17 +299,16 @@ public class ItemListController {
         itemName.setCellValueFactory(new PropertyValueFactory<>("item_name"));
         TableColumn<Item, String> category = new TableColumn<>("Category");
         category.setCellValueFactory(new PropertyValueFactory<>("sub_category_detail"));
-        TableColumn<Item, String> price = new TableColumn<>("Price");
-        price.setCellValueFactory(new PropertyValueFactory<>("price"));
+        TableColumn<Item, String> quantity = new TableColumn<>("Cost");
+        quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+
         TableColumn<Item, String> cost = new TableColumn<>("Cost");
         cost.setCellValueFactory(new PropertyValueFactory<>("cost"));
-        TableColumn<Item, String> margin = new TableColumn<>("Margin");
-        margin.setCellValueFactory(new PropertyValueFactory<>("margin"));
+
         TableColumn<Item, String> inStock = new TableColumn<>("In Stock");
         inStock.setCellValueFactory(new PropertyValueFactory<>("in_stock"));
 
-
-        setTableColumns(sku, itemName, category, price, cost, margin, inStock);
+        setTableColumns(sku, itemName, category, cost, inStock);
 
 
         dataSize = itemLists.size();
@@ -324,10 +324,9 @@ public class ItemListController {
                 cellData.add(tableView.getSelectionModel().getSelectedItem());
                 selectedItem = applicationContext.getBean(Item.class);
                 selectedItem.setTag(cellData.get(0).getTag());
+                selectedItem.setQuantity(cellData.get(0).getQuantity());
                 selectedItem.setCost(cellData.get(0).getCost());
-                selectedItem.setPrice(cellData.get(0).getPrice());
                 selectedItem.setItem_name(cellData.get(0).getItem_name());
-                selectedItem.setMargin(cellData.get(0).getMargin());
                 selectedItem.setLow_stock(cellData.get(0).getLow_stock());
                 selectedItem.setSub_category_detail(cellData.get(0).getSub_category_detail());
                 selectedItem.setIn_stock(cellData.get(0).getIn_stock());
@@ -338,13 +337,11 @@ public class ItemListController {
         });
     }
 
-    private void setTableColumns(TableColumn<Item, String> sku, TableColumn<Item, String> itemName, TableColumn<Item, String> category, TableColumn<Item, String> price, TableColumn<Item, String> cost, TableColumn<Item, String> margin, TableColumn<Item, String> inStock) {
+    private void setTableColumns(TableColumn<Item, String> sku, TableColumn<Item, String> itemName, TableColumn<Item, String> category, TableColumn<Item, String> cost, TableColumn<Item, String> inStock) {
         tableView.getColumns().add(sku);
         tableView.getColumns().add(itemName);
         tableView.getColumns().add(category);
-        tableView.getColumns().add(price);
         tableView.getColumns().add(cost);
-        tableView.getColumns().add(margin);
         tableView.getColumns().add(inStock);
     }
 
@@ -392,8 +389,7 @@ public class ItemListController {
                 if (updatedItem.getSku() == previousitem.getSku()) {
                     previousitem.setItem_name(updatedItem.getItem_name());
                     previousitem.setCost(updatedItem.getCost());
-                    previousitem.setPrice(updatedItem.getPrice());
-                    previousitem.setMargin(updatedItem.getMargin());
+
                     previousitem.setSub_category_detail(updatedItem.getSub_category_detail());
                     //previousitem.setTag("1"); //if THERE IS A POSSIBILITY OF MULTIPLE USER UPDATE ON SAME ITEM, do not set this to 1
                     previousitem.setLow_stock(updatedItem.getLow_stock());

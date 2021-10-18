@@ -20,7 +20,7 @@ public class DeletedItems {
 
     private String sub_category_detail;
 
-    private double price;
+    private int quantity;
 
     private double cost;
 

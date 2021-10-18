@@ -1,8 +1,6 @@
 package com.monterdev.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -10,6 +8,8 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "purchaseorder")
 public class PurchaseOrder {
 
@@ -17,22 +17,16 @@ public class PurchaseOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "itemName")
-    private String itemName;
+    private String item_name;
 
-    @Column(name = "inStock")
-    private int inStock;
+    private int in_stock;
 
-    @Column(name = "quantity")
     private int quantity;
 
-    @Column(name = "purchaseCost")
-    private double purchaseCost;
+    private double purchase_cost;
 
-    @Column(name = "sku")
     private int sku;
 
-    @Column(name = "amount")
     private double amount;
 
 }
