@@ -104,13 +104,7 @@ public class ComponentCreator {
         VBox searchGroup = new VBox();
         JFXListView searchedItems = new JFXListView();
         searchedItems.setPrefHeight(100);
-        HBox searchNavigationGroup = new HBox();
-        JFXButton previousButton = new JFXButton("PREVIOUS");
-        JFXButton nextButton = new JFXButton("NEXT");
-        JFXButton searchButton = new JFXButton("SEARCH");
-        searchNavigationGroup.getChildren().addAll(previousButton,searchButton,nextButton);
-
-        searchGroup.getChildren().addAll(searchedItems,searchNavigationGroup);
+        searchGroup.getChildren().addAll(searchedItems);
         searchBoxContainer.getChildren().addAll(searchGroup);
 
 

@@ -4,7 +4,9 @@ import com.jfoenix.controls.*;
 import com.monterdev.constants.GlobalConfiguration;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
+import com.monterdev.util.AppTime;
 import com.monterdev.util.Prompt;
+import com.monterdev.util.SearchUtil;
 import com.monterdev.util.StageLoader;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -136,9 +138,17 @@ public class EditItemController {
     @Qualifier("itemLists")
     private List<Item> itemLists;
 
-    private List<Item> resultsList;
+    @Autowired
+    private PurchaseOrderRepository purchaseOrderRepository;
 
-    private List<String> responseList;
+    @Autowired
+    private SearchUtil searchUtil;
+
+    private List<Item> resultsList = new ArrayList<>();
+
+    private List<String> responseList = new ArrayList<>();
+
+
 
     public void initialize() {
 
@@ -186,6 +196,7 @@ public class EditItemController {
 
 
     public void create(ActionEvent actionEvent) {
+        selectedItem = applicationContext.getBean(Item.class);
         EditItemAnchorpane = new AnchorPane();
 
         vBox = new VBox();
@@ -240,11 +251,16 @@ public class EditItemController {
                     ObservableList<Node> nodeStream = searchGroupMainContainer.getChildren();
                     for (Node node : nodeStream) {
                         if (node instanceof AnchorPane) {
-                            searchItem(newvalue);
+                            searchUtil.searchItem(newvalue,itemLists, responseList);
                             VBox vbox = (VBox) ((AnchorPane) node).getChildren().get(0);
                             JFXListView listView = (JFXListView) vbox.getChildren().get(0);
                             listView.getItems().clear();
                             listView.getItems().addAll(responseList);
+                            listView.setOnMouseClicked(e->{
+                                if(e.getClickCount() == 1){
+                                    setFields(listView.getSelectionModel().getSelectedItem().toString());
+                                }
+                            });
 
                         } else if (node instanceof JFXTextField && searchGroupMainContainer.getChildren().size() < 3) {
                             AnchorPane searchBox = createSearchBox();
@@ -265,50 +281,20 @@ public class EditItemController {
         });
     }
 
-    private void searchItem(String text) {
-        resultsList = itemLists;
-        responseList = new ArrayList<>();
-        responseList.clear();
-        StringBuilder regexTextBuilder = new StringBuilder();
-        regexTextBuilder.setLength(0);
-        try{
-            if(text.matches(".*\\s.*") && text.length()>=5){
-                String[] splittedText = text.split("\\s+");
-                regexTextBuilder.append(".*");
-                for(int ctr=0;ctr<splittedText.length;ctr++){
-                    regexTextBuilder.append(splittedText[ctr].toCharArray()[1]);
-                    regexTextBuilder.append(splittedText[ctr].toCharArray()[2]);
-                    regexTextBuilder.append(".");
-                    regexTextBuilder.append(splittedText[ctr].toCharArray()[4]);
-                    regexTextBuilder.append(".*");
-                    System.out.println(regexTextBuilder.toString());
-                }
-            }else if(text.length()>=5){
-                regexTextBuilder.append(".*");
-                regexTextBuilder.append(text.toCharArray()[1]);
-                regexTextBuilder.append(text.toCharArray()[2]);
-                regexTextBuilder.append(".");
-                regexTextBuilder.append(text.toCharArray()[4]);
-                regexTextBuilder.append(".*");
-            }
-            Pattern p = Pattern.compile(regexTextBuilder.toString(), Pattern.CASE_INSENSITIVE);
-            for (int ctr = 0; ctr < resultsList.size(); ctr++) {
-                Matcher m = p.matcher(resultsList.get(ctr).getItem_name());
-                if (m.matches()) {
-
-                    responseList.add(resultsList.get(ctr).getItem_name().concat("  |  ")
-                            .concat(Integer.toString(resultsList.get(ctr).getSku())));
-                    Collections.sort(responseList);
-                    //break;)
-                }
-            }
-        }catch(ArrayIndexOutOfBoundsException e){
-
+    private void setFields(String itemName) {
+        Optional<Item> item = itemLists.stream().filter(e -> e.getItem_name().equalsIgnoreCase(itemName))
+                .findFirst();
+        if(item.isPresent()){
+            name.setText(itemName);
+            inStock.setText(Integer.toString(item.get().getIn_stock()));
+            lowStock.setText( Integer.toString(item.get().getLow_stock()));
+            sku.setText(Integer.toString(item.get().getSku()));
+            averageCost.setText(Double.toString(item.get().getCost()));
+            subCategoryDetail.setValue(item.get().getSub_category_detail());
         }
-
-
-
     }
+
+
 
     private void quantityOnChange() {
         quantity.textProperty().addListener((observable, oldvalue, newvalue) -> {
@@ -398,6 +384,18 @@ public class EditItemController {
     }
 
     private void resetFields() {
+        resetSelectedItem();
+        name.setText("");
+        lowStock.setText("0");
+        quantity.setText("0");
+        purchaseCost.setText("0");
+        averageCost.setText("0");
+        inStock.setText("0");
+        sku.setText("0");
+        subCategoryDetail.setValue(GlobalConfiguration.DEFAULT_CATEGORY_DATA);
+    }
+
+    private void resetSelectedItem() {
         selectedItem.setTag(null);
         selectedItem.setItem_name("");
         selectedItem.setLow_stock(0);
@@ -407,24 +405,21 @@ public class EditItemController {
         selectedItem.setCost(0.0);
         selectedItem.setIn_stock(0);
         selectedItem.setSub_category_detail(GlobalConfiguration.DEFAULT_CATEGORY_DATA);
-        name.setText("");
-        lowStock.setText("0");
-        quantity.setText("0");
-        purchaseCost.setText("0");
-        averageCost.setText("0");
-        inStock.setText("0");
     }
 
     public void cancel(ActionEvent actionEvent) {
-        selectedItem = new Item();
+        selectedItem = applicationContext.getBean(Item.class);
+        resetSelectedItem();
         Stage stage = (Stage) cancel.getScene().getWindow();
         stage.close();
     }
 
     public void save(ActionEvent actionEvent) {
+        boolean isExistingData = false;
         selectedItem.setTag(null);
         if(!sku.getText().equalsIgnoreCase("0")){
             //EXISTING ITEM
+            isExistingData = true;
             double realAverageCost = Double.parseDouble(averageCost.getText());
             double realPurchaseCost = Double.parseDouble(purchaseCost.getText());
             int realQuantity = Integer.parseInt(quantity.getText());
@@ -436,9 +431,14 @@ public class EditItemController {
             selectedItem.setCost(finalAverageCost);
             selectedItem.setIn_stock(realInstock+realQuantity);
         }
-        Item item = itemsRepository.save(selectedItem);
-        if (!ObjectUtils.isEmpty(item)) {
-            PurchaseOrder purchaseOrder = setPurchaseOrder(item);
+        Item savedItem = itemsRepository.save(selectedItem);
+        if (!ObjectUtils.isEmpty(savedItem)) {
+
+            if(!isExistingData){
+                PurchaseOrder purchaseOrder = setPurchaseOrder(savedItem);
+                purchaseOrderRepository.save(purchaseOrder);
+            }
+
             Prompt.success("Data saved!");
             selectedItem = new Item();
             Stage stage = (Stage) save.getScene().getWindow();
@@ -450,6 +450,7 @@ public class EditItemController {
 
     private PurchaseOrder setPurchaseOrder(Item item){
         PurchaseOrder purchaseOrder = new PurchaseOrder();
+        purchaseOrder.setDatecreated(AppTime.now());
         purchaseOrder.setPurchase_cost(selectedItem.getCost());
         purchaseOrder.setItem_name(selectedItem.getItem_name());
         purchaseOrder.setQuantity(Integer.parseInt(quantity.getText()));

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.DropShadow?>
@@ -197,6 +199,11 @@
                <children>
                   <VBox prefHeight="200.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
+                        <Label fx:id="currentLocationBanner" text="DASHBOARD" textFill="#185d8b">
+                           <font>
+                              <Font name="Roboto Black" size="21.0" />
+                           </font>
+                        </Label>
                         <HBox fx:id="topHbox" prefHeight="100.0" prefWidth="800.0" style="-fx-background-color: white;">
                            <effect>
                               <DropShadow color="#d3d3d3" />
@@ -204,28 +211,107 @@
                            <VBox.margin>
                               <Insets top="20.0" />
                            </VBox.margin>
+                           <children>
+                              <ImageView fx:id="addItem" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#getInventoryModule" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Purchase-dashboard.jpg" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fx:id="releaseItem" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#getReleaseItemModule" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Release-dashboard.jpg" />
+                                 </image>
+                              </ImageView>
+                              <ImageView fx:id="reports" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#getReportsModule" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Reports-dashboard.jpg" />
+                                 </image>
+                              </ImageView>
+                           </children>
                         </HBox>
-                        <HBox fx:id="midHbox" layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: white;">
+                        <HBox fx:id="midHbox" alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: white;">
                            <effect>
                               <DropShadow color="#d3d3d3" />
                            </effect>
                            <VBox.margin>
                               <Insets top="20.0" />
                            </VBox.margin>
+                           <children>
+                              <Label fx:id="companyName" contentDisplay="CENTER" text="INFANTA QUEZON WATER DISTRICT" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Roboto Light" size="19.0" />
+                                 </font>
+                              </Label>
+                           </children>
                         </HBox>
-                        <HBox fx:id="bottomHbox" layoutX="10.0" layoutY="110.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: white;">
+                        <HBox fx:id="bottomHbox" alignment="CENTER" layoutX="10.0" layoutY="110.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: white;">
                            <effect>
                               <DropShadow color="#d3d3d3" />
                            </effect>
                            <VBox.margin>
                               <Insets top="20.0" />
                            </VBox.margin>
+                           <children>
+                              <Label fx:id="companyCopyright" alignment="CENTER" text="©IQWD 2021" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Roboto Medium" size="10.0" />
+                                 </font>
+                              </Label>
+                           </children>
                         </HBox>
                      </children>
                   </VBox>
                </children>
             </AnchorPane>
          </center>
+         <right>
+            <AnchorPane fx:id="searchPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <padding>
+                        <Insets left="20.0" right="20.0" top="20.0" />
+                     </padding>
+                     <effect>
+                        <DropShadow color="LIGHTGRAY" />
+                     </effect>
+                     <children>
+                        <Label alignment="CENTER" contentDisplay="CENTER" text="Item / Product Code" textAlignment="CENTER">
+                           <font>
+                              <Font name="Roboto" size="12.0" />
+                           </font>
+                        </Label>
+                        <JFXTextField fx:id="search" alignment="CENTER">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </JFXTextField>
+                        <Label text="Low stock Item/s">
+                           <VBox.margin>
+                              <Insets top="20.0" />
+                           </VBox.margin>
+                           <font>
+                              <Font name="Roboto" size="12.0" />
+                           </font>
+                        </Label>
+                        <JFXListView fx:id="lowStockList" prefHeight="100.0">
+                           <VBox.margin>
+                              <Insets bottom="20.0" />
+                           </VBox.margin>
+                        </JFXListView>
+                        <Label text="Out of stock item/s" />
+                        <JFXListView fx:id="outOfStockList" prefHeight="100.0">
+                           <VBox.margin>
+                              <Insets bottom="20.0" />
+                           </VBox.margin>
+                        </JFXListView>
+                     </children>
+                  </VBox>
+               </children>
+               <BorderPane.margin>
+                  <Insets bottom="20.0" right="20.0" top="20.0" />
+               </BorderPane.margin>
+            </AnchorPane>
+         </right>
       </BorderPane>
    </children>
 </AnchorPane>
