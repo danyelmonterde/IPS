@@ -32,7 +32,7 @@
                   </Pane>
                   <HBox layoutX="239.0" layoutY="1.0" prefHeight="43.0" prefWidth="640.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
                      <children>
-                        <JFXButton prefHeight="38.0" prefWidth="136.0" styleClass="menuItem" text="Dashboard">
+                        <JFXButton fx:id="dashboardIconMenu" onAction="#getDashboardModule" prefHeight="38.0" prefWidth="136.0" styleClass="menuItem" text="Dashboard">
                            <graphic>
                               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -41,7 +41,7 @@
                               </ImageView>
                            </graphic>
                         </JFXButton>
-                        <JFXButton prefHeight="38.0" prefWidth="136.0" styleClass="menuItem" text="ADD">
+                        <JFXButton fx:id="addItemMenu" onAction="#getItemsModule" prefHeight="38.0" prefWidth="136.0" styleClass="menuItem" text="ADD">
                            <graphic>
                               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -50,7 +50,7 @@
                               </ImageView>
                            </graphic>
                         </JFXButton>
-                        <JFXButton prefHeight="38.0" prefWidth="136.0" styleClass="menuItem" text="Report">
+                        <JFXButton fx:id="reportMenu" onAction="#getReportsModule" prefHeight="38.0" prefWidth="136.0" styleClass="menuItem" text="Report">
                            <graphic>
                               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -59,7 +59,7 @@
                               </ImageView>
                            </graphic>
                         </JFXButton>
-                        <JFXButton prefHeight="38.0" prefWidth="136.0" styleClass="menuItem" text="BackUp">
+                        <JFXButton fx:id="backupMenu" onAction="#getBackupModule" prefHeight="38.0" prefWidth="136.0" styleClass="menuItem" text="BackUp">
                            <graphic>
                               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -204,7 +204,7 @@
                               <Font name="Roboto Black" size="21.0" />
                            </font>
                         </Label>
-                        <HBox fx:id="topHbox" prefHeight="100.0" prefWidth="800.0" style="-fx-background-color: white;">
+                        <HBox fx:id="topHbox" alignment="CENTER" prefHeight="100.0" prefWidth="800.0" style="-fx-background-color: white;">
                            <effect>
                               <DropShadow color="#d3d3d3" />
                            </effect>
@@ -212,21 +212,33 @@
                               <Insets top="20.0" />
                            </VBox.margin>
                            <children>
-                              <ImageView fx:id="addItem" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#getInventoryModule" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Purchase-dashboard.jpg" />
-                                 </image>
-                              </ImageView>
-                              <ImageView fx:id="releaseItem" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#getReleaseItemModule" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Release-dashboard.jpg" />
-                                 </image>
-                              </ImageView>
-                              <ImageView fx:id="reports" fitHeight="150.0" fitWidth="200.0" onMouseClicked="#getReportsModule" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Reports-dashboard.jpg" />
-                                 </image>
-                              </ImageView>
+                              <JFXButton fx:id="addItem" contentDisplay="GRAPHIC_ONLY" onAction="#getItemsModule">
+                                 <graphic>
+                                    <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Purchase-dashboard.jpg" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </JFXButton>
+                              <JFXButton fx:id="releaseItem" contentDisplay="GRAPHIC_ONLY" onAction="#getReleaseItemModule">
+                                 <graphic>
+                                    <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Release-dashboard.jpg" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </JFXButton>
+                              <JFXButton fx:id="reports" contentDisplay="GRAPHIC_ONLY" onAction="#getReportsModule">
+                                 <graphic>
+                                    <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Main/Reports-dashboard.jpg" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </JFXButton>
                            </children>
                         </HBox>
                         <HBox fx:id="midHbox" alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: white;">

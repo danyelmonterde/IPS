@@ -4,10 +4,7 @@ import com.jfoenix.controls.*;
 import com.monterdev.constants.GlobalConfiguration;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
-import com.monterdev.util.AppTime;
-import com.monterdev.util.Prompt;
-import com.monterdev.util.SearchUtil;
-import com.monterdev.util.StageLoader;
+import com.monterdev.util.*;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,8 +28,6 @@ import org.springframework.util.ObjectUtils;
 
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -102,6 +97,15 @@ public class EditItemController {
     @FXML
     private ToggleGroup toggleGroup = new ToggleGroup();
 
+    @FXML
+    private JFXTextField supplierGroup;
+
+    @FXML
+    private JFXTextField receiptNumber;
+
+    @FXML
+    private JFXTextField purchaseOrderNumber;
+
     private VBox vBox;
 
     @Autowired
@@ -142,6 +146,12 @@ public class EditItemController {
     private PurchaseOrderRepository purchaseOrderRepository;
 
     @Autowired
+    private SupplierRepository supplierRepository;
+
+    @Autowired
+    private QrcodeRepository qrcodeRepository;
+
+    @Autowired
     private SearchUtil searchUtil;
 
     private List<Item> resultsList = new ArrayList<>();
@@ -177,6 +187,8 @@ public class EditItemController {
 
         subCategoryDetailOnChange();
 
+        purchaseCostOnChange();
+
         trackStockHbox.setVisible(false);
     }
 
@@ -195,7 +207,7 @@ public class EditItemController {
     }
 
 
-    public void create(ActionEvent actionEvent) {
+    public void create() {
         selectedItem = applicationContext.getBean(Item.class);
         EditItemAnchorpane = new AnchorPane();
 
@@ -215,7 +227,7 @@ public class EditItemController {
         botHbox.setAlignment(Pos.TOP_LEFT);
         botHbox.setSpacing(Double.parseDouble(getItemsTopHboxSpacing()));
 
-        new StageLoader().load(EditItemController.class, actionEvent, applicationContext);
+        new StageLoader().load(EditItemController.class, applicationContext);
     }
 
 
@@ -281,6 +293,19 @@ public class EditItemController {
         });
     }
 
+    private void purchaseCostOnChange(){
+        try{
+            purchaseCost.textProperty().addListener((observable,oldValue,newValue)->{
+                if(oldValue!=newValue){
+                    selectedItem.setCost(Double.parseDouble(newValue));
+                }
+            });
+        }catch (NumberFormatException numberFormatException){
+            purchaseCost.setText("0");
+        }
+
+    }
+
     private void setFields(String itemName) {
         Optional<Item> item = itemLists.stream().filter(e -> e.getItem_name().equalsIgnoreCase(itemName))
                 .findFirst();
@@ -297,14 +322,18 @@ public class EditItemController {
 
 
     private void quantityOnChange() {
-        quantity.textProperty().addListener((observable, oldvalue, newvalue) -> {
-            if (oldvalue != newvalue) {
-                selectedItem.setQuantity(Integer.parseInt(newvalue));
-            }
+        try{
+            quantity.textProperty().addListener((observable, oldvalue, newvalue) -> {
+                if (oldvalue != newvalue) {
+                    selectedItem.setQuantity(Integer.parseInt(newvalue));
+                }
 
-        });
+            });
+        }catch (NumberFormatException numberFormatException){
+            quantity.setText("0");
+        }
+
     }
-
 
     private void lowStockOnChange() {
         lowStock.textProperty().addListener((obs, old, newv) -> {
@@ -392,6 +421,9 @@ public class EditItemController {
         averageCost.setText("0");
         inStock.setText("0");
         sku.setText("0");
+        supplierGroup.setText("");
+        receiptNumber.setText("");
+        purchaseOrderNumber.setText("");
         subCategoryDetail.setValue(GlobalConfiguration.DEFAULT_CATEGORY_DATA);
     }
 
@@ -415,11 +447,11 @@ public class EditItemController {
     }
 
     public void save(ActionEvent actionEvent) {
-        boolean isExistingData = false;
+
         selectedItem.setTag(null);
         if(!sku.getText().equalsIgnoreCase("0")){
             //EXISTING ITEM
-            isExistingData = true;
+
             double realAverageCost = Double.parseDouble(averageCost.getText());
             double realPurchaseCost = Double.parseDouble(purchaseCost.getText());
             int realQuantity = Integer.parseInt(quantity.getText());
@@ -430,17 +462,28 @@ public class EditItemController {
             double finalAverageCost =  totalCost /totalQuantity;
             selectedItem.setCost(finalAverageCost);
             selectedItem.setIn_stock(realInstock+realQuantity);
+        }else{
+            selectedItem.setIn_stock(Integer.parseInt(quantity.getText()));
         }
         Item savedItem = itemsRepository.save(selectedItem);
         if (!ObjectUtils.isEmpty(savedItem)) {
 
-            if(!isExistingData){
                 PurchaseOrder purchaseOrder = setPurchaseOrder(savedItem);
                 purchaseOrderRepository.save(purchaseOrder);
-            }
+                SupplierGroup supplierGroup = setSupplierGroup(savedItem);
+                supplierRepository.save(supplierGroup);
+                Qrcode qrcode = setQrCodeData(savedItem);
+                qrcodeRepository.save(qrcode);
+
+                try{
+                    QrCodeUtil.saveQrCode( Integer.toString(savedItem.getSku()));
+                }catch (Exception ioException){
+
+                }
+
 
             Prompt.success("Data saved!");
-            selectedItem = new Item();
+            resetSelectedItem();
             Stage stage = (Stage) save.getScene().getWindow();
             stage.close();
         } else {
@@ -448,13 +491,34 @@ public class EditItemController {
         }
     }
 
+    private Qrcode setQrCodeData(Item savedItem) {
+        Qrcode qrcode = new Qrcode();
+        qrcode.setQrcodepath(QrCodeUtil.filePath + "\\" + savedItem.getSku()+".jpg");
+        qrcode.setSku(savedItem.getSku());
+        qrcode.setDatecreated(AppTime.now());
+        return qrcode;
+    }
+
+    private SupplierGroup setSupplierGroup(Item savedItem) {
+        SupplierGroup supplierdata= new SupplierGroup();
+        supplierdata.setSupplier(ObjectUtils.isEmpty(supplierGroup.getText())?"NONE":supplierGroup.getText());
+        supplierdata.setReceipt_number(ObjectUtils.isEmpty(receiptNumber.getText())?"NONE":receiptNumber.getText());
+        supplierdata.setPurchase_order_number(ObjectUtils.isEmpty(purchaseOrderNumber.getText())?"NONE":purchaseOrderNumber.getText());
+        return supplierdata;
+    }
+
+    private void createQrCode(Item item){
+
+    }
+
     private PurchaseOrder setPurchaseOrder(Item item){
         PurchaseOrder purchaseOrder = new PurchaseOrder();
         purchaseOrder.setDatecreated(AppTime.now());
-        purchaseOrder.setPurchase_cost(selectedItem.getCost());
-        purchaseOrder.setItem_name(selectedItem.getItem_name());
+        purchaseOrder.setPurchase_cost(Double.parseDouble(purchaseCost.getText()));
+        purchaseOrder.setItem_name(name.getText());
         purchaseOrder.setQuantity(Integer.parseInt(quantity.getText()));
         purchaseOrder.setSku(item.getSku());
+        purchaseOrder.setIn_stock(item.getIn_stock());
         purchaseOrder.setAmount(Integer.parseInt(quantity.getText()) * Double.parseDouble(purchaseCost.getText()));
         return  purchaseOrder;
     }

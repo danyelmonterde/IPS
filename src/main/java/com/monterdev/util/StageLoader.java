@@ -1,7 +1,5 @@
 package com.monterdev.util;
 
-import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -14,7 +12,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import static com.monterdev.constants.GlobalConfiguration.getWindowTitle;
 
 public class StageLoader {
-    double x,y = 0;
+    double x, y = 0;
 
     public void load(Class<?> t, MouseEvent event, ConfigurableApplicationContext applicationContext) {
         weave(t, applicationContext);
@@ -25,7 +23,8 @@ public class StageLoader {
         weave(t, applicationContext);
     }
 
-    public void load(Class<?> t, ActionEvent event, ConfigurableApplicationContext applicationContext) {
+    public void load(Class<?> t, ConfigurableApplicationContext applicationContext) {
+
         weave(t, applicationContext);
     }
 
@@ -37,7 +36,7 @@ public class StageLoader {
         weaveTest(t, applicationContext, primaryStage);
     }
 
-    private void weave(Class<?> t,Parent root) {
+    private void weave(Class<?> t, Parent root) {
         setStage(root);
     }
 
@@ -58,17 +57,17 @@ public class StageLoader {
         Parent root = fxWeaver.loadView(t);
     }
 
-    private void setStage(Parent root){
+    private void setStage(Parent root) {
         Scene scene = new Scene(root);
-    //    scene.getStylesheets().add(getClass().getResource("/fontstyle.css").toExternalForm());
+        //    scene.getStylesheets().add(getClass().getResource("/fontstyle.css").toExternalForm());
         Stage stage = new Stage();
-       // stage.setFullScreen(true);
+        // stage.setFullScreen(true);
         stage.setTitle(getWindowTitle());
         stage.setScene(scene);
         stage.show();
     }
 
-    private void TestStage(Parent root, Stage primaryStage){
+    private void TestStage(Parent root, Stage primaryStage) {
 
         primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.setFullScreen(true);

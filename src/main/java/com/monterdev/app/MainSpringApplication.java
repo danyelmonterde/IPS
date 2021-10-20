@@ -1,6 +1,7 @@
 package com.monterdev.app;
 
 import javafx.application.Application;
+import nu.pattern.OpenCV;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -15,6 +16,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class MainSpringApplication {
 
     public static void main(String[] args) {
+        OpenCV.loadShared();
         Application.launch(MainJavaFXApplication.class, args);
     }
 }

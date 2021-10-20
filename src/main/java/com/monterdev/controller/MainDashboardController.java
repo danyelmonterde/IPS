@@ -1,18 +1,24 @@
 package com.monterdev.controller;
 
+import com.google.zxing.NotFoundException;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXTextField;
 import com.monterdev.constants.GlobalConfiguration;
 import com.monterdev.model.Item;
+import com.monterdev.util.QrCodeUtil;
 import com.monterdev.util.StageLoader;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -20,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -85,6 +92,18 @@ public class MainDashboardController implements Initializable {
     @FXML
     private JFXButton sidebarLogout;
 
+    @FXML
+    private JFXButton dashboardIconMenu;
+
+    @FXML
+    private JFXButton addItemMenu;
+
+    @FXML
+    private JFXButton reportMenu;
+
+    @FXML
+    private JFXButton backupMenu;
+
     @Autowired
     private ItemListController itemListController;
 
@@ -96,6 +115,7 @@ public class MainDashboardController implements Initializable {
 
     @Autowired
     private Item selectedItem;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -129,7 +149,7 @@ public class MainDashboardController implements Initializable {
 
             sidebarAnchorpane.setTranslateX(0);
             mainAnchorpane.setTranslateX(0);
-            searchPane.setTranslateX(631);
+            searchPane.setTranslateX(0);
 
             slide.setOnFinished((ActionEvent e) -> {
                 Menu.setVisible(false);
@@ -156,7 +176,7 @@ public class MainDashboardController implements Initializable {
             slideMainAnchorpane.setToX(0);
             slideMainAnchorpane.play();
 
-            slideSearchPane.setToX(631);
+            slideSearchPane.setToX(0);
             slideSearchPane.play();
 
             sidebarAnchorpane.setTranslateX(-176);
@@ -184,9 +204,8 @@ public class MainDashboardController implements Initializable {
 
     }
 
-    public void getItemsModule(ActionEvent actionEvent) {
+    public void getItemsModule() {
         resetHboxes();
-        currentLocationBanner.setText("Add Item");
         selectedItem = applicationContext.getBean(Item.class);
         selectedItem.setTag(null);
         selectedItem.setItem_name("");
@@ -197,12 +216,54 @@ public class MainDashboardController implements Initializable {
         selectedItem.setCost(0.0);
         selectedItem.setIn_stock(0);
         selectedItem.setSub_category_detail(GlobalConfiguration.DEFAULT_CATEGORY_DATA);
-        editItemController.create(actionEvent);
+        editItemController.create();
+        currentLocationBanner.setText("Inventory");
+        topHbox.getChildren().addAll(itemListController.createItemList());
 
     }
 
     public void getDashboardModule(ActionEvent actionEvent) {
         resetHboxes();
+
+        ImageView addItem = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Purchase-dashboard.jpg", true));
+        ImageView releaseItem = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Release-dashboard.jpg", true));
+        ImageView reports = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Reports-dashboard.jpg", true));
+
+        JFXButton jfxBtnAddItem = new JFXButton();
+        JFXButton jfxBtnReleaseItem = new JFXButton();
+        JFXButton jfxBtnReports = new JFXButton();
+
+        jfxBtnAddItem.setGraphic(addItem);
+        jfxBtnReleaseItem.setGraphic(releaseItem);
+        jfxBtnReports.setGraphic(reports);
+
+        jfxBtnAddItem.setOnAction(e -> {
+            getItemsModule();
+        });
+
+        jfxBtnReleaseItem.setOnAction(f -> {
+            getReleaseItemModule();
+        });
+
+        jfxBtnReports.setOnAction(g -> {
+            getReportsModule(g);
+        });
+
+        Label companyName = new Label("INFANTA QUEZON WATER DISTRICT");
+        Label companyCopyright = new Label("©IQWD 2021");
+
+        companyName.setFont(Font.font("Roboto", FontWeight.LIGHT, 19.0));
+        companyCopyright.setFont(Font.font("Roboto", FontWeight.MEDIUM, 10.0));
+
+
+        topHbox.getChildren().addAll(jfxBtnAddItem, jfxBtnReleaseItem, jfxBtnReports);
+        midHbox.getChildren().addAll(companyName);
+        bottomHbox.getChildren().addAll(companyCopyright);
+
+
+        topHbox.setAlignment(Pos.CENTER);
+        midHbox.setAlignment(Pos.CENTER);
+        bottomHbox.setAlignment(Pos.CENTER);
         currentLocationBanner.setText("Dashboard");
     }
 
@@ -225,8 +286,23 @@ public class MainDashboardController implements Initializable {
     public void getLogoutModule(ActionEvent actionEvent) {
     }
 
-    public void getReleaseItemModule(MouseEvent event) {
+    public void getReleaseItemModule() {
         resetHboxes();
-        currentLocationBanner.setText("Release Item");
+        JFXTextField sku = new JFXTextField();
+        JFXButton openCamera = new JFXButton("Open Camera");
+        openCamera.setOnAction(e->{
+            new StageLoader().load(CaptureQrCodeController.class,applicationContext);
+        });
+        topHbox.getChildren().addAll(sku,openCamera);
+        try {
+            currentLocationBanner.setText(QrCodeUtil.readQrCodeImage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getBackupModule(ActionEvent actionEvent) {
     }
 }

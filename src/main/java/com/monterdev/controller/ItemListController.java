@@ -6,7 +6,6 @@ import com.jfoenix.controls.JFXTextField;
 import com.monterdev.constants.GlobalConfiguration;
 import com.monterdev.model.DeletedItems;
 import com.monterdev.model.Item;
-import com.monterdev.repository.ItemsRepository;
 import com.monterdev.util.StageLoader;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -153,7 +152,7 @@ public class ItemListController {
     }
 
     private void addItemFunction(JFXButton addItem) {
-        addItem.setOnAction(e->{
+        addItem.setOnAction(e -> {
             selectedItem = applicationContext.getBean(Item.class);
             selectedItem.setTag(null);
             selectedItem.setItem_name("");
@@ -164,7 +163,7 @@ public class ItemListController {
             selectedItem.setCost(0.0);
             selectedItem.setIn_stock(0);
             selectedItem.setSub_category_detail(GlobalConfiguration.DEFAULT_CATEGORY_DATA);
-            editItemController.create(e);
+            editItemController.create();
         });
     }
 

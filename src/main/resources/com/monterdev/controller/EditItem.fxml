@@ -159,19 +159,19 @@
                               <Insets top="20.0" />
                            </VBox.margin>
                         </Label>
-                        <JFXTextField promptText="(OPTIONAL)" />
+                        <JFXTextField fx:id="supplierGroup" promptText="(OPTIONAL)" />
                         <Label text="Receipt No.">
                            <VBox.margin>
                               <Insets top="20.0" />
                            </VBox.margin>
                         </Label>
-                        <JFXTextField promptText="(OPTIONAL)" />
+                        <JFXTextField fx:id="receiptNumber" promptText="(OPTIONAL)" />
                         <Label text="P.O#">
                            <VBox.margin>
                               <Insets top="20.0" />
                            </VBox.margin>
                         </Label>
-                        <JFXTextField promptText="(OPTIONAL)">
+                        <JFXTextField fx:id="purchaseOrderNumber" promptText="(OPTIONAL)">
                            <VBox.margin>
                               <Insets bottom="20.0" />
                            </VBox.margin>
