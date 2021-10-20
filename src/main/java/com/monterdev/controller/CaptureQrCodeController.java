@@ -2,6 +2,7 @@ package com.monterdev.controller;
 
 import com.google.zxing.NotFoundException;
 import com.jfoenix.controls.JFXButton;
+import com.monterdev.constants.GlobalConfiguration;
 import com.monterdev.model.Item;
 import com.monterdev.util.OpenCvUtils;
 import com.monterdev.util.QrCodeUtil;
@@ -21,10 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +57,7 @@ public class CaptureQrCodeController {
     // a flag to change the button behavior
     private boolean cameraActive = false;
     // the id of the camera to be used
-    private static int cameraId = 1;
+    private static int cameraId = 0;
 
 
     public void startCamera(ActionEvent actionEvent) {
@@ -172,12 +173,21 @@ public class CaptureQrCodeController {
         labelStatus.textProperty().addListener((observableValue, oldValue, newValue) -> {
 
         });
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
         try {
-            ImageIO.write(SwingFXUtils.fromFXImage(currentFrame.getImage(), null), "jpg", byteArrayOutputStream);
-            InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-            String sku = QrCodeUtil.readQRCodeFromInputStream(inputStream);
-            if(!sku.isEmpty()) {
+
+            Mat frame = grabFrame();
+            // convert and show the frame
+            Image imageToShow = OpenCvUtils.mat2Image(frame);
+            File outputFile = new File(GlobalConfiguration.CAPTURED_QR_CODE_DIRECTORY);
+            BufferedImage bImage = SwingFXUtils.fromFXImage(imageToShow, null);
+            try {
+                ImageIO.write(bImage, "png", outputFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            String sku = QrCodeUtil.readQRCodeFromInputStream(new FileInputStream(outputFile));
+            if (!sku.isEmpty()) {
                 labelStatus.setText("SUCCESS");
                 labelStatus.setTextFill(Paint.valueOf("GREEN"));
                 item.setSku(Integer.parseInt(sku));

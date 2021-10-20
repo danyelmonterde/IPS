@@ -29,6 +29,7 @@ public class GlobalConfiguration {
     private static final String windowTitle;
     private static final String defaultId;
     public static final String DEFAULT_CATEGORY_DATA = "TEST-CATEGORY-1"; //DON'T FORGET TO CHANGE ON PRODUCTION
+    public static final String CAPTURED_QR_CODE_DIRECTORY = "C:/Users/KAPE/Desktop/CapturedQrCodes/out.png";
 
     static {
         homePage = "HOME_PAGE";

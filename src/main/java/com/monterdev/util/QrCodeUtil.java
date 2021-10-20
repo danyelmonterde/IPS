@@ -15,7 +15,7 @@ import java.util.Map;
 public class QrCodeUtil {
 
 
-    public static String filePath = "C:\\Users\\Daniel\\Desktop\\GeneratedQrCodes";
+    public static String filePath = "C:\\Users\\KAPE\\Desktop\\GeneratedQrCodes";
 
     public static void saveQrCode(String sku) throws Exception {
         String charset = "UTF-8";
@@ -32,7 +32,7 @@ public class QrCodeUtil {
 
 
     public static String readQrCodeImage() throws IOException, NotFoundException {
-        String filePath = "C:\\Users\\Daniel\\Desktop\\IPS\\target\\classes\\qrcode2.jpg";
+        String filePath = "C:\\Users\\KAPE\\Desktop\\CapturedQrCodes\\frame2.jpg";
 
         // Encoding charset
         String charset = "UTF-8";
@@ -58,7 +58,7 @@ public class QrCodeUtil {
 
         Result result
                 = new MultiFormatReader().decode(binaryBitmap);
-
+        System.out.println(result.getText());
         return result.getText();
     }
 

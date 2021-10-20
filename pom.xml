@@ -156,7 +156,7 @@
             <artifactId>JFXButton</artifactId>
             <scope>system</scope>
             <version>1.0</version>
-            <systemPath>${basedir}/libs/jfoenix-8.0.7.jar</systemPath>
+            <systemPath>${basedir}/libs/jfoenix-8.0.10.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.google.zxing</groupId>
