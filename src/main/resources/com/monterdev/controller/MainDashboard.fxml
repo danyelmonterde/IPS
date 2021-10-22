@@ -204,6 +204,7 @@
                               <Font name="Roboto Black" size="21.0" />
                            </font>
                         </Label>
+                        <Label fx:id="sku" text="Label" visible="false" />
                         <HBox fx:id="topHbox" alignment="CENTER" prefHeight="100.0" prefWidth="800.0" style="-fx-background-color: white;">
                            <effect>
                               <DropShadow color="#d3d3d3" />
@@ -241,7 +242,7 @@
                               </JFXButton>
                            </children>
                         </HBox>
-                        <HBox fx:id="midHbox" alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: white;">
+                        <HBox fx:id="midHbox" alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="500.0" prefWidth="200.0" style="-fx-background-color: white;">
                            <effect>
                               <DropShadow color="#d3d3d3" />
                            </effect>

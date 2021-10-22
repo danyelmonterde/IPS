@@ -6,13 +6,20 @@ import com.monterdev.model.Item;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import static com.monterdev.constants.ItemsUIConfiguration.ITEMS_VBOX_CLASSES;
@@ -73,8 +80,45 @@ public class ComponentCreator {
         return jfxTextField;
     }
 
+    public static JFXTextField createTextField(String promptText, String paint){
+        JFXTextField textField = new JFXTextField();
+        textField.setLabelFloat(true);
+        textField.setPromptText(promptText);
+        textField.setUnFocusColor(Color.LIGHTGRAY);
+        return textField;
+    }
+
+    public static JFXButton createButtonWithoutText(String buttonType){
+        JFXButton jfxButton  = new JFXButton();
+        jfxButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        ImageView imageView = new ImageView();
+
+        if(buttonType.equalsIgnoreCase("EDIT")){
+            Image image = null;
+            try {
+                image = new Image(new FileInputStream(ItemsUIConfiguration.getEditButtonImage()));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            imageView.setImage(image);
+            imageView.setFitHeight(25.0);
+            imageView.setFitWidth(25.0);
+        }else if(buttonType.equalsIgnoreCase("DELETE")){
+            Image image = null;
+            try {
+                image = new Image(new FileInputStream(ItemsUIConfiguration.getDeleteButtonImage()));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            imageView.setImage(image);
+            imageView.setFitHeight(25.0);
+            imageView.setFitWidth(25.0);
+        }
+        jfxButton.setGraphic(imageView);
+        return jfxButton;
+    }
+
     public static JFXComboBox addCombobox(String function, List<String> values) {
-        ItemsUIConfiguration itemsUIConfiguration = new ItemsUIConfiguration();
         JFXComboBox comboBox = new JFXComboBox();
         values.stream().forEach(value -> {
             comboBox.getItems().add(value);
@@ -84,7 +128,6 @@ public class ComponentCreator {
     }
 
     public static JFXComboBox addComboboxWithPadding(String function) {
-        ItemsUIConfiguration itemsUIConfiguration = new ItemsUIConfiguration();
         JFXComboBox comboBox = new JFXComboBox();
         return comboBox;
     }

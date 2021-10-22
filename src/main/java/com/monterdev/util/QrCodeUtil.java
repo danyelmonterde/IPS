@@ -12,16 +12,19 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.monterdev.constants.GlobalConfiguration.generatedQrCodeDirectory;
+import static com.monterdev.constants.GlobalConfiguration.getConfigValue;
+
 public class QrCodeUtil {
 
 
-    public static String filePath = "C:\\Users\\KAPE\\Desktop\\GeneratedQrCodes";
+    public static String filePath = getConfigValue(generatedQrCodeDirectory);
 
-    public static void saveQrCode(String sku) throws Exception {
+    public static void saveQrCode(String itemName) throws Exception {
         String charset = "UTF-8";
         Map<EncodeHintType, ErrorCorrectionLevel> hashMap = new HashMap<EncodeHintType, ErrorCorrectionLevel>();
         hashMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
-        generateQRcode(sku, filePath+"\\"+sku+".jpg", charset, hashMap, 200, 200);
+        generateQRcode(itemName, filePath+"\\"+itemName+".jpg", charset, hashMap, 200, 200);
 
     }
 
@@ -32,7 +35,7 @@ public class QrCodeUtil {
 
 
     public static String readQrCodeImage() throws IOException, NotFoundException {
-        String filePath = "C:\\Users\\KAPE\\Desktop\\CapturedQrCodes\\frame2.jpg";
+        String filePath = getConfigValue(generatedQrCodeDirectory)+"/release-item.png";
 
         // Encoding charset
         String charset = "UTF-8";
@@ -58,7 +61,6 @@ public class QrCodeUtil {
 
         Result result
                 = new MultiFormatReader().decode(binaryBitmap);
-        System.out.println(result.getText());
         return result.getText();
     }
 
@@ -78,4 +80,5 @@ public class QrCodeUtil {
 
         return result.getText();
     }
+
 }

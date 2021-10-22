@@ -3,7 +3,6 @@ package com.monterdev.controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import com.monterdev.constants.GlobalConfiguration;
 import com.monterdev.model.DeletedItems;
 import com.monterdev.model.Item;
 import com.monterdev.util.StageLoader;
@@ -162,7 +161,7 @@ public class ItemListController {
             selectedItem.setMargin(0.0);
             selectedItem.setCost(0.0);
             selectedItem.setIn_stock(0);
-            selectedItem.setSub_category_detail(GlobalConfiguration.DEFAULT_CATEGORY_DATA);
+            selectedItem.setSub_category_detail(getConfigValue(defaultCategoryData));
             editItemController.create();
         });
     }

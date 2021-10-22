@@ -3,32 +3,49 @@ package com.monterdev.controller;
 import com.google.zxing.NotFoundException;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
-import com.monterdev.constants.GlobalConfiguration;
 import com.monterdev.model.Item;
-import com.monterdev.util.QrCodeUtil;
 import com.monterdev.util.StageLoader;
 import javafx.animation.TranslateTransition;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static com.monterdev.constants.GlobalConfiguration.defaultCategoryData;
+import static com.monterdev.constants.GlobalConfiguration.getConfigValue;
+import static com.monterdev.util.ComponentCreator.createButtonWithoutText;
+import static com.monterdev.util.ComponentCreator.createTextField;
+import static com.monterdev.util.QrCodeUtil.readQrCodeImage;
 
 @Component
 @FxmlView("MainDashboard.fxml")
@@ -104,6 +121,9 @@ public class MainDashboardController implements Initializable {
     @FXML
     private JFXButton backupMenu;
 
+    @FXML
+    private Label sku;
+
     @Autowired
     private ItemListController itemListController;
 
@@ -116,7 +136,21 @@ public class MainDashboardController implements Initializable {
     @Autowired
     private Item selectedItem;
 
+    @Autowired
+    @Qualifier("itemLists")
+    private List<Item> itemLists;
 
+    private ScheduledExecutorService timer;
+
+    private int rowIndex=0;
+
+    private int indexToBeRemoved=0;
+
+    private List<Item> itemCart = new ArrayList<>();
+
+    private boolean isEmpty = true;
+
+    @SneakyThrows
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
@@ -188,6 +222,101 @@ public class MainDashboardController implements Initializable {
                 MenuClose.setVisible(false);
             });
         });
+        sku.textProperty().addListener((obs,old,newv)->{
+            if(old!=newv){
+                ObservableList<Node> nodeStream = midHbox.getChildren();
+
+                for(Node node: nodeStream){
+                    if(node instanceof ScrollPane){
+                        Node node2 = ((ScrollPane) node).getContent();
+                        if(node2 instanceof AnchorPane){
+                            for (Node node3: ((AnchorPane) node2).getChildren()){
+                                if(node3 instanceof VBox){
+                                    VBox vBox = (VBox) node3;
+                                    HBox row = createRow(vBox,selectedItem,rowIndex);
+                                    VBox.setMargin(row,new Insets(20.0, 0.0, 0.0, 0.0));
+                                    vBox.getChildren().add(rowIndex, row);
+                                    rowIndex++;
+                                    itemCart.add(selectedItem);
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+
+        });
+        refreshReleaseItemsOnMouseHover();
+    }
+
+    private void refreshReleaseItemsOnMouseHover(){
+
+        mainAnchorpane.hoverProperty().addListener((observableValue, oldValue, newValue) -> {
+            if(newValue != oldValue && currentLocationBanner.getText().equalsIgnoreCase("RELEASE ITEMS") && !ObjectUtils.isEmpty(selectedItem.getItem_name())){
+
+                ObservableList<Node> nodeStreamTopHbox = topHbox.getChildren();
+                for(Node node: nodeStreamTopHbox){
+                    if(node instanceof JFXTextField){
+                        ((JFXTextField) node).setText(selectedItem.getItem_name());
+                        sku.setText(selectedItem.getItem_name());
+                    }
+                }
+
+            }
+        });
+    }
+
+    private HBox createRow(VBox vBox,Item item, int currentIndex) {
+
+        Item currentItem = new Item();
+        itemLists.stream().forEach(s ->{
+            if(s.getSku()==item.getSku()){
+                currentItem.setLow_stock(s.getLow_stock());
+                currentItem.setMargin(s.getMargin());
+                currentItem.setTag(s.getTag());
+                currentItem.setCost(s.getCost());
+                currentItem.setIn_stock(s.getIn_stock());
+                currentItem.setSku(s.getSku());
+                currentItem.setQuantity(s.getQuantity());
+                currentItem.setSub_category_detail(s.getSub_category_detail());
+                currentItem.setItem_name(s.getItem_name());
+            }
+        });
+
+        JFXTextField name = createTextField("ITEM NAME","LIGHT GRAY");
+        name.setText(currentItem.getItem_name());
+        JFXTextField quantity = createTextField("QUANTITY","LIGHT GRAY");
+        quantity.setText(String.valueOf(currentItem.getQuantity()));
+        JFXTextField cost = createTextField("COST","LIGHT GRAY");
+        cost.setText(String.valueOf(currentItem.getCost()));
+        JFXTextField amount = createTextField("AMOUNT","LIGHT GRAY");
+        amount.setText(String.valueOf(currentItem.getQuantity()*currentItem.getCost()));
+        JFXButton edit = createButtonWithoutText("EDIT");
+        JFXButton delete = createButtonWithoutText("DELETE");
+        delete.setId(Integer.toString(currentIndex));
+        deleteOnClick(vBox,delete);
+
+        HBox hBox = new HBox();
+        HBox.setMargin(name,new Insets(50.0, 0.0, 0.0, 20.0));
+        HBox.setMargin(quantity,new Insets(50.0, 0.0, 0.0, 20.0));
+        HBox.setMargin(cost,new Insets(50.0, 0.0, 0.0, 20.0));
+        HBox.setMargin(amount,new Insets(50.0, 0.0, 0.0, 20.0));
+        HBox.setMargin(edit,new Insets(35.0,0.0,0.0,20.0));
+        HBox.setMargin(delete,new Insets(35.0,0.0,0.0,20.0));
+        hBox.getChildren().addAll(name,quantity,cost,amount,edit,delete);
+
+
+        currentIndex++;
+        System.out.println("row created");
+        return hBox;
+    }
+
+    private void deleteOnClick(VBox vBox,JFXButton delete){
+        delete.setOnAction(e->{
+            System.out.println(delete.getId());
+            //vBox.getChildren().remove(delete.getId());
+        });
     }
 
     public void getReportsModule(ActionEvent actionEvent) {
@@ -200,6 +329,7 @@ public class MainDashboardController implements Initializable {
     private void resetHboxes() {
         topHbox.getChildren().clear();
         midHbox.getChildren().clear();
+        midHbox.setPrefHeight(100.0);
         bottomHbox.getChildren().clear();
 
     }
@@ -215,7 +345,7 @@ public class MainDashboardController implements Initializable {
         selectedItem.setMargin(0.0);
         selectedItem.setCost(0.0);
         selectedItem.setIn_stock(0);
-        selectedItem.setSub_category_detail(GlobalConfiguration.DEFAULT_CATEGORY_DATA);
+        selectedItem.setSub_category_detail(getConfigValue(defaultCategoryData));
         editItemController.create();
         currentLocationBanner.setText("Inventory");
         topHbox.getChildren().addAll(itemListController.createItemList());
@@ -288,20 +418,61 @@ public class MainDashboardController implements Initializable {
 
     public void getReleaseItemModule() {
         resetHboxes();
-        JFXTextField sku = new JFXTextField();
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setPrefHeight(500);
+        scrollPane.setPrefWidth(800);
+
+        AnchorPane anchorPane  = new AnchorPane();
+        anchorPane.setPrefWidth(800);
+        anchorPane.setPrefHeight(800);
+
+
+        VBox vbox = new VBox();
+
+        anchorPane.getChildren().add(vbox);
+        AnchorPane.setLeftAnchor(vbox,0.0);
+        AnchorPane.setRightAnchor(vbox,0.0);
+        AnchorPane.setTopAnchor(vbox, 0.0);
+        AnchorPane.setBottomAnchor(vbox,0.0);
+
+        scrollPane.setContent(anchorPane);
+
+
+        JFXTextField itemName = new JFXTextField();
+        itemNameOnChange(itemName);
         JFXButton openCamera = new JFXButton("Open Camera");
-        openCamera.setOnAction(e->{
-            new StageLoader().load(CaptureQrCodeController.class,applicationContext);
+
+        openCamera.setOnAction(e -> {
+           new StageLoader().load(CaptureQrCodeController.class, applicationContext);
         });
-        topHbox.getChildren().addAll(sku,openCamera);
+
+        topHbox.getChildren().addAll(itemName, openCamera);
+        midHbox.getChildren().addAll(scrollPane);
+        midHbox.setPrefHeight(500.0);
+        HBox.setMargin(scrollPane, new Insets(20.0, 0.0, 0.0, 20.0));
+
         try {
-            currentLocationBanner.setText(QrCodeUtil.readQrCodeImage());
+            currentLocationBanner.setText(readQrCodeImage());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (NotFoundException e) {
             e.printStackTrace();
         }
     }
+
+
+    private void itemNameOnChange(JFXTextField itemName){
+        itemName.textProperty().addListener((observable, oldValue, newValue)->{
+            if(selectedItem.getSku()!=0){
+                itemName.setText(newValue);
+            }
+        });
+    }
+
+
+
+
 
     public void getBackupModule(ActionEvent actionEvent) {
     }

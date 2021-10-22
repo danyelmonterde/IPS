@@ -424,7 +424,7 @@ public class EditItemController {
         supplierGroup.setText("");
         receiptNumber.setText("");
         purchaseOrderNumber.setText("");
-        subCategoryDetail.setValue(GlobalConfiguration.DEFAULT_CATEGORY_DATA);
+        subCategoryDetail.setValue(getConfigValue(defaultCategoryData));
     }
 
     private void resetSelectedItem() {
@@ -436,7 +436,7 @@ public class EditItemController {
         selectedItem.setMargin(0.0);
         selectedItem.setCost(0.0);
         selectedItem.setIn_stock(0);
-        selectedItem.setSub_category_detail(GlobalConfiguration.DEFAULT_CATEGORY_DATA);
+        selectedItem.setSub_category_detail(getConfigValue(defaultCategoryData));
     }
 
     public void cancel(ActionEvent actionEvent) {
@@ -493,7 +493,7 @@ public class EditItemController {
 
     private Qrcode setQrCodeData(Item savedItem) {
         Qrcode qrcode = new Qrcode();
-        qrcode.setQrcodepath(QrCodeUtil.filePath + "\\" + savedItem.getSku()+".jpg");
+        qrcode.setQrcodepath(QrCodeUtil.filePath + "\\" + savedItem.getItem_name()+".jpg");
         qrcode.setSku(savedItem.getSku());
         qrcode.setDatecreated(AppTime.now());
         return qrcode;

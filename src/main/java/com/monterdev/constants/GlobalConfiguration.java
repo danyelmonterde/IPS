@@ -28,8 +28,9 @@ public class GlobalConfiguration {
     private static final String apiUrl;
     private static final String windowTitle;
     private static final String defaultId;
-    public static final String DEFAULT_CATEGORY_DATA = "TEST-CATEGORY-1"; //DON'T FORGET TO CHANGE ON PRODUCTION
-    public static final String CAPTURED_QR_CODE_DIRECTORY = "C:/Users/KAPE/Desktop/CapturedQrCodes/out.png";
+    public static final String defaultCategoryData; //DON'T FORGET TO CHANGE ON PRODUCTION
+    public static final String capturedQrCodeDirectory; //DON'T FORGET TO CHANGE ON PRODUCTION
+    public static final String generatedQrCodeDirectory; //DON'T FORGET TO CHANGE ON PRODUCTION
 
     static {
         homePage = "HOME_PAGE";
@@ -37,6 +38,9 @@ public class GlobalConfiguration {
         apiUrl = "API_URL";
         defaultId = "DEFAULT_ID";
         windowTitle = "WINDOW_TITLE";
+        defaultCategoryData = "DEFAULT_CATEGORY_DATA";
+        capturedQrCodeDirectory = "CAPTURED_QR_CODE_DIRECTORY";
+        generatedQrCodeDirectory = "GENERATED_QR_CODE_DIRECTORY";
     }
 
 

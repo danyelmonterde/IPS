@@ -1,12 +1,23 @@
 {
   "customConfigurations": [
     {
-      "configId": "IQWD_INVENTORY_CONFIG_1",
-      "configValue": ""
+      "configId": "DEFAULT_CATEGORY_DATA",
+      "configValue": "TEST-CATEGORY-1"
     },
     {
-      "configId": "IQWD_INVENTORY_CONFIG_2",
-      "configValue": "IQWD"
+      "configId": "CAPTURED_QR_CODE_DIRECTORY",
+      "configValue": "C:/Users/B3AST/CapturedQrCode/out.png"
+    },
+    {
+      "configId": "GENERATED_QR_CODE_DIRECTORY",
+      "configValue": "C:/Users/B3AST/GeneratedQrCodes"
+    },
+    {
+      "configId": "EDIT_BUTTON",
+      "configValue": "C:/Users/B3AST/git/IPS/src/main/resources/config-ui/IQWD-APP-RESOURCES/Main/check.png"
+    },    {
+      "configId": "DELETE_BUTTON",
+      "configValue": "C:/Users/B3AST/git/IPS/src/main/resources/config-ui/IQWD-APP-RESOURCES/Main/trash.png"
     }
   ]
 }

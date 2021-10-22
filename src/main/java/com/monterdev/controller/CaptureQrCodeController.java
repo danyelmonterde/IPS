@@ -2,10 +2,10 @@ package com.monterdev.controller;
 
 import com.google.zxing.NotFoundException;
 import com.jfoenix.controls.JFXButton;
-import com.monterdev.constants.GlobalConfiguration;
 import com.monterdev.model.Item;
 import com.monterdev.util.OpenCvUtils;
 import com.monterdev.util.QrCodeUtil;
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,18 +17,25 @@ import javafx.stage.Stage;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.opencv.core.Mat;
+import org.opencv.objdetect.QRCodeDetector;
 import org.opencv.videoio.VideoCapture;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static com.monterdev.constants.GlobalConfiguration.capturedQrCodeDirectory;
+import static com.monterdev.constants.GlobalConfiguration.getConfigValue;
 
 @Component
 @FxmlView("CaptureQrCode.fxml")
@@ -59,23 +66,47 @@ public class CaptureQrCodeController {
     // the id of the camera to be used
     private static int cameraId = 0;
 
+    public void initialize() {
+
+        startCamera(null);
+    }
+
 
     public void startCamera(ActionEvent actionEvent) {
+
         if (!this.cameraActive) {
             // start the video capture
             this.capture.open(cameraId);
 
             // is the video stream available?
             if (this.capture.isOpened()) {
-                this.cameraActive = true;
+                // this.cameraActive = true;
 
                 // grab a frame every 33 ms (30 frames/sec)
                 Runnable frameGrabber = new Runnable() {
 
                     @Override
                     public void run() {
+
                         // effectively grab and process a single frame
                         Mat frame = grabFrame();
+
+                        QRCodeDetector decoder = new QRCodeDetector();
+                        Mat points = new Mat();
+                        String sku = decoder.detectAndDecode(frame, points);
+                        if (!ObjectUtils.isEmpty(sku)) {
+
+                            Platform.runLater(() -> {
+                                item.setSku(Integer.parseInt(sku));
+                                item.setItem_name(sku);
+                                Stage stage = (Stage) openCamera.getScene().getWindow();
+                                stage.close();
+                            });
+
+                            return;
+
+                        }
+
                         // convert and show the frame
                         Image imageToShow = OpenCvUtils.mat2Image(frame);
                         updateImageView(currentFrame, imageToShow);
@@ -177,9 +208,13 @@ public class CaptureQrCodeController {
         try {
 
             Mat frame = grabFrame();
-            // convert and show the frame
+
+            QRCodeDetector decoder = new QRCodeDetector();
+            Mat points = new Mat();
+            String data = decoder.detectAndDecode(frame, points);
+            System.out.println(data);
             Image imageToShow = OpenCvUtils.mat2Image(frame);
-            File outputFile = new File(GlobalConfiguration.CAPTURED_QR_CODE_DIRECTORY);
+            File outputFile = new File(getConfigValue(capturedQrCodeDirectory));
             BufferedImage bImage = SwingFXUtils.fromFXImage(imageToShow, null);
             try {
                 ImageIO.write(bImage, "png", outputFile);

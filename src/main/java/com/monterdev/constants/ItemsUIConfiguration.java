@@ -37,6 +37,8 @@ public class ItemsUIConfiguration extends GlobalConfiguration {
     public static final String ITEMS_STOCK_ALERTS;
     public static final String ITEMS_SETTINGS_CONTEXT_MENU;
     public static final String ITEMS_ROWS_PER_PAGE;
+    public static final String EDIT_BUTTON;
+    public static final String DELETE_BUTTON;
 
 
     static {
@@ -62,7 +64,8 @@ public class ItemsUIConfiguration extends GlobalConfiguration {
         ITEMS_STOCK_ALERTS="ITEMS_STOCK_ALERTS";
         ITEMS_SETTINGS_CONTEXT_MENU="ITEMS_SETTINGS_CONTEXT_MENU";
         ITEMS_ROWS_PER_PAGE="ITEMS_ROWS_PER_PAGE";
-
+        DELETE_BUTTON="DELETE_BUTTON";
+        EDIT_BUTTON="EDIT_BUTTON";
     }
 
     //Custom getters/////////////////////////////////////
@@ -106,6 +109,8 @@ public class ItemsUIConfiguration extends GlobalConfiguration {
     public static String getItemsSettingsContextMenu() {return  getConfigValue(ITEMS_SETTINGS_CONTEXT_MENU);}
     public static String getItemsRowsPerPage() {return  getConfigValue(ITEMS_ROWS_PER_PAGE);}
     public static String getItemsStockAlerts() {return  getConfigValue(ITEMS_STOCK_ALERTS);}
+    public static String getEditButtonImage(){ return getConfigValue(EDIT_BUTTON);}
+    public static String getDeleteButtonImage(){ return getConfigValue(DELETE_BUTTON);}
 
     //////////////////////////////////
     public String getButtonName(String function) {
