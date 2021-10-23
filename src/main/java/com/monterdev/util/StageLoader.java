@@ -38,18 +38,21 @@ public class StageLoader {
 
     private void weave(Class<?> t, Parent root) {
         setStage(root);
+        System.gc();
     }
 
     private void weave(Class<?> t, ConfigurableApplicationContext applicationContext) {
         FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
         Parent root = fxWeaver.loadView(t);
         setStage(root);
+        System.gc();
     }
 
     private void weaveTest(Class<?> t, ConfigurableApplicationContext applicationContext, Stage primaryStage) {
         FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
         Parent root = fxWeaver.loadView(t);
         TestStage(root, primaryStage);
+        System.gc();
     }
 
     public void weaveInitially(Class<?> t, ConfigurableApplicationContext applicationContext) {
@@ -64,7 +67,15 @@ public class StageLoader {
         // stage.setFullScreen(true);
         stage.setTitle(getWindowTitle());
         stage.setScene(scene);
+        stage.initStyle(StageStyle.UNDECORATED);
         stage.show();
+
+        stage.setOnCloseRequest(windowEvent -> {
+            System.gc();
+            System.out.println("Window is closing..");
+            System.exit(-176);
+        });
+
     }
 
     private void TestStage(Parent root, Stage primaryStage) {
@@ -84,6 +95,11 @@ public class StageLoader {
 
         primaryStage.setScene(new Scene(root, 700, 400));
         primaryStage.show();
+        primaryStage.setOnCloseRequest(windowEvent -> {
+            System.out.println("Windows closing");
+            System.exit(-176);
+        });
+
     }
 
 }

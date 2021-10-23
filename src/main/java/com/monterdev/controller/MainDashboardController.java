@@ -4,6 +4,8 @@ import com.google.zxing.NotFoundException;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import com.monterdev.model.Item;
+import com.monterdev.repository.ItemsRepository;
+import com.monterdev.util.Prompt;
 import com.monterdev.util.StageLoader;
 import javafx.animation.TranslateTransition;
 import javafx.collections.ObservableList;
@@ -20,9 +22,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -39,7 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.monterdev.constants.GlobalConfiguration.defaultCategoryData;
 import static com.monterdev.constants.GlobalConfiguration.getConfigValue;
@@ -140,15 +141,20 @@ public class MainDashboardController implements Initializable {
     @Qualifier("itemLists")
     private List<Item> itemLists;
 
-    private ScheduledExecutorService timer;
+    @Autowired
+    private ItemsRepository itemsRepository;
 
-    private int rowIndex=0;
+    private static int rowIndex = 0;
 
-    private int indexToBeRemoved=0;
+    private int indexToBeRemoved = 0;
 
     private List<Item> itemCart = new ArrayList<>();
 
     private boolean isEmpty = true;
+
+    private TranslateTransition slide = new TranslateTransition();
+    private TranslateTransition slideMainAnchorpane = new TranslateTransition();
+    private TranslateTransition slideSearchPane = new TranslateTransition();
 
     @SneakyThrows
     @Override
@@ -161,9 +167,6 @@ public class MainDashboardController implements Initializable {
         mainAnchorpane.setTranslateX(0);
         searchPane.setTranslateX(0);
         Menu.setOnMouseClicked(event -> {
-            TranslateTransition slide = new TranslateTransition();
-            TranslateTransition slideMainAnchorpane = new TranslateTransition();
-            TranslateTransition slideSearchPane = new TranslateTransition();
 
             slide.setDuration(Duration.seconds(0.4));
             slideMainAnchorpane.setDuration(Duration.seconds(0.4));
@@ -189,18 +192,19 @@ public class MainDashboardController implements Initializable {
                 Menu.setVisible(false);
                 MenuClose.setVisible(true);
             });
+
         });
 
         MenuClose.setOnMouseClicked(event -> {
-            TranslateTransition slide = new TranslateTransition();
+          //  TranslateTransition slide = new TranslateTransition();
             slide.setDuration(Duration.seconds(0.4));
             slide.setNode(sidebarAnchorpane);
 
-            TranslateTransition slideMainAnchorpane = new TranslateTransition();
+           // TranslateTransition slideMainAnchorpane = new TranslateTransition();
             slideMainAnchorpane.setDuration(Duration.seconds(0.4));
             slideMainAnchorpane.setNode(mainAnchorpane);
 
-            TranslateTransition slideSearchPane = new TranslateTransition();
+          //  TranslateTransition slideSearchPane = new TranslateTransition();
             slideSearchPane.setDuration(Duration.seconds(0.4));
             slideSearchPane.setNode(searchPane);
 
@@ -217,107 +221,150 @@ public class MainDashboardController implements Initializable {
             mainAnchorpane.setTranslateX(-176);
             searchPane.setTranslateX(-176);
 
+
+
             slide.setOnFinished((ActionEvent e) -> {
                 Menu.setVisible(true);
                 MenuClose.setVisible(false);
             });
+
+
         });
-        sku.textProperty().addListener((obs,old,newv)->{
-            if(old!=newv){
+        sku.textProperty().addListener((obs, oldValue, newValue) -> {
+            if (oldValue != newValue && !ObjectUtils.isEmpty(sku.getText())) {
+
                 ObservableList<Node> nodeStream = midHbox.getChildren();
 
-                for(Node node: nodeStream){
-                    if(node instanceof ScrollPane){
+                for (Node node : nodeStream) {
+                    if (node instanceof ScrollPane) {
                         Node node2 = ((ScrollPane) node).getContent();
-                        if(node2 instanceof AnchorPane){
-                            for (Node node3: ((AnchorPane) node2).getChildren()){
-                                if(node3 instanceof VBox){
+                        if (node2 instanceof AnchorPane) {
+                            for (Node node3 : ((AnchorPane) node2).getChildren()) {
+                                if (node3 instanceof VBox) {
                                     VBox vBox = (VBox) node3;
-                                    HBox row = createRow(vBox,selectedItem,rowIndex);
-                                    VBox.setMargin(row,new Insets(20.0, 0.0, 0.0, 0.0));
-                                    vBox.getChildren().add(rowIndex, row);
-                                    rowIndex++;
-                                    itemCart.add(selectedItem);
+                                    HBox row = createRow(vBox, selectedItem, rowIndex-1);
+                                    row.setId(String.valueOf(rowIndex-1));
+                                    VBox.setMargin(row, new Insets(20.0, 0.0, 0.0, 0.0));
+                                    vBox.getChildren().add(rowIndex-1, row);
+
                                 }
                             }
                         }
 
                     }
                 }
+
             }
 
         });
         refreshReleaseItemsOnMouseHover();
     }
 
-    private void refreshReleaseItemsOnMouseHover(){
+    private void refreshReleaseItemsOnMouseHover() {
 
         mainAnchorpane.hoverProperty().addListener((observableValue, oldValue, newValue) -> {
-            if(newValue != oldValue && currentLocationBanner.getText().equalsIgnoreCase("RELEASE ITEMS") && !ObjectUtils.isEmpty(selectedItem.getItem_name())){
-
-                ObservableList<Node> nodeStreamTopHbox = topHbox.getChildren();
-                for(Node node: nodeStreamTopHbox){
-                    if(node instanceof JFXTextField){
-                        ((JFXTextField) node).setText(selectedItem.getItem_name());
-                        sku.setText(selectedItem.getItem_name());
-                    }
-                }
+            Iterable<Item> initialItemList = itemsRepository.findAll();
+            itemLists = new ArrayList<>();
+            initialItemList.forEach(itemLists::add);
+            if (newValue != oldValue && currentLocationBanner.getText().equalsIgnoreCase("RELEASE ITEMS") && !ObjectUtils.isEmpty(selectedItem.getItem_name())) {
+                refresher();
 
             }
         });
     }
 
-    private HBox createRow(VBox vBox,Item item, int currentIndex) {
+    private void refresher() {
+        ObservableList<Node> nodeStreamTopHbox = topHbox.getChildren();
+        for (Node node : nodeStreamTopHbox) {
+            if (node instanceof JFXTextField) {
+                ((JFXTextField) node).setText(String.valueOf(selectedItem.getSku()));
+                sku.setText(String.valueOf(selectedItem.getSku()));
+            }
+        }
+    }
 
+    private HBox createRow(VBox vBox, Item item, int currentIndex) {
         Item currentItem = new Item();
-        itemLists.stream().forEach(s ->{
-            if(s.getSku()==item.getSku()){
+        itemLists.stream().forEach(s -> {
+            if (s.getSku() == item.getSku()) {
                 currentItem.setLow_stock(s.getLow_stock());
                 currentItem.setMargin(s.getMargin());
-                currentItem.setTag(s.getTag());
+                currentItem.setTag(null);
                 currentItem.setCost(s.getCost());
                 currentItem.setIn_stock(s.getIn_stock());
                 currentItem.setSku(s.getSku());
-                currentItem.setQuantity(s.getQuantity());
+                currentItem.setQuantity(0);
                 currentItem.setSub_category_detail(s.getSub_category_detail());
                 currentItem.setItem_name(s.getItem_name());
             }
         });
 
-        JFXTextField name = createTextField("ITEM NAME","LIGHT GRAY");
+        itemCart.add(currentItem);
+
+        JFXTextField name = createTextField("ITEM NAME", "LIGHT GRAY");
         name.setText(currentItem.getItem_name());
-        JFXTextField quantity = createTextField("QUANTITY","LIGHT GRAY");
+        name.setId(String.valueOf(currentIndex));
+        name.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                itemCart.get(Integer.parseInt(name.getId())).setItem_name(newValue);
+            }
+        });
+
+        JFXTextField quantity = createTextField("QUANTITY", "LIGHT GRAY");
         quantity.setText(String.valueOf(currentItem.getQuantity()));
-        JFXTextField cost = createTextField("COST","LIGHT GRAY");
+        quantity.setId(String.valueOf(currentIndex));
+        quantity.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                itemCart.get(Integer.parseInt(quantity.getId())).setQuantity(Integer.parseInt(newValue));
+            }
+        });
+
+        JFXTextField cost = createTextField("COST", "LIGHT GRAY");
         cost.setText(String.valueOf(currentItem.getCost()));
-        JFXTextField amount = createTextField("AMOUNT","LIGHT GRAY");
-        amount.setText(String.valueOf(currentItem.getQuantity()*currentItem.getCost()));
+        cost.setId(String.valueOf(currentIndex));
+        cost.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                itemCart.get(Integer.parseInt(cost.getId())).setCost(Double.parseDouble(newValue));
+            }
+        });
+
+        JFXTextField amount = createTextField("AMOUNT", "LIGHT GRAY");
+        amount.setText(String.valueOf(currentItem.getQuantity() * currentItem.getCost()));
+        amount.setEditable(false);
+
         JFXButton edit = createButtonWithoutText("EDIT");
         JFXButton delete = createButtonWithoutText("DELETE");
         delete.setId(Integer.toString(currentIndex));
-        deleteOnClick(vBox,delete);
+        delete.setOnAction(del -> {
+
+            vBox.getChildren().remove(delete.getParent());
+            itemCart.remove(Integer.parseInt(delete.getId()));
+            selectedItem.setItem_name("");
+            sku.setText("");
+            selectedItem.setSku(0);
+            if(vBox.getChildren().size()==0){
+                rowIndex =1;
+                refresher();
+            }else{
+                rowIndex--;
+            }
+        });
 
         HBox hBox = new HBox();
-        HBox.setMargin(name,new Insets(50.0, 0.0, 0.0, 20.0));
-        HBox.setMargin(quantity,new Insets(50.0, 0.0, 0.0, 20.0));
-        HBox.setMargin(cost,new Insets(50.0, 0.0, 0.0, 20.0));
-        HBox.setMargin(amount,new Insets(50.0, 0.0, 0.0, 20.0));
-        HBox.setMargin(edit,new Insets(35.0,0.0,0.0,20.0));
-        HBox.setMargin(delete,new Insets(35.0,0.0,0.0,20.0));
-        hBox.getChildren().addAll(name,quantity,cost,amount,edit,delete);
+        HBox.setMargin(name, new Insets(50.0, 0.0, 0.0, 20.0));
+        HBox.setMargin(quantity, new Insets(50.0, 0.0, 0.0, 20.0));
+        HBox.setMargin(cost, new Insets(50.0, 0.0, 0.0, 20.0));
+        HBox.setMargin(amount, new Insets(50.0, 0.0, 0.0, 20.0));
+        HBox.setMargin(edit, new Insets(35.0, 0.0, 0.0, 20.0));
+        HBox.setMargin(delete, new Insets(35.0, 0.0, 0.0, 20.0));
+        hBox.getChildren().addAll(name, quantity, cost, amount, edit, delete);
 
 
-        currentIndex++;
-        System.out.println("row created");
         return hBox;
+
     }
 
-    private void deleteOnClick(VBox vBox,JFXButton delete){
-        delete.setOnAction(e->{
-            System.out.println(delete.getId());
-            //vBox.getChildren().remove(delete.getId());
-        });
-    }
+
 
     public void getReportsModule(ActionEvent actionEvent) {
         resetHboxes();
@@ -423,7 +470,7 @@ public class MainDashboardController implements Initializable {
         scrollPane.setPrefHeight(500);
         scrollPane.setPrefWidth(800);
 
-        AnchorPane anchorPane  = new AnchorPane();
+        AnchorPane anchorPane = new AnchorPane();
         anchorPane.setPrefWidth(800);
         anchorPane.setPrefHeight(800);
 
@@ -431,25 +478,48 @@ public class MainDashboardController implements Initializable {
         VBox vbox = new VBox();
 
         anchorPane.getChildren().add(vbox);
-        AnchorPane.setLeftAnchor(vbox,0.0);
-        AnchorPane.setRightAnchor(vbox,0.0);
+        AnchorPane.setLeftAnchor(vbox, 0.0);
+        AnchorPane.setRightAnchor(vbox, 0.0);
         AnchorPane.setTopAnchor(vbox, 0.0);
-        AnchorPane.setBottomAnchor(vbox,0.0);
+        AnchorPane.setBottomAnchor(vbox, 0.0);
 
         scrollPane.setContent(anchorPane);
 
 
         JFXTextField itemName = new JFXTextField();
-        itemNameOnChange(itemName);
+        itemName.textProperty().addListener((observableValue, oldValue, newValue)->{
+            if(oldValue!=newValue){
+                boolean isPresent = itemLists.stream().filter(e -> e.getSku() == Integer.parseInt(newValue)).findFirst().isPresent();
+                if(isPresent) {
+                    rowIndex++;
+                    refresher();
+                }
+            }
+        });
+
         JFXButton openCamera = new JFXButton("Open Camera");
 
         openCamera.setOnAction(e -> {
-           new StageLoader().load(CaptureQrCodeController.class, applicationContext);
+            new StageLoader().load(CaptureQrCodeController.class, applicationContext);
         });
 
         topHbox.getChildren().addAll(itemName, openCamera);
         midHbox.getChildren().addAll(scrollPane);
         midHbox.setPrefHeight(500.0);
+
+        JFXButton releaseItem = new JFXButton("RELEASE ITEM");
+        JFXButton cancelButton = new JFXButton("CANCEL");
+
+        releaseItem.setOnAction(x -> {
+            releaseItemsOnCart();
+        });
+
+        cancelButton.setOnAction(v -> {
+            cancelTransaction();
+        });
+
+        bottomHbox.getChildren().addAll(releaseItem, cancelButton);
+
         HBox.setMargin(scrollPane, new Insets(20.0, 0.0, 0.0, 20.0));
 
         try {
@@ -461,17 +531,30 @@ public class MainDashboardController implements Initializable {
         }
     }
 
-
-    private void itemNameOnChange(JFXTextField itemName){
-        itemName.textProperty().addListener((observable, oldValue, newValue)->{
-            if(selectedItem.getSku()!=0){
-                itemName.setText(newValue);
-            }
-        });
+    private void cancelTransaction() {
+        getDashboardModule(null);
     }
 
+    private void releaseItemsOnCart() {
+        itemCart.stream().forEach(item -> {
+            System.out.println("SKU: "+ item.getSku());
+            System.out.println("Item name: "+item.getItem_name());
+            System.out.println("Quantity: "+item.getQuantity());
+            System.out.println("Cost: "+item.getCost());
+            System.out.println("In Stock: "+item.getIn_stock());
+            System.out.println("- - - - - - - - - - - - - - - - - - - - ");
+            System.out.println("\n");
 
-
+            int inStock = item.getIn_stock() - item.getQuantity();
+            item.setQuantity(inStock);
+            item.setIn_stock(inStock);
+        });
+        if(!ObjectUtils.isEmpty(itemsRepository.saveAll(itemCart))){
+            Prompt.success("Item released!");
+        }else{
+            Prompt.failed("An error occured while saving!");
+        }
+    }
 
 
     public void getBackupModule(ActionEvent actionEvent) {

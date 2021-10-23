@@ -24,11 +24,6 @@
                <Font size="14.0" />
             </font>
          </JFXButton>
-         <JFXButton fx:id="captor" buttonType="RAISED" onAction="#captureImage" text="Capture">
-            <font>
-               <Font size="14.0" />
-            </font>
-         </JFXButton>
       </HBox>
    </bottom>
    <center>

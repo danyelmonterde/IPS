@@ -43,11 +43,9 @@ public class ItemListController {
 
     private static int row = 1;
 
-    private static TableView<Item> tableView = new TableView<>();
+    private  TableView<Item> tableView = new TableView<>();
 
-    private static ObservableList<Item> itemObservableList;
-
-    private StringProperty OF_VALUE = new SimpleStringProperty();
+    private  ObservableList<Item> itemObservableList;
 
     private static int maxSku = 0;
 
@@ -297,7 +295,7 @@ public class ItemListController {
     }
 
     private void createTableView() {
-        String centerAlignment = "-fx-alignment: CENTER;";
+        String centerAlignment = "-fx-alignment: CENTER;".intern();
         this.tableView = new TableView<Item>();
         this.tableView.setPrefHeight(275);
         this.tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -460,7 +458,7 @@ public class ItemListController {
     }
 
 
-    private static List<String> fillStockAlert() {
+    private List<String> fillStockAlert() {
         List<String> stockAlerts = stockAlerts();
         return stockAlerts;
     }

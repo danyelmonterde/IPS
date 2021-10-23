@@ -16,6 +16,9 @@ import org.springframework.context.annotation.Scope;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class OnloadConfig {
@@ -53,12 +56,14 @@ public class OnloadConfig {
         return subCategoryDetailsRepository.findAll();
     }
 
+
+    private ScheduledExecutorService timer;
+
     @Bean
     @Qualifier("itemLists")
     public List<Item> itemLists(){
-        List<Item> itemLists = new ArrayList<>();
         Iterable<Item> initialItemList = itemsRepository.findAll();
-        itemLists.clear();
+        List<Item> itemLists = new ArrayList<>();
         initialItemList.forEach(itemLists::add);
         return itemLists;
     }

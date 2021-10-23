@@ -46,9 +46,6 @@ public class CaptureQrCodeController {
     private JFXButton openCamera;
 
     @FXML
-    private JFXButton captor;
-
-    @FXML
     private ImageView currentFrame;
 
     @Autowired
@@ -67,7 +64,11 @@ public class CaptureQrCodeController {
     private static int cameraId = 0;
 
     public void initialize() {
+        labelStatus.textProperty().addListener((observable,oldValue,newValue)->{
+            if(oldValue!=newValue){
 
+            }
+        });
         startCamera(null);
     }
 
@@ -93,40 +94,59 @@ public class CaptureQrCodeController {
 
                         QRCodeDetector decoder = new QRCodeDetector();
                         Mat points = new Mat();
-                        String sku = decoder.detectAndDecode(frame, points);
+                        Image imageToShow =null;
+                        String sku = decoder.detectAndDecode(frame, points).intern();
                         if (!ObjectUtils.isEmpty(sku)) {
+                            imageToShow = OpenCvUtils.mat2Image(frame);
+                            updateImageView(currentFrame, imageToShow);
+                            stopAcquisition();
+                            points = null;
+                            decoder = null;
+                            frame = null;
 
                             Platform.runLater(() -> {
+
+                                labelStatus.setText(sku);
                                 item.setSku(Integer.parseInt(sku));
                                 item.setItem_name(sku);
+                                System.gc();
                                 Stage stage = (Stage) openCamera.getScene().getWindow();
                                 stage.close();
+
                             });
 
                             return;
 
+                        }else{
+                            points = null;
+                            decoder = null;
+                            frame = null;
+                            Platform.runLater(()->{
+                                labelStatus.setText("Retry");
+                            });
+
                         }
 
                         // convert and show the frame
-                        Image imageToShow = OpenCvUtils.mat2Image(frame);
-                        updateImageView(currentFrame, imageToShow);
+
+
                     }
                 };
 
                 this.timer = Executors.newSingleThreadScheduledExecutor();
-                this.timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
+                this.timer.scheduleAtFixedRate(frameGrabber, 0, 1, TimeUnit.SECONDS);
 
                 // update the button content
-                this.openCamera.setText("Stop Camera");
+               // this.openCamera.setText("Stop Camera");
             } else {
                 // log the error
                 System.err.println("Impossible to open the camera connection...");
             }
         } else {
             // the camera is not active at this point
-            this.cameraActive = false;
+       //     this.cameraActive = false;
             // update again the button content
-            this.openCamera.setText("Start Camera");
+         //   this.openCamera.setText("Start Camera");
 
             // stop the timer
             this.stopAcquisition();
@@ -148,13 +168,9 @@ public class CaptureQrCodeController {
                 // read the current frame
                 this.capture.read(frame);
 
-                // if the frame is not empty, process it
-                if (!frame.empty()) {
-                    //Imgproc.cvtColor(frame, frame, Imgproc.);
-                }
 
             } catch (Exception e) {
-                // log the error
+
                 System.err.println("Exception during the image elaboration: " + e);
             }
         }
@@ -180,6 +196,7 @@ public class CaptureQrCodeController {
         if (this.capture.isOpened()) {
             // release the camera
             this.capture.release();
+
         }
     }
 
@@ -200,40 +217,4 @@ public class CaptureQrCodeController {
         this.stopAcquisition();
     }
 
-    public void captureImage(ActionEvent actionEvent) {
-        labelStatus.textProperty().addListener((observableValue, oldValue, newValue) -> {
-
-        });
-
-        try {
-
-            Mat frame = grabFrame();
-
-            QRCodeDetector decoder = new QRCodeDetector();
-            Mat points = new Mat();
-            String data = decoder.detectAndDecode(frame, points);
-            System.out.println(data);
-            Image imageToShow = OpenCvUtils.mat2Image(frame);
-            File outputFile = new File(getConfigValue(capturedQrCodeDirectory));
-            BufferedImage bImage = SwingFXUtils.fromFXImage(imageToShow, null);
-            try {
-                ImageIO.write(bImage, "png", outputFile);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            String sku = QrCodeUtil.readQRCodeFromInputStream(new FileInputStream(outputFile));
-            if (!sku.isEmpty()) {
-                labelStatus.setText("SUCCESS");
-                labelStatus.setTextFill(Paint.valueOf("GREEN"));
-                item.setSku(Integer.parseInt(sku));
-                Thread.sleep(2000);
-                Stage stage = (Stage) openCamera.getScene().getWindow();
-                stage.close();
-            }
-
-        } catch (IOException | NotFoundException | InterruptedException notFoundException) {
-            labelStatus.setText("RETRY");
-            labelStatus.setTextFill(Paint.valueOf("RED"));
-        }
-    }
 }
