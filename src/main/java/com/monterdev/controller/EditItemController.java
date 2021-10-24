@@ -446,48 +446,50 @@ public class EditItemController {
     }
 
     public void save(ActionEvent actionEvent) {
+        if(!ObjectUtils.isEmpty(name.getText())){
+            selectedItem.setTag(null);
+            if (!sku.getText().equalsIgnoreCase("0")) {
+                //EXISTING ITEM
 
-        selectedItem.setTag(null);
-        if (!sku.getText().equalsIgnoreCase("0")) {
-            //EXISTING ITEM
-
-            double realAverageCost = Double.parseDouble(averageCost.getText());
-            double realPurchaseCost = Double.parseDouble(purchaseCost.getText());
-            int realQuantity = Integer.parseInt(quantity.getText());
-            int realInstock = Integer.parseInt(inStock.getText());
-            double totalQuantity = realInstock + realQuantity;
-            double productOfQuantityandPurchaseCost = realQuantity * realPurchaseCost;
-            double totalCost = realAverageCost + productOfQuantityandPurchaseCost;
-            double finalAverageCost = totalCost / totalQuantity;
-            selectedItem.setCost(finalAverageCost);
-            selectedItem.setIn_stock(realInstock + realQuantity);
-        } else {
-            selectedItem.setIn_stock(Integer.parseInt(quantity.getText()));
-        }
-        Item savedItem = itemsRepository.save(selectedItem);
-        if (!ObjectUtils.isEmpty(savedItem)) {
-
-            PurchaseOrder purchaseOrder = setPurchaseOrder(savedItem);
-            purchaseOrderRepository.save(purchaseOrder);
-            SupplierGroup supplierGroup = setSupplierGroup(savedItem);
-            supplierRepository.save(supplierGroup);
-            Qrcode qrcode = setQrCodeData(savedItem);
-            qrcodeRepository.save(qrcode);
-
-            try {
-                QrCodeUtil.saveQrCode(Integer.toString(savedItem.getSku()));
-            } catch (Exception ioException) {
-
+                double realAverageCost = Double.parseDouble(averageCost.getText());
+                double realPurchaseCost = Double.parseDouble(purchaseCost.getText());
+                int realQuantity = Integer.parseInt(quantity.getText());
+                int realInstock = Integer.parseInt(inStock.getText());
+                double totalQuantity = realInstock + realQuantity;
+                double productOfQuantityandPurchaseCost = realQuantity * realPurchaseCost;
+                double totalCost = realAverageCost + productOfQuantityandPurchaseCost;
+                double finalAverageCost = totalCost / totalQuantity;
+                selectedItem.setCost(finalAverageCost);
+                selectedItem.setIn_stock(realInstock + realQuantity);
+            } else {
+                selectedItem.setIn_stock(Integer.parseInt(quantity.getText()));
             }
+            Item savedItem = itemsRepository.save(selectedItem);
+            if (!ObjectUtils.isEmpty(savedItem)) {
+
+                PurchaseOrder purchaseOrder = setPurchaseOrder(savedItem);
+                purchaseOrderRepository.save(purchaseOrder);
+                SupplierGroup supplierGroup = setSupplierGroup(savedItem);
+                supplierRepository.save(supplierGroup);
+                Qrcode qrcode = setQrCodeData(savedItem);
+                qrcodeRepository.save(qrcode);
+
+                try {
+                    QrCodeUtil.saveQrCode(Integer.toString(savedItem.getSku()));
+                } catch (Exception ioException) {
+
+                }
 
 
-            Prompt.success("Data saved!");
-            resetSelectedItem();
-            Stage stage = (Stage) save.getScene().getWindow();
-            stage.close();
-        } else {
-            Prompt.failed("Data did NOT save successfully!");
+                Prompt.success("Data saved!");
+                resetSelectedItem();
+                Stage stage = (Stage) save.getScene().getWindow();
+                stage.close();
+            } else {
+                Prompt.failed("Data did NOT save successfully!");
+            }
         }
+
     }
 
     private Qrcode setQrCodeData(Item savedItem) {
