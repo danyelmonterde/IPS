@@ -2,10 +2,12 @@ package com.monterdev.controller;
 
 import com.google.zxing.NotFoundException;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import com.monterdev.model.Item;
 import com.monterdev.repository.ItemsRepository;
 import com.monterdev.util.Prompt;
+import com.monterdev.util.SearchUtil;
 import com.monterdev.util.StageLoader;
 import javafx.animation.TranslateTransition;
 import javafx.collections.ObservableList;
@@ -19,12 +21,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -39,8 +41,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.monterdev.constants.GlobalConfiguration.defaultCategoryData;
 import static com.monterdev.constants.GlobalConfiguration.getConfigValue;
@@ -144,6 +148,11 @@ public class MainDashboardController implements Initializable {
     @Autowired
     private ItemsRepository itemsRepository;
 
+    @Autowired
+    private SearchUtil searchUtil;
+
+    private List<String> responseList = new ArrayList<>();
+
     private static int rowIndex = 0;
 
     private int indexToBeRemoved = 0;
@@ -151,6 +160,8 @@ public class MainDashboardController implements Initializable {
     private List<Item> itemCart = new ArrayList<>();
 
     private boolean isEmpty = true;
+
+    private JFXListView listView = new JFXListView();
 
     private TranslateTransition slide = new TranslateTransition();
     private TranslateTransition slideMainAnchorpane = new TranslateTransition();
@@ -196,15 +207,15 @@ public class MainDashboardController implements Initializable {
         });
 
         MenuClose.setOnMouseClicked(event -> {
-          //  TranslateTransition slide = new TranslateTransition();
+            //  TranslateTransition slide = new TranslateTransition();
             slide.setDuration(Duration.seconds(0.4));
             slide.setNode(sidebarAnchorpane);
 
-           // TranslateTransition slideMainAnchorpane = new TranslateTransition();
+            // TranslateTransition slideMainAnchorpane = new TranslateTransition();
             slideMainAnchorpane.setDuration(Duration.seconds(0.4));
             slideMainAnchorpane.setNode(mainAnchorpane);
 
-          //  TranslateTransition slideSearchPane = new TranslateTransition();
+            //  TranslateTransition slideSearchPane = new TranslateTransition();
             slideSearchPane.setDuration(Duration.seconds(0.4));
             slideSearchPane.setNode(searchPane);
 
@@ -222,7 +233,6 @@ public class MainDashboardController implements Initializable {
             searchPane.setTranslateX(-176);
 
 
-
             slide.setOnFinished((ActionEvent e) -> {
                 Menu.setVisible(true);
                 MenuClose.setVisible(false);
@@ -231,32 +241,33 @@ public class MainDashboardController implements Initializable {
 
         });
         sku.textProperty().addListener((obs, oldValue, newValue) -> {
-            if (oldValue != newValue && !ObjectUtils.isEmpty(sku.getText())) {
 
-                ObservableList<Node> nodeStream = midHbox.getChildren();
-
-                for (Node node : nodeStream) {
-                    if (node instanceof ScrollPane) {
-                        Node node2 = ((ScrollPane) node).getContent();
-                        if (node2 instanceof AnchorPane) {
-                            for (Node node3 : ((AnchorPane) node2).getChildren()) {
-                                if (node3 instanceof VBox) {
-                                    VBox vBox = (VBox) node3;
-                                    HBox row = createRow(vBox, selectedItem, rowIndex-1);
-                                    row.setId(String.valueOf(rowIndex-1));
-                                    VBox.setMargin(row, new Insets(20.0, 0.0, 0.0, 0.0));
-                                    vBox.getChildren().add(rowIndex-1, row);
-
+            if (!ObjectUtils.isEmpty(sku.getText())) {
+                boolean isPresent = itemLists.stream().filter(e -> e.getSku() == Integer.parseInt(newValue)).findFirst().isPresent();
+                if (isPresent) {
+                    ObservableList<Node> nodeStream = midHbox.getChildren();
+                    for (Node node : nodeStream) {
+                        if (node instanceof ScrollPane) {
+                            Node node2 = ((ScrollPane) node).getContent();
+                            if (node2 instanceof AnchorPane) {
+                                for (Node node3 : ((AnchorPane) node2).getChildren()) {
+                                    if (node3 instanceof VBox) {
+                                        VBox vBox = (VBox) node3;
+                                        HBox row = createRow(vBox, selectedItem, rowIndex);
+                                        row.setId(String.valueOf(rowIndex));
+                                        VBox.setMargin(row, new Insets(20.0, 0.0, 0.0, 0.0));
+                                        vBox.getChildren().add(rowIndex, row);
+                                        rowIndex++;
+                                    }
                                 }
                             }
                         }
-
                     }
                 }
-
             }
 
         });
+
         refreshReleaseItemsOnMouseHover();
     }
 
@@ -264,11 +275,9 @@ public class MainDashboardController implements Initializable {
 
         mainAnchorpane.hoverProperty().addListener((observableValue, oldValue, newValue) -> {
             Iterable<Item> initialItemList = itemsRepository.findAll();
-            itemLists = new ArrayList<>();
-            initialItemList.forEach(itemLists::add);
-            if (newValue != oldValue && currentLocationBanner.getText().equalsIgnoreCase("RELEASE ITEMS") && !ObjectUtils.isEmpty(selectedItem.getItem_name())) {
+            itemLists = StreamSupport.stream(initialItemList.spliterator(), false).collect(Collectors.toList());
+            if (newValue != oldValue && currentLocationBanner.getText().equalsIgnoreCase("RELEASE ITEMS") && selectedItem.getSku() != 0) {
                 refresher();
-
             }
         });
     }
@@ -284,6 +293,7 @@ public class MainDashboardController implements Initializable {
     }
 
     private HBox createRow(VBox vBox, Item item, int currentIndex) {
+        System.out.println("Index where this row is created: " + currentIndex);
         Item currentItem = new Item();
         itemLists.stream().forEach(s -> {
             if (s.getSku() == item.getSku()) {
@@ -332,22 +342,29 @@ public class MainDashboardController implements Initializable {
         amount.setText(String.valueOf(currentItem.getQuantity() * currentItem.getCost()));
         amount.setEditable(false);
 
-        JFXButton edit = createButtonWithoutText("EDIT");
         JFXButton delete = createButtonWithoutText("DELETE");
         delete.setId(Integer.toString(currentIndex));
         delete.setOnAction(del -> {
+            try {
+                int indexOfItemToBeDeleted = itemCart.indexOf(currentItem);
 
-            vBox.getChildren().remove(delete.getParent());
-            itemCart.remove(Integer.parseInt(delete.getId()));
-            selectedItem.setItem_name("");
-            sku.setText("");
-            selectedItem.setSku(0);
-            if(vBox.getChildren().size()==0){
-                rowIndex =1;
-                refresher();
-            }else{
-                rowIndex--;
+                if (vBox.getChildren().size() == 1) {
+                    rowIndex = 0;
+                    selectedItem.setSku(0);
+                    vBox.getChildren().clear();
+                    itemCart.clear();
+                    midHbox.getChildren().remove(1);
+                } else {
+                    itemCart.remove(Integer.parseInt(delete.getId()));
+                    vBox.getChildren().remove(indexOfItemToBeDeleted);
+                    midHbox.getChildren().remove(1);
+                }
+            } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+                vBox.getChildren().clear();
+            } catch (Exception exception) {
+                vBox.getChildren().clear();
             }
+
         });
 
         HBox hBox = new HBox();
@@ -355,15 +372,13 @@ public class MainDashboardController implements Initializable {
         HBox.setMargin(quantity, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(cost, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(amount, new Insets(50.0, 0.0, 0.0, 20.0));
-        HBox.setMargin(edit, new Insets(35.0, 0.0, 0.0, 20.0));
-        HBox.setMargin(delete, new Insets(35.0, 0.0, 0.0, 20.0));
-        hBox.getChildren().addAll(name, quantity, cost, amount, edit, delete);
 
+        HBox.setMargin(delete, new Insets(35.0, 0.0, 0.0, 20.0));
+        hBox.getChildren().addAll(name, quantity, cost, amount, delete);
 
         return hBox;
 
     }
-
 
 
     public void getReportsModule(ActionEvent actionEvent) {
@@ -378,11 +393,18 @@ public class MainDashboardController implements Initializable {
         midHbox.getChildren().clear();
         midHbox.setPrefHeight(100.0);
         bottomHbox.getChildren().clear();
-
     }
 
     public void getItemsModule() {
         resetHboxes();
+        resetSelectedItem();
+        editItemController.create();
+        currentLocationBanner.setText("Inventory");
+        topHbox.getChildren().addAll(itemListController.createItemList());
+
+    }
+
+    private void resetSelectedItem() {
         selectedItem = applicationContext.getBean(Item.class);
         selectedItem.setTag(null);
         selectedItem.setItem_name("");
@@ -393,10 +415,6 @@ public class MainDashboardController implements Initializable {
         selectedItem.setCost(0.0);
         selectedItem.setIn_stock(0);
         selectedItem.setSub_category_detail(getConfigValue(defaultCategoryData));
-        editItemController.create();
-        currentLocationBanner.setText("Inventory");
-        topHbox.getChildren().addAll(itemListController.createItemList());
-
     }
 
     public void getDashboardModule(ActionEvent actionEvent) {
@@ -484,15 +502,51 @@ public class MainDashboardController implements Initializable {
         AnchorPane.setBottomAnchor(vbox, 0.0);
 
         scrollPane.setContent(anchorPane);
-
+        HBox.setMargin(scrollPane, new Insets(0.0, 20.0, 0.0, 0.0));
 
         JFXTextField itemName = new JFXTextField();
-        itemName.textProperty().addListener((observableValue, oldValue, newValue)->{
-            if(oldValue!=newValue){
-                boolean isPresent = itemLists.stream().filter(e -> e.getSku() == Integer.parseInt(newValue)).findFirst().isPresent();
-                if(isPresent) {
-                    rowIndex++;
-                    refresher();
+        itemName.textProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                searchUtil.searchItem(newValue, itemLists, responseList, "NAME");
+                if (responseList.size() > 0) {
+
+                    HBox.setMargin(listView, new Insets(20.0, 0.0, 20.0, 20.0));
+                    responseList.stream().forEach(data -> {
+                        listView.getItems().clear();
+                        listView.getItems().add(data);
+                        listView.setOnMouseClicked(e -> {
+                            if (e.getClickCount() == 2) {
+                                Optional<Item> optionalItem = itemLists.stream().filter(f -> f.getItem_name().equalsIgnoreCase(listView.getSelectionModel().getSelectedItem().toString())).findFirst();
+                                selectedItem.setSku(optionalItem.isPresent() ? optionalItem.get().getSku() : 0);
+                                sku.setText(String.valueOf(optionalItem.isPresent() ? optionalItem.get().getSku() : 0));
+                            }
+                        });
+                    });
+
+                    midHbox.getChildren().add(listView);
+                }
+
+                if (ObjectUtils.isEmpty(newValue)) {
+                    responseList.clear();
+                    selectedItem.setSku(0);
+                    sku.setText("");
+                    rowIndex = 0;
+                    try {
+                        midHbox.getChildren().remove(1);
+                    } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+
+                    }
+
+                }
+            }
+        });
+
+        itemName.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.BACK_SPACE) {
+                try {
+                    midHbox.getChildren().retainAll(scrollPane);
+                } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+
                 }
             }
         });
@@ -531,29 +585,41 @@ public class MainDashboardController implements Initializable {
         }
     }
 
+
     private void cancelTransaction() {
+        rowIndex = 0;
+        resetSelectedItem();
+        itemCart.clear();
         getDashboardModule(null);
     }
 
     private void releaseItemsOnCart() {
-        itemCart.stream().forEach(item -> {
-            System.out.println("SKU: "+ item.getSku());
-            System.out.println("Item name: "+item.getItem_name());
-            System.out.println("Quantity: "+item.getQuantity());
-            System.out.println("Cost: "+item.getCost());
-            System.out.println("In Stock: "+item.getIn_stock());
-            System.out.println("- - - - - - - - - - - - - - - - - - - - ");
-            System.out.println("\n");
+        if (!ObjectUtils.isEmpty(itemCart) || selectedItem.getSku() != 0) {
+            itemCart.stream().forEach(item -> {
 
-            int inStock = item.getIn_stock() - item.getQuantity();
-            item.setQuantity(inStock);
-            item.setIn_stock(inStock);
-        });
-        if(!ObjectUtils.isEmpty(itemsRepository.saveAll(itemCart))){
-            Prompt.success("Item released!");
-        }else{
-            Prompt.failed("An error occured while saving!");
+                int inStock = item.getIn_stock() - item.getQuantity();
+                item.setQuantity(inStock);
+                item.setIn_stock(inStock);
+            });
+            if (!ObjectUtils.isEmpty(itemsRepository.saveAll(itemCart))) {
+                resetSelectedItem();
+                sku.setText("0");
+                itemCart.clear();
+                try {
+                    midHbox.getChildren().remove(1);
+                    cancelTransaction();
+                } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+
+                }
+
+                Prompt.success("Item released!");
+            } else {
+                Prompt.failed("An error occured while saving!");
+            }
+        } else {
+            Prompt.failed("Please enter valid input!");
         }
+
     }
 
 

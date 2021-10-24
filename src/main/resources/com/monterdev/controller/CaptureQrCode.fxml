@@ -24,6 +24,7 @@
                <Font size="14.0" />
             </font>
          </JFXButton>
+         <JFXButton fx:id="cancelButton" buttonType="RAISED" onAction="#cancelCapture" text="Cancel" />
       </HBox>
    </bottom>
    <center>

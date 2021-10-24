@@ -93,17 +93,7 @@ public class ComponentCreator {
         jfxButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         ImageView imageView = new ImageView();
 
-        if(buttonType.equalsIgnoreCase("EDIT")){
-            Image image = null;
-            try {
-                image = new Image(new FileInputStream(ItemsUIConfiguration.getEditButtonImage()));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            imageView.setImage(image);
-            imageView.setFitHeight(25.0);
-            imageView.setFitWidth(25.0);
-        }else if(buttonType.equalsIgnoreCase("DELETE")){
+        if(buttonType.equalsIgnoreCase("DELETE")){
             Image image = null;
             try {
                 image = new Image(new FileInputStream(ItemsUIConfiguration.getDeleteButtonImage()));

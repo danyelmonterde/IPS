@@ -1,18 +1,14 @@
 package com.monterdev.controller;
 
-import com.google.zxing.NotFoundException;
 import com.jfoenix.controls.JFXButton;
 import com.monterdev.model.Item;
 import com.monterdev.util.OpenCvUtils;
-import com.monterdev.util.QrCodeUtil;
 import javafx.application.Platform;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -20,22 +16,12 @@ import org.opencv.core.Mat;
 import org.opencv.objdetect.QRCodeDetector;
 import org.opencv.videoio.VideoCapture;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import static com.monterdev.constants.GlobalConfiguration.capturedQrCodeDirectory;
-import static com.monterdev.constants.GlobalConfiguration.getConfigValue;
 
 @Component
 @FxmlView("CaptureQrCode.fxml")
@@ -44,6 +30,9 @@ public class CaptureQrCodeController {
 
     @FXML
     private JFXButton openCamera;
+
+    @FXML
+    private JFXButton cancelButton;
 
     @FXML
     private ImageView currentFrame;
@@ -64,14 +53,19 @@ public class CaptureQrCodeController {
     private static int cameraId = 0;
 
     public void initialize() {
-        labelStatus.textProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
+        labelStatus.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
 
             }
         });
         startCamera(null);
     }
 
+    public void cancelCapture(ActionEvent actionEvent) {
+        stopAcquisition();
+        Stage stage = (Stage) cancelButton.getScene().getWindow();
+        stage.close();
+    }
 
     public void startCamera(ActionEvent actionEvent) {
 
@@ -94,7 +88,7 @@ public class CaptureQrCodeController {
 
                         QRCodeDetector decoder = new QRCodeDetector();
                         Mat points = new Mat();
-                        Image imageToShow =null;
+                        Image imageToShow = null;
                         String sku = decoder.detectAndDecode(frame, points).intern();
                         if (!ObjectUtils.isEmpty(sku)) {
                             imageToShow = OpenCvUtils.mat2Image(frame);
@@ -117,11 +111,11 @@ public class CaptureQrCodeController {
 
                             return;
 
-                        }else{
+                        } else {
                             points = null;
                             decoder = null;
                             frame = null;
-                            Platform.runLater(()->{
+                            Platform.runLater(() -> {
                                 labelStatus.setText("Retry");
                             });
 
@@ -137,16 +131,16 @@ public class CaptureQrCodeController {
                 this.timer.scheduleAtFixedRate(frameGrabber, 0, 1, TimeUnit.SECONDS);
 
                 // update the button content
-               // this.openCamera.setText("Stop Camera");
+                // this.openCamera.setText("Stop Camera");
             } else {
                 // log the error
                 System.err.println("Impossible to open the camera connection...");
             }
         } else {
             // the camera is not active at this point
-       //     this.cameraActive = false;
+            //     this.cameraActive = false;
             // update again the button content
-         //   this.openCamera.setText("Start Camera");
+            //   this.openCamera.setText("Start Camera");
 
             // stop the timer
             this.stopAcquisition();

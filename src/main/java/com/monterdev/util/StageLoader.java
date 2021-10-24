@@ -67,13 +67,13 @@ public class StageLoader {
         // stage.setFullScreen(true);
         stage.setTitle(getWindowTitle());
         stage.setScene(scene);
-        stage.initStyle(StageStyle.UNDECORATED);
+       // stage.initStyle(StageStyle.UNDECORATED);
         stage.show();
 
         stage.setOnCloseRequest(windowEvent -> {
             System.gc();
             System.out.println("Window is closing..");
-            System.exit(-176);
+           // System.exit(-176);
         });
 
     }

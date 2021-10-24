@@ -1,7 +1,6 @@
 package com.monterdev.controller;
 
 import com.jfoenix.controls.*;
-import com.monterdev.constants.GlobalConfiguration;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
 import com.monterdev.util.*;
@@ -26,8 +25,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -159,7 +160,6 @@ public class EditItemController {
     private List<String> responseList = new ArrayList<>();
 
 
-
     public void initialize() {
 
         selectedItem = applicationContext.getBean(Item.class);
@@ -263,13 +263,13 @@ public class EditItemController {
                     ObservableList<Node> nodeStream = searchGroupMainContainer.getChildren();
                     for (Node node : nodeStream) {
                         if (node instanceof AnchorPane) {
-                            searchUtil.searchItem(newvalue,itemLists, responseList);
+                            searchUtil.searchItem(newvalue, itemLists, responseList, "NAME");
                             VBox vbox = (VBox) ((AnchorPane) node).getChildren().get(0);
                             JFXListView listView = (JFXListView) vbox.getChildren().get(0);
                             listView.getItems().clear();
                             listView.getItems().addAll(responseList);
-                            listView.setOnMouseClicked(e->{
-                                if(e.getClickCount() == 1){
+                            listView.setOnMouseClicked(e -> {
+                                if (e.getClickCount() == 1) {
                                     setFields(listView.getSelectionModel().getSelectedItem().toString());
                                 }
                             });
@@ -284,7 +284,7 @@ public class EditItemController {
 
                 }
 
-            }else if(ObjectUtils.isEmpty(newvalue)){
+            } else if (ObjectUtils.isEmpty(newvalue)) {
                 searchGroupMainContainer.getChildren().remove(2);
                 resetFields();
                 responseList.clear();
@@ -293,14 +293,14 @@ public class EditItemController {
         });
     }
 
-    private void purchaseCostOnChange(){
-        try{
-            purchaseCost.textProperty().addListener((observable,oldValue,newValue)->{
-                if(oldValue!=newValue){
+    private void purchaseCostOnChange() {
+        try {
+            purchaseCost.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (oldValue != newValue) {
                     selectedItem.setCost(Double.parseDouble(newValue));
                 }
             });
-        }catch (NumberFormatException numberFormatException){
+        } catch (NumberFormatException numberFormatException) {
             purchaseCost.setText("0");
         }
 
@@ -309,10 +309,10 @@ public class EditItemController {
     private void setFields(String itemName) {
         Optional<Item> item = itemLists.stream().filter(e -> e.getItem_name().equalsIgnoreCase(itemName))
                 .findFirst();
-        if(item.isPresent()){
+        if (item.isPresent()) {
             name.setText(itemName);
             inStock.setText(Integer.toString(item.get().getIn_stock()));
-            lowStock.setText( Integer.toString(item.get().getLow_stock()));
+            lowStock.setText(Integer.toString(item.get().getLow_stock()));
             sku.setText(Integer.toString(item.get().getSku()));
             averageCost.setText(Double.toString(item.get().getCost()));
             subCategoryDetail.setValue(item.get().getSub_category_detail());
@@ -320,16 +320,15 @@ public class EditItemController {
     }
 
 
-
     private void quantityOnChange() {
-        try{
+        try {
             quantity.textProperty().addListener((observable, oldvalue, newvalue) -> {
                 if (oldvalue != newvalue) {
                     selectedItem.setQuantity(Integer.parseInt(newvalue));
                 }
 
             });
-        }catch (NumberFormatException numberFormatException){
+        } catch (NumberFormatException numberFormatException) {
             quantity.setText("0");
         }
 
@@ -449,7 +448,7 @@ public class EditItemController {
     public void save(ActionEvent actionEvent) {
 
         selectedItem.setTag(null);
-        if(!sku.getText().equalsIgnoreCase("0")){
+        if (!sku.getText().equalsIgnoreCase("0")) {
             //EXISTING ITEM
 
             double realAverageCost = Double.parseDouble(averageCost.getText());
@@ -459,27 +458,27 @@ public class EditItemController {
             double totalQuantity = realInstock + realQuantity;
             double productOfQuantityandPurchaseCost = realQuantity * realPurchaseCost;
             double totalCost = realAverageCost + productOfQuantityandPurchaseCost;
-            double finalAverageCost =  totalCost /totalQuantity;
+            double finalAverageCost = totalCost / totalQuantity;
             selectedItem.setCost(finalAverageCost);
-            selectedItem.setIn_stock(realInstock+realQuantity);
-        }else{
+            selectedItem.setIn_stock(realInstock + realQuantity);
+        } else {
             selectedItem.setIn_stock(Integer.parseInt(quantity.getText()));
         }
         Item savedItem = itemsRepository.save(selectedItem);
         if (!ObjectUtils.isEmpty(savedItem)) {
 
-                PurchaseOrder purchaseOrder = setPurchaseOrder(savedItem);
-                purchaseOrderRepository.save(purchaseOrder);
-                SupplierGroup supplierGroup = setSupplierGroup(savedItem);
-                supplierRepository.save(supplierGroup);
-                Qrcode qrcode = setQrCodeData(savedItem);
-                qrcodeRepository.save(qrcode);
+            PurchaseOrder purchaseOrder = setPurchaseOrder(savedItem);
+            purchaseOrderRepository.save(purchaseOrder);
+            SupplierGroup supplierGroup = setSupplierGroup(savedItem);
+            supplierRepository.save(supplierGroup);
+            Qrcode qrcode = setQrCodeData(savedItem);
+            qrcodeRepository.save(qrcode);
 
-                try{
-                    QrCodeUtil.saveQrCode( Integer.toString(savedItem.getSku()));
-                }catch (Exception ioException){
+            try {
+                QrCodeUtil.saveQrCode(Integer.toString(savedItem.getSku()));
+            } catch (Exception ioException) {
 
-                }
+            }
 
 
             Prompt.success("Data saved!");
@@ -493,25 +492,25 @@ public class EditItemController {
 
     private Qrcode setQrCodeData(Item savedItem) {
         Qrcode qrcode = new Qrcode();
-        qrcode.setQrcodepath(QrCodeUtil.filePath + "\\" + savedItem.getItem_name()+".jpg");
+        qrcode.setQrcodepath(QrCodeUtil.filePath + "\\" + savedItem.getItem_name() + ".jpg");
         qrcode.setSku(savedItem.getSku());
         qrcode.setDatecreated(AppTime.now());
         return qrcode;
     }
 
     private SupplierGroup setSupplierGroup(Item savedItem) {
-        SupplierGroup supplierdata= new SupplierGroup();
-        supplierdata.setSupplier(ObjectUtils.isEmpty(supplierGroup.getText())?"NONE":supplierGroup.getText());
-        supplierdata.setReceipt_number(ObjectUtils.isEmpty(receiptNumber.getText())?"NONE":receiptNumber.getText());
-        supplierdata.setPurchase_order_number(ObjectUtils.isEmpty(purchaseOrderNumber.getText())?"NONE":purchaseOrderNumber.getText());
+        SupplierGroup supplierdata = new SupplierGroup();
+        supplierdata.setSupplier(ObjectUtils.isEmpty(supplierGroup.getText()) ? "NONE" : supplierGroup.getText());
+        supplierdata.setReceipt_number(ObjectUtils.isEmpty(receiptNumber.getText()) ? "NONE" : receiptNumber.getText());
+        supplierdata.setPurchase_order_number(ObjectUtils.isEmpty(purchaseOrderNumber.getText()) ? "NONE" : purchaseOrderNumber.getText());
         return supplierdata;
     }
 
-    private void createQrCode(Item item){
+    private void createQrCode(Item item) {
 
     }
 
-    private PurchaseOrder setPurchaseOrder(Item item){
+    private PurchaseOrder setPurchaseOrder(Item item) {
         PurchaseOrder purchaseOrder = new PurchaseOrder();
         purchaseOrder.setDatecreated(AppTime.now());
         purchaseOrder.setPurchase_cost(Double.parseDouble(purchaseCost.getText()));
@@ -520,7 +519,7 @@ public class EditItemController {
         purchaseOrder.setSku(item.getSku());
         purchaseOrder.setIn_stock(item.getIn_stock());
         purchaseOrder.setAmount(Integer.parseInt(quantity.getText()) * Double.parseDouble(purchaseCost.getText()));
-        return  purchaseOrder;
+        return purchaseOrder;
     }
 
     public void showTrackStock(ActionEvent actionEvent) {
