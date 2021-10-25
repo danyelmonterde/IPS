@@ -31,6 +31,8 @@ public class GlobalConfiguration {
     public static final String defaultCategoryData; //DON'T FORGET TO CHANGE ON PRODUCTION
     public static final String capturedQrCodeDirectory; //DON'T FORGET TO CHANGE ON PRODUCTION
     public static final String generatedQrCodeDirectory; //DON'T FORGET TO CHANGE ON PRODUCTION
+    public static final String clientAcronym;
+    public static final String defaultSubCategoryData;
 
     static {
         homePage = "HOME_PAGE";
@@ -41,6 +43,8 @@ public class GlobalConfiguration {
         defaultCategoryData = "DEFAULT_CATEGORY_DATA";
         capturedQrCodeDirectory = "CAPTURED_QR_CODE_DIRECTORY";
         generatedQrCodeDirectory = "GENERATED_QR_CODE_DIRECTORY";
+        clientAcronym = "CLIENT_ACRONYM";
+        defaultSubCategoryData = "DEFAULT_SUB_CATEGORY_DATA";
     }
 
 
@@ -60,6 +64,14 @@ public class GlobalConfiguration {
 
     public static String getWindowTitle(){
         return getConfigValue(windowTitle);
+    }
+
+    public static String getClientAcronym(){
+        return getConfigValue(clientAcronym);
+    }
+
+    public static String getDefaultSubCategoryData(){
+        return getConfigValue(defaultSubCategoryData);
     }
 
     //Getting default value when configuration id could not be found

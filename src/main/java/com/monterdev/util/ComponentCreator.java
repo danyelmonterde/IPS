@@ -148,4 +148,5 @@ public class ComponentCreator {
 
         return searchBoxContainer;
     }
+
 }

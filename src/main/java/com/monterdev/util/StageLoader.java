@@ -12,6 +12,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import static com.monterdev.constants.GlobalConfiguration.getWindowTitle;
 
 public class StageLoader {
+
+    private Stage primaryStage = null;
     double x, y = 0;
 
     public void load(Class<?> t, MouseEvent event, ConfigurableApplicationContext applicationContext) {
@@ -33,7 +35,11 @@ public class StageLoader {
     }
 
     public void loadTest(Class<?> t, ConfigurableApplicationContext applicationContext, Stage primaryStage) {
-        weaveTest(t, applicationContext, primaryStage);
+        if(primaryStage == null){
+            primaryStage = this.primaryStage;
+        }
+        this.primaryStage = primaryStage;
+        weaveTest(t, applicationContext, this.primaryStage);
     }
 
     private void weave(Class<?> t, Parent root) {

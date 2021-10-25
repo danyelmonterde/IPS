@@ -297,7 +297,7 @@ public class EditItemController {
         try {
             purchaseCost.textProperty().addListener((observable, oldValue, newValue) -> {
                 if (oldValue != newValue) {
-                    selectedItem.setCost(Double.parseDouble(newValue));
+                    selectedItem.setCost(DataUtil.formatDouble(newValue));
                 }
             });
         } catch (NumberFormatException numberFormatException) {
@@ -459,7 +459,7 @@ public class EditItemController {
                 double productOfQuantityandPurchaseCost = realQuantity * realPurchaseCost;
                 double totalCost = realAverageCost + productOfQuantityandPurchaseCost;
                 double finalAverageCost = totalCost / totalQuantity;
-                selectedItem.setCost(finalAverageCost);
+                selectedItem.setCost(DataUtil.formatToDouble(finalAverageCost));
                 selectedItem.setIn_stock(realInstock + realQuantity);
             } else {
                 selectedItem.setIn_stock(Integer.parseInt(quantity.getText()));

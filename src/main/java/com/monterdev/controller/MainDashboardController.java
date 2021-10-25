@@ -5,8 +5,11 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import com.monterdev.model.Item;
+import com.monterdev.model.Ris;
 import com.monterdev.repository.ItemsRepository;
+import com.monterdev.repository.RisRepository;
 import com.monterdev.util.Prompt;
+import com.monterdev.util.ReportUtil;
 import com.monterdev.util.SearchUtil;
 import com.monterdev.util.StageLoader;
 import javafx.animation.TranslateTransition;
@@ -27,10 +30,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.rgielen.fxweaver.core.FxmlView;
+import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -39,6 +44,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -149,7 +155,13 @@ public class MainDashboardController implements Initializable {
     private ItemsRepository itemsRepository;
 
     @Autowired
+    private RisRepository risRepository;
+
+    @Autowired
     private SearchUtil searchUtil;
+
+    @Autowired
+    private Ris ris;
 
     private List<String> responseList = new ArrayList<>();
 
@@ -166,6 +178,8 @@ public class MainDashboardController implements Initializable {
     private TranslateTransition slide = new TranslateTransition();
     private TranslateTransition slideMainAnchorpane = new TranslateTransition();
     private TranslateTransition slideSearchPane = new TranslateTransition();
+    @Autowired
+    private ReportUtil reportUtil;
 
     @SneakyThrows
     @Override
@@ -319,15 +333,18 @@ public class MainDashboardController implements Initializable {
                 itemCart.get(Integer.parseInt(name.getId())).setItem_name(newValue);
             }
         });
+        name.setEditable(false);
 
-        JFXTextField quantity = createTextField("QUANTITY", "LIGHT GRAY");
-        quantity.setText(String.valueOf(currentItem.getQuantity()));
-        quantity.setId(String.valueOf(currentIndex));
-        quantity.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldValue != newValue) {
-                itemCart.get(Integer.parseInt(quantity.getId())).setQuantity(Integer.parseInt(newValue));
+
+        JFXTextField amount = createTextField("AMOUNT", "LIGHT GRAY");
+
+        amount.setEditable(false);
+        amount.textProperty().addListener((observable,oldValue,newValue)->{
+            if(oldValue!=newValue){
+
             }
         });
+
 
         JFXTextField cost = createTextField("COST", "LIGHT GRAY");
         cost.setText(String.valueOf(currentItem.getCost()));
@@ -335,12 +352,23 @@ public class MainDashboardController implements Initializable {
         cost.textProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
                 itemCart.get(Integer.parseInt(cost.getId())).setCost(Double.parseDouble(newValue));
+                amount.setText( String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
+
             }
         });
 
-        JFXTextField amount = createTextField("AMOUNT", "LIGHT GRAY");
-        amount.setText(String.valueOf(currentItem.getQuantity() * currentItem.getCost()));
-        amount.setEditable(false);
+        JFXTextField quantity = createTextField("QUANTITY", "LIGHT GRAY");
+        quantity.setText(String.valueOf(currentItem.getQuantity()));
+        quantity.setId(String.valueOf(currentIndex));
+        quantity.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                itemCart.get(Integer.parseInt(quantity.getId())).setQuantity(Integer.parseInt(newValue));
+                amount.setText( String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
+
+            }
+        });
+
+        amount.setText( String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
 
         JFXButton delete = createButtonWithoutText("DELETE");
         delete.setId(Integer.toString(currentIndex));
@@ -367,14 +395,20 @@ public class MainDashboardController implements Initializable {
 
         });
 
+        JFXButton risDetails = new JFXButton("DETAILS");
+        risDetails.setOnAction(e->{
+            new StageLoader().load(GlobalRisController.class,applicationContext);
+        });
+
         HBox hBox = new HBox();
         HBox.setMargin(name, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(quantity, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(cost, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(amount, new Insets(50.0, 0.0, 0.0, 20.0));
+        HBox.setMargin(risDetails, new Insets(50.0, 0.0, 0.0, 20.0));
 
         HBox.setMargin(delete, new Insets(35.0, 0.0, 0.0, 20.0));
-        hBox.getChildren().addAll(name, quantity, cost, amount, delete);
+        hBox.getChildren().addAll(name, quantity, cost, amount, delete, risDetails);
 
         return hBox;
 
@@ -385,7 +419,17 @@ public class MainDashboardController implements Initializable {
         resetHboxes();
         currentLocationBanner.setText("Reports Module");
         Label label = new Label("Reports Module");
-        topHbox.getChildren().add(label);
+        JFXButton getReport = new JFXButton("Generate List of Items");
+        getReport.setOnAction(e ->{
+            try {
+                reportUtil.generateReport();
+            } catch (JRException ex) {
+                ex.printStackTrace();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        });
+        topHbox.getChildren().addAll(label, getReport);
     }
 
     private void resetHboxes() {
@@ -544,6 +588,8 @@ public class MainDashboardController implements Initializable {
         itemName.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.BACK_SPACE) {
                 try {
+                    responseList.clear();
+                    selectedItem.setSku(0);
                     midHbox.getChildren().retainAll(scrollPane);
                 } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
 
@@ -552,6 +598,7 @@ public class MainDashboardController implements Initializable {
         });
 
         JFXButton openCamera = new JFXButton("Open Camera");
+
 
         openCamera.setOnAction(e -> {
             new StageLoader().load(CaptureQrCodeController.class, applicationContext);
@@ -563,6 +610,8 @@ public class MainDashboardController implements Initializable {
 
         JFXButton releaseItem = new JFXButton("RELEASE ITEM");
         JFXButton cancelButton = new JFXButton("CANCEL");
+
+
 
         releaseItem.setOnAction(x -> {
             releaseItemsOnCart();
@@ -612,10 +661,20 @@ public class MainDashboardController implements Initializable {
 
                 }
 
-                Prompt.success("Item released!");
+                if(!ObjectUtils.isEmpty(ris)){
+                    System.out.println(ris.toString());
+                    if(!ObjectUtils.isEmpty(risRepository.save(ris))){
+                        Prompt.success("Item released!");
+                    }
+                }else{
+                    Prompt.failed("Item could not be released! Please check RIS details!");
+                }
+
             } else {
                 Prompt.failed("An error occured while saving!");
             }
+
+
         } else {
             Prompt.failed("Please enter valid input!");
         }
