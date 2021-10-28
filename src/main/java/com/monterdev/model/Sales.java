@@ -18,15 +18,13 @@ public class Sales {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "sales")
-    private double sales;
+    private String control_number;
 
-    @Column(name = "quantity")
-    private int quantity;
+    private double total_sales;
 
-    @Column(name = "controlNumber")
-    private String controlNumber;
+    private double total_cost;
 
-    @Column(name = "price")
-    private double price;
+    private double income;
+
+    private String date_transacted;
 }

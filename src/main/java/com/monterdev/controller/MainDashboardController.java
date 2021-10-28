@@ -5,11 +5,11 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import com.monterdev.model.Item;
-import com.monterdev.model.Ris;
+import com.monterdev.model.RequisitionIssueSlip;
 import com.monterdev.repository.ItemsRepository;
 import com.monterdev.repository.RisRepository;
 import com.monterdev.util.Prompt;
-import com.monterdev.util.ReportUtil;
+//import com.monterdev.util.ReportUtil;
 import com.monterdev.util.SearchUtil;
 import com.monterdev.util.StageLoader;
 import javafx.animation.TranslateTransition;
@@ -30,12 +30,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.rgielen.fxweaver.core.FxmlView;
-import net.sf.jasperreports.engine.JRException;
+//import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -44,7 +43,6 @@ import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -161,7 +159,7 @@ public class MainDashboardController implements Initializable {
     private SearchUtil searchUtil;
 
     @Autowired
-    private Ris ris;
+    private RequisitionIssueSlip ris;
 
     private List<String> responseList = new ArrayList<>();
 
@@ -178,8 +176,8 @@ public class MainDashboardController implements Initializable {
     private TranslateTransition slide = new TranslateTransition();
     private TranslateTransition slideMainAnchorpane = new TranslateTransition();
     private TranslateTransition slideSearchPane = new TranslateTransition();
-    @Autowired
-    private ReportUtil reportUtil;
+//    @Autowired
+//    private ReportUtil reportUtil;
 
     @SneakyThrows
     @Override
@@ -421,13 +419,13 @@ public class MainDashboardController implements Initializable {
         Label label = new Label("Reports Module");
         JFXButton getReport = new JFXButton("Generate List of Items");
         getReport.setOnAction(e ->{
-            try {
-                reportUtil.generateReport();
-            } catch (JRException ex) {
-                ex.printStackTrace();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+//            try {
+//                reportUtil.generateReport();
+//            } catch (JRException ex) {
+//                ex.printStackTrace();
+//            } catch (SQLException ex) {
+//                ex.printStackTrace();
+//            }
         });
         topHbox.getChildren().addAll(label, getReport);
     }

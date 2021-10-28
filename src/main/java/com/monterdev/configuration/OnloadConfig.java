@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -24,9 +21,7 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class OnloadConfig {
@@ -44,8 +39,8 @@ public class OnloadConfig {
     private ItemsRepository itemsRepository;
 
     @Bean
-    public Ris ris(){
-         return new Ris();
+    public RequisitionIssueSlip ris(){
+         return new RequisitionIssueSlip();
     }
 
     @Bean
@@ -55,17 +50,17 @@ public class OnloadConfig {
     }
 
     @Bean
-    public Iterable<Category> category() {
+    public Iterable<ItemCategory> category() {
         return categoryRepository.findAll();
     }
 
     @Bean
-    public Iterable<SubCategoryHeader> subCategoryHeader() {
+    public Iterable<ItemSubCategoryHeader> subCategoryHeader() {
         return subCategoryHeaderRepository.findAll();
     }
 
     @Bean
-    public Iterable<SubCategoryDetail> subCategoryDetail() {
+    public Iterable<ItemSubCategoryDetail> subCategoryDetail() {
         return subCategoryDetailsRepository.findAll();
     }
 
@@ -84,7 +79,7 @@ public class OnloadConfig {
     public DataSource dataSource() {
         System.out.println("datasource creation");
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.url("jdbc:mysql://localhost:3306/iqwddbv2");
+        dataSourceBuilder.url("jdbc:mysql://localhost:3306/iqwddbv2?&serverTimezone=UTC");
         dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
         dataSourceBuilder.username("root");
         dataSourceBuilder.password("root");

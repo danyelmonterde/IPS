@@ -43,7 +43,7 @@
                               <Insets left="20.0" top="20.0" />
                            </VBox.margin>
                         </Label>
-                        <JFXComboBox fx:id="category" minWidth="-Infinity" onAction="#updateSubCategoryHeader">
+                        <JFXComboBox fx:id="itemCategory" minWidth="-Infinity" onAction="#updateSubCategoryHeader">
                            <VBox.margin>
                               <Insets bottom="20.0" left="20.0" />
                            </VBox.margin>
@@ -57,7 +57,7 @@
                               <Insets top="20.0" />
                            </VBox.margin>
                         </Label>
-                        <JFXComboBox fx:id="subCategoryHeader" minWidth="-Infinity" onAction="#updateSubCategoryDetail">
+                        <JFXComboBox fx:id="itemSubCategoryHeader" minWidth="-Infinity" onAction="#updateSubCategoryDetail">
                            <VBox.margin>
                               <Insets />
                            </VBox.margin>
@@ -71,7 +71,7 @@
                               <Insets top="20.0" />
                            </VBox.margin>
                         </Label>
-                        <JFXComboBox fx:id="subCategoryDetail" minWidth="-Infinity">
+                        <JFXComboBox fx:id="itemSubCategoryDetail" minWidth="-Infinity">
                            <VBox.margin>
                               <Insets />
                            </VBox.margin>

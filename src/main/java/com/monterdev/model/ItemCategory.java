@@ -3,24 +3,20 @@ package com.monterdev.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
 @Builder
-@NoArgsConstructor
+@Table(name = "itemcategory")
 @AllArgsConstructor
-@Table(name = "qrcode")
-public class Qrcode {
+@NoArgsConstructor
+public class ItemCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private int id;
 
-    private String qr_code_path;
-
-    private LocalDateTime date_created;
-
-    private int sku;
+    private String category_name;
 }

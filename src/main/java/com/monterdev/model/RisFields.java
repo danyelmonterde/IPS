@@ -1,6 +1,8 @@
 package com.monterdev.model;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -8,18 +10,13 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Builder
-@Table(name = "subcategorydetail")
-@AllArgsConstructor
-@NoArgsConstructor
-public class SubCategoryDetail {
+@Table(name = "risfields")
+public class RisFields {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
-    private String sub_category_detail;
-
-    private String sub_category_header;
+    private String ris_field;
 }
-

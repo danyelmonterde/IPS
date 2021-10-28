@@ -18,15 +18,11 @@ public class Customer {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "firstName")
-    private String firstName;
+    private String first_name;
 
-    @Column(name = "middleName")
-    private String middleName;
+    private String middle_name;
 
-    @Column(name = "lastName")
-    private String lastName;
+    private String last_name;
 
-    @Column(name = "cluster")
     private String cluster;
 }

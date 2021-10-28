@@ -8,15 +8,17 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Builder
-@Table(name = "category")
+@Table(name = "itemsubcategoryheader")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Category {
+public class ItemSubCategoryHeader {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
-    private String category_name;
+    private String sub_category_header;
+
+    private String category;
 }

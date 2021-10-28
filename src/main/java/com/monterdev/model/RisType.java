@@ -5,30 +5,20 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
 @Builder
-@Table(name = "history")
-public class History {
+@Table(name = "ristype")
+public class RisType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
-    private LocalDateTime date;
+    private String ristype;
 
-    private String item_name;
-
-    private String reason;
-
-    private int adjustment;
-
-    private int stock_after;
-
-    private String sub_category_detail;
-
+    private String inventory_type;
 }

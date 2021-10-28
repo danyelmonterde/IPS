@@ -18,30 +18,21 @@ public class StockAdjustment {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "reason")
     private String reason;
 
-    @Column(name = "itemName")
-    private String itemName;
+    private String item_name;
 
-    @Column(name = "sku")
     private int sku;
 
-    @Column(name = "inStock")
-    private int inStock;
+    private int in_stock;
 
-    @Column(name = "addStock")
-    private int addStock;
+    private int add_stock;
 
-    @Column(name = "cost")
     private double cost;
 
-    @Column(name = "stockAfter")
-    private int stockAfter;
+    private int stock_after;
 
-    @Column(name = "expectedStock")
-    private int expectedStock;
+    private int expected_stock;
 
-    @Column(name = "removeStock")
-    private int removeStock;
+    private int remove_stock;
 }

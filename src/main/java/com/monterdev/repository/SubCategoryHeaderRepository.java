@@ -1,16 +1,16 @@
 package com.monterdev.repository;
 
-import com.monterdev.model.SubCategoryHeader;
+import com.monterdev.model.ItemSubCategoryHeader;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface SubCategoryHeaderRepository extends CrudRepository<SubCategoryHeader, Integer> {
+public interface SubCategoryHeaderRepository extends CrudRepository<ItemSubCategoryHeader, Integer> {
 
     @Query(value = "SELECT * FROM subcategoryheader WHERE sub_category_header=:sub_category_header", nativeQuery = true)
-    SubCategoryHeader findBySubCategoryHeader(@Param("sub_category_header") String sub_category_header);
+    ItemSubCategoryHeader findBySubCategoryHeader(@Param("sub_category_header") String sub_category_header);
 
     @Query(value = "SELECT * FROM subcategoryheader WHERE category=:category", nativeQuery = true)
-    SubCategoryHeader findByCategory(@Param("category") String category);
+    ItemSubCategoryHeader findByCategory(@Param("category") String category);
 
 }

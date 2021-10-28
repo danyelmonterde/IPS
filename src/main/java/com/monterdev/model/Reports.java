@@ -18,27 +18,19 @@ public class Reports {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "reportName")
-    private String reportName;
+    private String report_name;
 
-    @Column(name = "reportLocation")
-    private String reportLocation;
+    private String report_location;
 
-    @Column(name = "preparedBy")
-    private String preparedBy;
+    private String prepared_by;
 
-    @Column(name = "checkedBy")
-    private String checkedBy;
+    private String checked_by;
 
-    @Column(name = "notedBy")
-    private String notedBy;
+    private String noted_by;
 
-    @Column(name = "monthOfReport")
-    private String monthOfReport;
+    private String month_of_report;
 
-    @Column(name = "yearOfReport")
-    private String yearOfReport;
+    private String year_of_report;
 
-    @Column(name = "dayOfReport")
-    private String dayOfReport;
+    private String day_of_report;
 }

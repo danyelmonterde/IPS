@@ -128,13 +128,13 @@ public class EditItemController {
     private ItemsRepository itemsRepository;
 
     @Autowired
-    private Iterable<SubCategoryDetail> subCategoryDetailPreLoaded;
+    private Iterable<ItemSubCategoryDetail> subCategoryDetailPreLoaded;
 
     @Autowired
-    private Iterable<SubCategoryHeader> subCategoryHeaderPreLoaded;
+    private Iterable<ItemSubCategoryHeader> subCategoryHeaderPreLoaded;
 
     @Autowired
-    private Iterable<Category> categoryPreLoaded;
+    private Iterable<ItemCategory> categoryPreLoaded;
 
     @Autowired
     private DeletedItemsRepository deletedItemsRepository;
@@ -173,11 +173,11 @@ public class EditItemController {
         checkIfItemNameExists();
 
 
-        SubCategoryDetail subCategoryDetail = subCategoryDetailsRepository.findBySubCategoryDetail(selectedItem.getSub_category_detail());
-        SubCategoryHeader subCategoryHeader = subCategoryHeaderRepository.findBySubCategoryHeader(subCategoryDetail.getSub_category_header());
-        Category category = categoryRepository.findByCategory(subCategoryHeader.getCategory());
+        ItemSubCategoryDetail itemSubCategoryDetail = subCategoryDetailsRepository.findBySubCategoryDetail(selectedItem.getSub_category_detail());
+        ItemSubCategoryHeader itemSubCategoryHeader = subCategoryHeaderRepository.findBySubCategoryHeader(itemSubCategoryDetail.getSub_category_header());
+        ItemCategory itemCategory = categoryRepository.findByCategory(itemSubCategoryHeader.getCategory());
 
-        loadCategories(subCategoryDetail, subCategoryHeader, category);
+        loadCategories(itemSubCategoryDetail, itemSubCategoryHeader, itemCategory);
 
         itemNameonChange();
 
@@ -231,22 +231,22 @@ public class EditItemController {
     }
 
 
-    private void loadCategories(SubCategoryDetail subCategoryDetail, SubCategoryHeader subCategoryHeader, Category category) {
+    private void loadCategories(ItemSubCategoryDetail itemSubCategoryDetail, ItemSubCategoryHeader itemSubCategoryHeader, ItemCategory itemCategory) {
         clearComboBoxes();
-        subCategoryDetailPreLoaded.forEach(subCategoryDetail1 -> {
-            this.subCategoryDetail.getItems().add(subCategoryDetail1.getSub_category_detail());
+        subCategoryDetailPreLoaded.forEach(itemSubCategoryDetail1 -> {
+            this.subCategoryDetail.getItems().add(itemSubCategoryDetail1.getSub_category_detail());
         });
 
-        subCategoryHeaderPreLoaded.forEach(subCategoryHeader1 -> {
-            this.subCategoryHeader.getItems().add(subCategoryHeader1.getSub_category_header());
+        subCategoryHeaderPreLoaded.forEach(itemSubCategoryHeader1 -> {
+            this.subCategoryHeader.getItems().add(itemSubCategoryHeader1.getSub_category_header());
         });
 
-        categoryPreLoaded.forEach(category1 -> {
-            this.category.getItems().add(category1.getCategory_name());
+        categoryPreLoaded.forEach(itemCategory1 -> {
+            this.category.getItems().add(itemCategory1.getCategory_name());
         });
-        this.subCategoryDetail.setValue(subCategoryDetail.getSub_category_detail());
-        this.subCategoryHeader.setValue(subCategoryHeader.getSub_category_header());
-        this.category.setValue(category.getCategory_name());
+        this.subCategoryDetail.setValue(itemSubCategoryDetail.getSub_category_detail());
+        this.subCategoryHeader.setValue(itemSubCategoryHeader.getSub_category_header());
+        this.category.setValue(itemCategory.getCategory_name());
     }
 
     private void clearComboBoxes() {
@@ -353,7 +353,7 @@ public class EditItemController {
 
     public void updateSubCategoryHeader(ActionEvent actionEvent) {
         try {
-            List<SubCategoryHeader> subCategories = StreamSupport.stream(this.subCategoryHeaderPreLoaded.spliterator(), false)
+            List<ItemSubCategoryHeader> subCategories = StreamSupport.stream(this.subCategoryHeaderPreLoaded.spliterator(), false)
                     .filter(e -> e.getCategory().equalsIgnoreCase(this.category.getValue().toString())).collect(Collectors.toList());
             this.subCategoryHeader.getItems().clear();
             this.subCategoryDetail.getItems().clear();
@@ -368,10 +368,10 @@ public class EditItemController {
 
     public void updateSubCategoryDetail(ActionEvent actionEvent) {
         try {
-            List<SubCategoryDetail> subCategoryDetailList = StreamSupport.stream(this.subCategoryDetailPreLoaded.spliterator(), false)
+            List<ItemSubCategoryDetail> itemSubCategoryDetailList = StreamSupport.stream(this.subCategoryDetailPreLoaded.spliterator(), false)
                     .filter(e -> e.getSub_category_header().equalsIgnoreCase(this.subCategoryHeader.getValue().toString())).collect(Collectors.toList());
             this.subCategoryDetail.getItems().clear();
-            subCategoryDetailList.stream().forEach(d -> {
+            itemSubCategoryDetailList.stream().forEach(d -> {
                 this.subCategoryDetail.getItems().add(d.getSub_category_detail());
             });
         } catch (NullPointerException nullPointerException) {
@@ -494,9 +494,9 @@ public class EditItemController {
 
     private Qrcode setQrCodeData(Item savedItem) {
         Qrcode qrcode = new Qrcode();
-        qrcode.setQrcodepath(QrCodeUtil.filePath + "\\" + savedItem.getItem_name() + ".jpg");
+        qrcode.setQr_code_path(QrCodeUtil.filePath + "\\" + savedItem.getItem_name() + ".jpg");
         qrcode.setSku(savedItem.getSku());
-        qrcode.setDatecreated(AppTime.now());
+        qrcode.setDate_created(AppTime.now());
         return qrcode;
     }
 

@@ -4,9 +4,8 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTextField;
-import com.monterdev.constants.GlobalConfiguration;
-import com.monterdev.model.Ris;
-import com.monterdev.model.SubCategoryHeader;
+import com.monterdev.model.RequisitionIssueSlip;
+import com.monterdev.model.ItemSubCategoryHeader;
 import com.monterdev.repository.SubCategoryHeaderRepository;
 import com.monterdev.util.ControlNumberGenerator;
 import com.monterdev.util.Prompt;
@@ -95,14 +94,14 @@ public class GlobalRisController implements Initializable {
     private SubCategoryHeaderRepository subCategoryHeaderRepository;
 
     @Autowired
-    private Ris ris;
+    private RequisitionIssueSlip ris;
 
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         txtControlNumber.setText(new ControlNumberGenerator().generate());
-        Iterable<SubCategoryHeader> subCategoryHeader = subCategoryHeaderRepository.findAll();
+        Iterable<ItemSubCategoryHeader> subCategoryHeader = subCategoryHeaderRepository.findAll();
 
         subCategoryHeader.forEach(data ->{
             this.categoryHeader.getItems().add(data.getSub_category_header());
