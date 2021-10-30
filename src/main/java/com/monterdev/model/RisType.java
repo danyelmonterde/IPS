@@ -21,4 +21,8 @@ public class RisType {
     private String ristype;
 
     private String inventory_type;
+
+    private String risfield;
+
+    private String risfieldtype;
 }

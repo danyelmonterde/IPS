@@ -39,8 +39,8 @@ public class OnloadConfig {
     private ItemsRepository itemsRepository;
 
     @Bean
-    public RequisitionIssueSlip ris(){
-         return new RequisitionIssueSlip();
+    public RequisitionIssueSlip ris() {
+        return new RequisitionIssueSlip();
     }
 
     @Bean
@@ -68,7 +68,7 @@ public class OnloadConfig {
 
     @Bean
     @Qualifier("itemLists")
-    public List<Item> itemLists(){
+    public List<Item> itemLists() {
         Iterable<Item> initialItemList = itemsRepository.findAll();
         List<Item> itemLists = new ArrayList<>();
         initialItemList.forEach(itemLists::add);
@@ -91,7 +91,7 @@ public class OnloadConfig {
         LocalContainerEntityManagerFactoryBean em
                 = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan(new String[] { "com.monterdev.model" });
+        em.setPackagesToScan(new String[]{"com.monterdev.model"});
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
@@ -109,7 +109,7 @@ public class OnloadConfig {
     }
 
     @Bean
-    public PersistenceExceptionTranslationPostProcessor exceptionTranslation(){
+    public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
         return new PersistenceExceptionTranslationPostProcessor();
     }
 
@@ -119,6 +119,21 @@ public class OnloadConfig {
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
 
         return properties;
+    }
+
+    @Bean
+    public Customer customer() {
+        return new Customer();
+    }
+
+    @Bean
+    public RequisitionIssueSlip requisitionIssueSlip() {
+        return new RequisitionIssueSlip();
+    }
+
+    @Bean
+    public SelectedRisTemplate selectedRISTemplate(){
+        return new SelectedRisTemplate();
     }
 
 }

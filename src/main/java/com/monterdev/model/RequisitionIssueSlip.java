@@ -21,6 +21,10 @@ public class RequisitionIssueSlip {
 
     private String control_number;
 
+    private int is_customer_new;
+
+    private String customer_name;
+
     private String requisition_and_issue_slip_number;
 
     private String purpose;

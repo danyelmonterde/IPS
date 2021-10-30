@@ -6,18 +6,24 @@
     },
     {
       "configId": "CAPTURED_QR_CODE_DIRECTORY",
-      "configValue": "C:/Users/B3AST/CapturedQrCode/out.png"
+      "configValue": "C:\\Users\\Daniel\\Desktop\\CapturedQrCode\\out.png"
     },
     {
       "configId": "GENERATED_QR_CODE_DIRECTORY",
-      "configValue": "C:/Users/B3AST/GeneratedQrCodes"
+      "configValue": "C:\\Users\\Daniel\\Desktop\\GeneratedQrCodes"
     },
     {
       "configId": "EDIT_BUTTON",
-      "configValue": "C:/Users/B3AST/git/IPS/src/main/resources/config-ui/IQWD-APP-RESOURCES/Main/check.png"
+      "configValue": "C:\\Users\\Daniel\\Desktop\\IPS\\src\\main\\resources\\config-ui\\IQWD-APP-RESOURCES\\Main\\check.png"
     },    {
       "configId": "DELETE_BUTTON",
-      "configValue": "C:/Users/B3AST/git/IPS/src/main/resources/config-ui/IQWD-APP-RESOURCES/Main/trash.png"
+      "configValue": "C:\\Users\\Daniel\\Desktop\\IPS\\src\\main\\resources\\config-ui\\IQWD-APP-RESOURCES\\Main\\trash.png"
+    }, {
+      "configId": "CUSTOMER_TYPES",
+      "configValue": "OLD,NEW"
+    }, {
+      "configId": "RIS_TEMPLATES",
+      "configValue": "CM-NEW CONNECTION,CM-REPAIRS AND MAINTENANCE,CM-CONSTRUCTION WORK IN PROGRESS,CM-PUMPING STATION EXPENSES, CM-ACCOUNTS RECEIVABLE, CM-OTHER DEFERRED CREDITS"
     }
   ]
 }

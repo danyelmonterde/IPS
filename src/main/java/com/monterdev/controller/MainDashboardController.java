@@ -178,7 +178,8 @@ public class MainDashboardController implements Initializable {
     private TranslateTransition slideSearchPane = new TranslateTransition();
 //    @Autowired
 //    private ReportUtil reportUtil;
-
+    @FXML
+    private JFXButton releaseItemTest;
     @SneakyThrows
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -305,7 +306,7 @@ public class MainDashboardController implements Initializable {
     }
 
     private HBox createRow(VBox vBox, Item item, int currentIndex) {
-        System.out.println("Index where this row is created: " + currentIndex);
+
         Item currentItem = new Item();
         itemLists.stream().forEach(s -> {
             if (s.getSku() == item.getSku()) {
@@ -393,20 +394,15 @@ public class MainDashboardController implements Initializable {
 
         });
 
-        JFXButton risDetails = new JFXButton("DETAILS");
-        risDetails.setOnAction(e->{
-            new StageLoader().load(GlobalRisController.class,applicationContext);
-        });
 
         HBox hBox = new HBox();
         HBox.setMargin(name, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(quantity, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(cost, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(amount, new Insets(50.0, 0.0, 0.0, 20.0));
-        HBox.setMargin(risDetails, new Insets(50.0, 0.0, 0.0, 20.0));
 
         HBox.setMargin(delete, new Insets(35.0, 0.0, 0.0, 20.0));
-        hBox.getChildren().addAll(name, quantity, cost, amount, delete, risDetails);
+        hBox.getChildren().addAll(name, quantity, cost, amount, delete);
 
         return hBox;
 
@@ -479,7 +475,8 @@ public class MainDashboardController implements Initializable {
         });
 
         jfxBtnReleaseItem.setOnAction(f -> {
-            getReleaseItemModule();
+            getCustomizeRIS();
+        //    createRequisitionIssueSlip();
         });
 
         jfxBtnReports.setOnAction(g -> {
@@ -504,6 +501,10 @@ public class MainDashboardController implements Initializable {
         currentLocationBanner.setText("Dashboard");
     }
 
+    private void getCustomizeRIS() {
+        new StageLoader().load(CustomizeRequisitionIssueSlipController.class, applicationContext);
+    }
+
     public void getInventoryModule(ActionEvent actionEvent) {
         resetHboxes();
         currentLocationBanner.setText("Inventory");
@@ -523,7 +524,7 @@ public class MainDashboardController implements Initializable {
     public void getLogoutModule(ActionEvent actionEvent) {
     }
 
-    public void getReleaseItemModule() {
+    public void createRequisitionIssueSlip() {
         resetHboxes();
 
         ScrollPane scrollPane = new ScrollPane();
@@ -596,13 +597,18 @@ public class MainDashboardController implements Initializable {
         });
 
         JFXButton openCamera = new JFXButton("Open Camera");
+        JFXButton viewRisDetails = new JFXButton("RIS Details");
 
 
         openCamera.setOnAction(e -> {
             new StageLoader().load(CaptureQrCodeController.class, applicationContext);
         });
 
-        topHbox.getChildren().addAll(itemName, openCamera);
+        viewRisDetails.setOnAction(e ->{
+            new StageLoader().load(RisDetailsController.class, applicationContext);
+        });
+
+        topHbox.getChildren().addAll(itemName, openCamera,viewRisDetails);
         midHbox.getChildren().addAll(scrollPane);
         midHbox.setPrefHeight(500.0);
 
@@ -660,7 +666,6 @@ public class MainDashboardController implements Initializable {
                 }
 
                 if(!ObjectUtils.isEmpty(ris)){
-                    System.out.println(ris.toString());
                     if(!ObjectUtils.isEmpty(risRepository.save(ris))){
                         Prompt.success("Item released!");
                     }
@@ -681,5 +686,10 @@ public class MainDashboardController implements Initializable {
 
 
     public void getBackupModule(ActionEvent actionEvent) {
+    }
+
+    public void sampleAction(ActionEvent actionEvent) {
+        getCustomizeRIS();
+        createRequisitionIssueSlip();
     }
 }

@@ -33,6 +33,8 @@ public class GlobalConfiguration {
     public static final String generatedQrCodeDirectory; //DON'T FORGET TO CHANGE ON PRODUCTION
     public static final String clientAcronym;
     public static final String defaultSubCategoryData;
+    public static final String customerTypes;
+    public static final String risTemplates;
 
     static {
         homePage = "HOME_PAGE";
@@ -45,6 +47,8 @@ public class GlobalConfiguration {
         generatedQrCodeDirectory = "GENERATED_QR_CODE_DIRECTORY";
         clientAcronym = "CLIENT_ACRONYM";
         defaultSubCategoryData = "DEFAULT_SUB_CATEGORY_DATA";
+        customerTypes = "CUSTOMER_TYPES";
+        risTemplates = "RIS_TEMPLATES";
     }
 
 
@@ -73,6 +77,11 @@ public class GlobalConfiguration {
     public static String getDefaultSubCategoryData(){
         return getConfigValue(defaultSubCategoryData);
     }
+
+    public static String getCustomerTypes() { return getConfigValue(customerTypes);}
+
+    public static String getRisTemplates() { return getConfigValue(risTemplates);}
+
 
     //Getting default value when configuration id could not be found
     public static String getDefaultValue(){

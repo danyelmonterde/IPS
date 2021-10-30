@@ -222,7 +222,7 @@
                                     </ImageView>
                                  </graphic>
                               </JFXButton>
-                              <JFXButton fx:id="releaseItem" contentDisplay="GRAPHIC_ONLY" onAction="#getReleaseItemModule">
+                              <JFXButton fx:id="releaseItemTest" contentDisplay="GRAPHIC_ONLY" onAction="#sampleAction">
                                  <graphic>
                                     <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
