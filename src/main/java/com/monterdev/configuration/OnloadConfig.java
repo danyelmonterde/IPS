@@ -132,8 +132,12 @@ public class OnloadConfig {
     }
 
     @Bean
-    public SelectedRisTemplate selectedRISTemplate(){
+    public SelectedRisTemplate selectedRISTemplate() {
         return new SelectedRisTemplate();
     }
 
+    @Bean
+    public List<RisTypeFields> risTypeFields() {
+        return new ArrayList<>();
+    }
 }

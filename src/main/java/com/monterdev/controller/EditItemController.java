@@ -508,10 +508,6 @@ public class EditItemController {
         return supplierdata;
     }
 
-    private void createQrCode(Item item) {
-
-    }
-
     private PurchaseOrder setPurchaseOrder(Item item) {
         PurchaseOrder purchaseOrder = new PurchaseOrder();
         purchaseOrder.setDatecreated(AppTime.now());

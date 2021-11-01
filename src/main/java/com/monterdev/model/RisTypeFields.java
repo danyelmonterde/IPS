@@ -1,8 +1,6 @@
 package com.monterdev.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -10,6 +8,8 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "ristypefields")
 public class RisTypeFields {
 
@@ -21,6 +21,8 @@ public class RisTypeFields {
     private String ristype;
 
     private String ris_field;
+
+    private String ris_field_type;
 
     private String ris_value;
 

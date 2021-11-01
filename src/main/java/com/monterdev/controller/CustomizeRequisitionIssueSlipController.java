@@ -115,11 +115,14 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     }
 
     public void addRIS(ActionEvent actionEvent) {
+        resetFields();
         requisitionIssueSlip.setCustomer_name(customer.getFirst_name()+" "+customer.getMiddle_name()+" "+customer.getLast_name());
         customer.setFirst_name(customer.getFirst_name());
         customer.setMiddle_name(customer.getMiddle_name());
         customer.setLast_name((customer.getLast_name()));
-        cancel(null);
+        selectedRisTemplate.setSelectedRisTemplate(this.comboRisTemplate.getValue().toString().intern());
+        Stage stage = (Stage) btnRisTemplate.getScene().getWindow();
+        stage.close();
     }
 
     public void cancel(ActionEvent actionEvent) {
