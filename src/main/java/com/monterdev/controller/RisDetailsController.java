@@ -3,6 +3,7 @@ package com.monterdev.controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTextField;
+import com.monterdev.model.RequisitionIssueSlip;
 import com.monterdev.model.RisType;
 import com.monterdev.model.RisTypeFields;
 import com.monterdev.model.SelectedRisTemplate;
@@ -49,6 +50,12 @@ public class RisDetailsController implements Initializable {
     @FXML
     private JFXButton btnSave;
 
+    @FXML
+    private JFXTextField risNumber;
+
+    @FXML
+    private JFXTextField risPurpose;
+
     @Autowired
     private SelectedRisTemplate selectedRisTemplate;
 
@@ -59,6 +66,9 @@ public class RisDetailsController implements Initializable {
     private ControlNumberGenerator controlNumberGenerator;
 
     private String generatedControlNumber = null;
+
+    @Autowired
+    private RequisitionIssueSlip requisitionIssueSlip;
 
     @Autowired
     private List<RisTypeFields> risTypeFieldsList;
@@ -89,6 +99,8 @@ public class RisDetailsController implements Initializable {
             successFields =0;
             numberOfFields = risTypeFieldsList.size();
             risContainer.getChildren().clear();
+            risNumber.setText(requisitionIssueSlip.getRequisition_and_issue_slip_number());
+            risPurpose.setText(requisitionIssueSlip.getPurpose());
             risTypeFieldsList.stream().forEach(data -> {
                 if (data.getRis_field_type().equalsIgnoreCase(TEXT) || data.getRis_field_type().equalsIgnoreCase(NUMBER) || data.getRis_field_type().equalsIgnoreCase(MONEY)) {
                     generatedControlNumber = data.getControl_number();
@@ -159,7 +171,11 @@ public class RisDetailsController implements Initializable {
     }
 
     public void save(ActionEvent actionEvent) {
+        requisitionIssueSlip.setRequisition_and_issue_slip_number(risNumber.getText());
+        requisitionIssueSlip.setPurpose(risPurpose.getText());
+        requisitionIssueSlip.setControl_number(generatedControlNumber);
         risTypeFieldsList.clear();
+        successFields =0;
         ObservableList<Node> risContainerChildren = risContainer.getChildren();
         for (Node child : risContainerChildren) {
             if (child instanceof JFXTextField) {

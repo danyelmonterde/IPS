@@ -1,8 +1,6 @@
 package com.monterdev.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -11,6 +9,8 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "history")
 public class History {
 

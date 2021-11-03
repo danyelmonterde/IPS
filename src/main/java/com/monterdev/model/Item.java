@@ -35,6 +35,8 @@ public class Item {
 
     private String tag;
 
+    private String unit;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -69,6 +69,7 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        resetFields();
         customerTypeOnload();
         comboRisTemplateOnload();
         setFirstName();
@@ -115,7 +116,6 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     }
 
     public void addRIS(ActionEvent actionEvent) {
-        resetFields();
         requisitionIssueSlip.setCustomer_name(customer.getFirst_name()+" "+customer.getMiddle_name()+" "+customer.getLast_name());
         customer.setFirst_name(customer.getFirst_name());
         customer.setMiddle_name(customer.getMiddle_name());

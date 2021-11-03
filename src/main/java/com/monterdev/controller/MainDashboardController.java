@@ -2,14 +2,13 @@ package com.monterdev.controller;
 
 import com.google.zxing.NotFoundException;
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
-import com.monterdev.model.Item;
-import com.monterdev.model.RequisitionIssueSlip;
-import com.monterdev.repository.ItemsRepository;
-import com.monterdev.repository.RisRepository;
+import com.monterdev.model.*;
+import com.monterdev.repository.*;
+import com.monterdev.util.AppTime;
 import com.monterdev.util.Prompt;
-//import com.monterdev.util.ReportUtil;
 import com.monterdev.util.SearchUtil;
 import com.monterdev.util.StageLoader;
 import javafx.animation.TranslateTransition;
@@ -34,7 +33,6 @@ import javafx.util.Duration;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.rgielen.fxweaver.core.FxmlView;
-//import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -43,6 +41,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -159,7 +158,25 @@ public class MainDashboardController implements Initializable {
     private SearchUtil searchUtil;
 
     @Autowired
-    private RequisitionIssueSlip ris;
+    private RequisitionIssueSlip requisitionIssueSlip;
+
+    @Autowired
+    private RisTypeFieldsRepository risTypeFieldsRepository;
+
+    @Autowired
+    private SalesRepository salesRepository;
+
+    @Autowired
+    private HistoryRepository historyRepository;
+
+    @Autowired
+    private List<RisTypeFields> risTypeFieldsList;
+
+    @Autowired
+    private Customer customer;
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     private List<String> responseList = new ArrayList<>();
 
@@ -174,12 +191,21 @@ public class MainDashboardController implements Initializable {
     private JFXListView listView = new JFXListView();
 
     private TranslateTransition slide = new TranslateTransition();
+
     private TranslateTransition slideMainAnchorpane = new TranslateTransition();
+
     private TranslateTransition slideSearchPane = new TranslateTransition();
-//    @Autowired
+    //    @Autowired
 //    private ReportUtil reportUtil;
     @FXML
     private JFXButton releaseItemTest;
+
+    private double totalSales =0; //;total amount na may 20% na patong pag new
+
+    private double totalCost = 0; //lahat ng average cost
+
+    private double totalIncome = 0; //totalSales - totalCost
+
     @SneakyThrows
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -338,21 +364,21 @@ public class MainDashboardController implements Initializable {
         JFXTextField amount = createTextField("AMOUNT", "LIGHT GRAY");
 
         amount.setEditable(false);
-        amount.textProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
+        amount.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue && !ObjectUtils.isEmpty(newValue) ) {
 
             }
         });
 
 
         JFXTextField cost = createTextField("COST", "LIGHT GRAY");
-        cost.setText(String.valueOf(currentItem.getCost()));
         cost.setId(String.valueOf(currentIndex));
+        cost.setText(String.valueOf(currentItem.getCost()));
         cost.textProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
                 itemCart.get(Integer.parseInt(cost.getId())).setCost(Double.parseDouble(newValue));
-                amount.setText( String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
-
+                amount.setText(String.format("%.2f", currentItem.getQuantity() * Double.parseDouble(newValue)));
+                currentItem.setCost(Double.parseDouble(newValue));
             }
         });
 
@@ -361,13 +387,23 @@ public class MainDashboardController implements Initializable {
         quantity.setId(String.valueOf(currentIndex));
         quantity.textProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
+                currentItem.setQuantity(Integer.parseInt(newValue));
                 itemCart.get(Integer.parseInt(quantity.getId())).setQuantity(Integer.parseInt(newValue));
-                amount.setText( String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
+                amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
 
             }
         });
 
-        amount.setText( String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
+        JFXComboBox unit = new JFXComboBox();
+        unit.setPromptText("SELECT ITEM UNIT");
+        unit.setId(String.valueOf(currentIndex));
+        unit.valueProperty().addListener((observable,oldValue,newValue)->{
+            if(oldValue!=newValue){
+
+            }
+        });
+
+        amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
 
         JFXButton delete = createButtonWithoutText("DELETE");
         delete.setId(Integer.toString(currentIndex));
@@ -414,7 +450,7 @@ public class MainDashboardController implements Initializable {
         currentLocationBanner.setText("Reports Module");
         Label label = new Label("Reports Module");
         JFXButton getReport = new JFXButton("Generate List of Items");
-        getReport.setOnAction(e ->{
+        getReport.setOnAction(e -> {
 //            try {
 //                reportUtil.generateReport();
 //            } catch (JRException ex) {
@@ -476,7 +512,7 @@ public class MainDashboardController implements Initializable {
 
         jfxBtnReleaseItem.setOnAction(f -> {
             getCustomizeRIS();
-        //    createRequisitionIssueSlip();
+            createRequisitionIssueSlip();
         });
 
         jfxBtnReports.setOnAction(g -> {
@@ -604,17 +640,16 @@ public class MainDashboardController implements Initializable {
             new StageLoader().load(CaptureQrCodeController.class, applicationContext);
         });
 
-        viewRisDetails.setOnAction(e ->{
+        viewRisDetails.setOnAction(e -> {
             new StageLoader().load(RisDetailsController.class, applicationContext);
         });
 
-        topHbox.getChildren().addAll(itemName, openCamera,viewRisDetails);
+        topHbox.getChildren().addAll(itemName, openCamera, viewRisDetails);
         midHbox.getChildren().addAll(scrollPane);
         midHbox.setPrefHeight(500.0);
 
         JFXButton releaseItem = new JFXButton("RELEASE ITEM");
         JFXButton cancelButton = new JFXButton("CANCEL");
-
 
 
         releaseItem.setOnAction(x -> {
@@ -650,9 +685,33 @@ public class MainDashboardController implements Initializable {
         if (!ObjectUtils.isEmpty(itemCart) || selectedItem.getSku() != 0) {
             itemCart.stream().forEach(item -> {
 
+                History history = new History();
+                history.setDate(AppTime.now());
+                history.setItem_name(item.getItem_name());
+                history.setAdjustment(item.getQuantity()*-1);
+                history.setSub_category_detail(item.getSub_category_detail());
+                history.setReason("RELEASE ITEM");
+
+
                 int inStock = item.getIn_stock() - item.getQuantity();
                 item.setQuantity(inStock);
                 item.setIn_stock(inStock);
+                item.setTag(null);
+
+                history.setStock_after(inStock);
+                historyRepository.save(history);
+
+                if(requisitionIssueSlip.getIs_customer_new()==1){
+                    totalCost+=item.getCost() * item.getQuantity();
+                    totalSales+=(item.getCost()+(item.getCost()*.2)) * item.getQuantity();
+                    totalIncome = totalSales - totalCost;
+                }else{
+                    totalCost+=item.getCost() * item.getQuantity();
+                    totalSales+= item.getCost() * item.getQuantity();
+                    totalIncome = totalSales - totalCost;
+                }
+
+
             });
             if (!ObjectUtils.isEmpty(itemsRepository.saveAll(itemCart))) {
                 resetSelectedItem();
@@ -665,18 +724,31 @@ public class MainDashboardController implements Initializable {
 
                 }
 
-                if(!ObjectUtils.isEmpty(ris)){
-                    if(!ObjectUtils.isEmpty(risRepository.save(ris))){
+                if (!ObjectUtils.isEmpty(requisitionIssueSlip)) {
+                    if (!ObjectUtils.isEmpty(risRepository.save(requisitionIssueSlip))) {
                         Prompt.success("Item released!");
                     }
-                }else{
+                } else {
                     Prompt.failed("Item could not be released! Please check RIS details!");
                 }
 
             } else {
                 Prompt.failed("An error occured while saving!");
             }
+            risTypeFieldsList.stream().forEach(data ->{
+                risTypeFieldsRepository.save(data);
+            });
 
+            Sales sales = new Sales();
+            sales.setControl_number(requisitionIssueSlip.getControl_number());
+            sales.setTotal_sales(totalSales);
+            sales.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern("dd-MMM-YYYY")));
+            sales.setIncome(totalIncome);
+            sales.setTotal_cost(totalCost);
+
+            salesRepository.save(sales);
+
+            customerRepository.save(customer);
 
         } else {
             Prompt.failed("Please enter valid input!");
@@ -688,7 +760,7 @@ public class MainDashboardController implements Initializable {
     public void getBackupModule(ActionEvent actionEvent) {
     }
 
-    public void sampleAction(ActionEvent actionEvent) {
+    public void openRISModule(ActionEvent actionEvent) {
         getCustomizeRIS();
         createRequisitionIssueSlip();
     }

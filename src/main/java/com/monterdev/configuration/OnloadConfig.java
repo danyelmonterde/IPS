@@ -39,7 +39,7 @@ public class OnloadConfig {
     private ItemsRepository itemsRepository;
 
     @Bean
-    public RequisitionIssueSlip ris() {
+    public RequisitionIssueSlip requisitionIssueSlip() {
         return new RequisitionIssueSlip();
     }
 
@@ -124,11 +124,6 @@ public class OnloadConfig {
     @Bean
     public Customer customer() {
         return new Customer();
-    }
-
-    @Bean
-    public RequisitionIssueSlip requisitionIssueSlip() {
-        return new RequisitionIssueSlip();
     }
 
     @Bean

@@ -73,6 +73,8 @@ public class CaptureQrCodeController {
             // start the video capture
             this.capture.open(cameraId);
 
+
+
             // is the video stream available?
             if (this.capture.isOpened()) {
                 // this.cameraActive = true;
