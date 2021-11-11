@@ -7,6 +7,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface SubCategoryDetailsRepository extends CrudRepository<ItemSubCategoryDetail, Integer> {
 
-    @Query(value = "SELECT * FROM subcategorydetail WHERE sub_category_detail=:sub_category_detail", nativeQuery = true)
+    @Query(value = "SELECT * FROM itemsubcategorydetail WHERE sub_category_detail=:sub_category_detail", nativeQuery = true)
     ItemSubCategoryDetail findBySubCategoryDetail(@Param("sub_category_detail") String sub_category_detail);
 }

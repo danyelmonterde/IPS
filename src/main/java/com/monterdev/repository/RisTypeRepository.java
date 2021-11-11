@@ -1,6 +1,5 @@
 package com.monterdev.repository;
 
-import com.monterdev.model.ItemSubCategoryDetail;
 import com.monterdev.model.RisType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

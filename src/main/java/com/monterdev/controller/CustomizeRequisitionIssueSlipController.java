@@ -6,6 +6,8 @@ import com.jfoenix.controls.JFXTextField;
 import com.monterdev.model.Customer;
 import com.monterdev.model.RequisitionIssueSlip;
 import com.monterdev.model.SelectedRisTemplate;
+import com.monterdev.util.AppTime;
+import com.monterdev.util.StageLoader;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,6 +20,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 
@@ -39,6 +42,18 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
 
     @FXML
     private JFXTextField lastName;
+
+    @FXML
+    private JFXTextField requestedBy;
+
+    @FXML
+    private JFXTextField division;
+
+    @FXML
+    private JFXTextField office;
+
+    @FXML
+    private JFXTextField responsibilityCenterCode;
 
     @FXML
     private JFXComboBox customerType;
@@ -69,12 +84,52 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        setDate();
         resetFields();
         customerTypeOnload();
         comboRisTemplateOnload();
         setFirstName();
         setMiddleName();
         setLastName();
+        setRequestedBy();
+        setDivision();
+        setOffice();
+        setResponsibilityCenterCode();
+    }
+
+    private void setResponsibilityCenterCode() {
+        responsibilityCenterCode.textProperty().addListener((observable,oldValue,newValue)->{
+            if(oldValue!=newValue){
+                requisitionIssueSlip.setResponsibility_center_code(newValue);
+            }
+        });
+    }
+
+    private void setDivision() {
+        division.textProperty().addListener((observable,oldValue,newValue)->{
+            if(oldValue!=newValue){
+                requisitionIssueSlip.setDivision(newValue);
+            }
+        });
+    }    
+    private void setOffice() {
+        office.textProperty().addListener((observable,oldValue,newValue)->{
+            if(oldValue!=newValue){
+                requisitionIssueSlip.setOffice(newValue);
+            }
+        });
+    }
+
+    private void setRequestedBy() {
+        requestedBy.textProperty().addListener((observable,oldValue,newValue)->{
+            if(oldValue!=newValue){
+                requisitionIssueSlip.setRequested_by(newValue);
+            }
+        });
+    }
+
+    private void setDate() {
+        currentDate.setText(AppTime.now().format(DateTimeFormatter.ofPattern("dd-MMM-YYYY hh:mm:ss")));
     }
 
     public void customerTypeOnload() {
@@ -112,7 +167,7 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     }
 
     public void createRISTemplate(ActionEvent actionEvent) {
-        cancel(null);
+        new StageLoader().load(CreateRequisitionTemplateController.class, applicationContext);
     }
 
     public void addRIS(ActionEvent actionEvent) {

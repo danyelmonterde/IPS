@@ -1,7 +1,5 @@
 package com.monterdev.configuration;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 public class AppStateConfig {
 
     @Bean
-    public ApplicationState applicationState(){
+    public ApplicationState applicationState() {
         return new ApplicationState();
     }
 

@@ -7,6 +7,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface CategoryRepository extends CrudRepository<ItemCategory, Integer> {
 
-    @Query(value = "SELECT * FROM category WHERE category_name=:category", nativeQuery = true)
+    @Query(value = "SELECT * FROM itemcategory WHERE category_name=:category", nativeQuery = true)
     ItemCategory findByCategory(@Param("category") String category);
 }

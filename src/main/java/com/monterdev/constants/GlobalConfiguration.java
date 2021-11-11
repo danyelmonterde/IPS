@@ -7,12 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.monterdev.configuration.JsonFileConfiguration;
 import com.monterdev.exception.IqwdException;
 import com.monterdev.model.CustomConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +31,11 @@ public class GlobalConfiguration {
     public static final String defaultSubCategoryData;
     public static final String customerTypes;
     public static final String risTemplates;
+    public static final String inventoryTypes;
+    public static final String risFieldTypes;
+    public static final String availableReports;
+    public static final String months;
+    public static final String years;
 
     static {
         homePage = "HOME_PAGE";
@@ -49,8 +50,12 @@ public class GlobalConfiguration {
         defaultSubCategoryData = "DEFAULT_SUB_CATEGORY_DATA";
         customerTypes = "CUSTOMER_TYPES";
         risTemplates = "RIS_TEMPLATES";
+        inventoryTypes = "INVENTORY_TYPES";
+        risFieldTypes = "RIS_FIELD_TYPES";
+        availableReports = "AVAILABLE_REPORTS";
+        months = "CALENDAR_MONTHS";
+        years = "CALENDAR_YEARS";
     }
-
 
 
     //Custom getters
@@ -66,46 +71,68 @@ public class GlobalConfiguration {
         return getConfigValue(apiUrl);
     }
 
-    public static String getWindowTitle(){
+    public static String getWindowTitle() {
         return getConfigValue(windowTitle);
     }
 
-    public static String getClientAcronym(){
+    public static String getClientAcronym() {
         return getConfigValue(clientAcronym);
     }
 
-    public static String getDefaultSubCategoryData(){
+    public static String getDefaultSubCategoryData() {
         return getConfigValue(defaultSubCategoryData);
     }
 
-    public static String getCustomerTypes() { return getConfigValue(customerTypes);}
+    public static String getCustomerTypes() {
+        return getConfigValue(customerTypes);
+    }
 
-    public static String getRisTemplates() { return getConfigValue(risTemplates);}
+    public static String getRisTemplates() {
+        return getConfigValue(risTemplates);
+    }
+
+    public static String getInventoryTypes() {
+        return getConfigValue(inventoryTypes);
+    }
+
+    public static String getAvailableReports() {
+        return getConfigValue(availableReports);
+    }
+    public static String getCalenderYears() {
+        return getConfigValue(years);
+    }
+    public static String getMonthsofCalender() {
+        return getConfigValue(months);
+    }
+    public static String getRisFieldTypes() {
+        return getConfigValue(risFieldTypes);
+    }
 
 
     //Getting default value when configuration id could not be found
-    public static String getDefaultValue(){
+    public static String getDefaultValue() {
         Optional<CustomConfig> optionalValue = customConfigs
                 .stream().filter(id -> id.getConfigId().equalsIgnoreCase(defaultId))
                 .findFirst();
-        return optionalValue.isPresent() ? optionalValue.get().getConfigValue(): null;
+        return optionalValue.isPresent() ? optionalValue.get().getConfigValue() : null;
     }
 
     //Getting the actual configuration value based from the configuration id
-    public static String getConfigValue(String configId ){
+    public static String getConfigValue(String configId) {
         Optional<CustomConfig> optionalValue = customConfigs
                 .stream().filter(id -> id.getConfigId().equalsIgnoreCase(configId))
                 .findFirst();
-        return optionalValue.isPresent() ? optionalValue.get().getConfigValue(): getDefaultValue();
+        return optionalValue.isPresent() ? optionalValue.get().getConfigValue() : getDefaultValue();
     }
 
     //On-startup setting of the Global json configuration
     public void setJsonFileConfiguration(JsonFileConfiguration jsonFileConfiguration) throws IqwdException {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            customConfigs = objectMapper.readValue(objectMapper.writeValueAsString(jsonFileConfiguration.getCustomConfigurations()), new TypeReference<List<CustomConfig>>() {});
+            customConfigs = objectMapper.readValue(objectMapper.writeValueAsString(jsonFileConfiguration.getCustomConfigurations()), new TypeReference<List<CustomConfig>>() {
+            });
         } catch (JsonProcessingException e) {
-            throw new IqwdException(ErrorConstants.APPLICATION_ERROR_CODE(),ErrorConstants.APPLICATION_ERROR_MESSAGE(), e.getCause());
+            throw new IqwdException(ErrorConstants.APPLICATION_ERROR_CODE(), ErrorConstants.APPLICATION_ERROR_MESSAGE(), e.getCause());
         }
     }
 }

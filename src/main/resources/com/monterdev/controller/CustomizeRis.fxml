@@ -11,9 +11,9 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="299.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.CustomizeRequisitionIssueSlipController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="362.0" prefWidth="617.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.CustomizeRequisitionIssueSlipController">
    <children>
-      <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <VBox prefHeight="333.0" prefWidth="569.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="17.0">
          <children>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
@@ -56,6 +56,35 @@
                </children>
             </HBox>
             <Line endX="489.29290771484375" endY="1.7928931713104248" opacity="0.31" startX="-100.0">
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </Line>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <JFXTextField fx:id="requestedBy" labelFloat="true" promptText="REQUESTED BY">
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+                  <JFXTextField fx:id="division" labelFloat="true" promptText="DIVISION">
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+                  <JFXTextField fx:id="office" labelFloat="true" promptText="OFFICE">
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+                  <JFXTextField fx:id="responsibilityCenterCode" labelFloat="true" promptText="RESPONSIBILITY CENTER CODE">
+                     <HBox.margin>
+                        <Insets left="20.0" right="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+               </children>
+            </HBox>
+            <Line endX="489.29290771484375" endY="1.7928931713104248" layoutX="111.0" layoutY="154.0" opacity="0.31" startX="-100.0">
                <VBox.margin>
                   <Insets top="20.0" />
                </VBox.margin>

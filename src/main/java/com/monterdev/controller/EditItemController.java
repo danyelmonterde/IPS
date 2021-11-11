@@ -60,13 +60,13 @@ public class EditItemController {
     private HBox trackStockHbox;
 
     @FXML
-    private JFXComboBox category;
+    private JFXComboBox itemCategory;
 
     @FXML
-    private JFXComboBox subCategoryHeader;
+    private JFXComboBox itemSubCategoryHeader;
 
     @FXML
-    private JFXComboBox subCategoryDetail;
+    private JFXComboBox itemSubCategoryDetail;
 
     @FXML
     private JFXTextField quantity;
@@ -234,25 +234,25 @@ public class EditItemController {
     private void loadCategories(ItemSubCategoryDetail itemSubCategoryDetail, ItemSubCategoryHeader itemSubCategoryHeader, ItemCategory itemCategory) {
         clearComboBoxes();
         subCategoryDetailPreLoaded.forEach(itemSubCategoryDetail1 -> {
-            this.subCategoryDetail.getItems().add(itemSubCategoryDetail1.getSub_category_detail());
+            this.itemSubCategoryDetail.getItems().add(itemSubCategoryDetail1.getSub_category_detail());
         });
 
         subCategoryHeaderPreLoaded.forEach(itemSubCategoryHeader1 -> {
-            this.subCategoryHeader.getItems().add(itemSubCategoryHeader1.getSub_category_header());
+            this.itemSubCategoryHeader.getItems().add(itemSubCategoryHeader1.getSub_category_header());
         });
 
         categoryPreLoaded.forEach(itemCategory1 -> {
-            this.category.getItems().add(itemCategory1.getCategory_name());
+            this.itemCategory.getItems().add(itemCategory1.getCategory_name());
         });
-        this.subCategoryDetail.setValue(itemSubCategoryDetail.getSub_category_detail());
-        this.subCategoryHeader.setValue(itemSubCategoryHeader.getSub_category_header());
-        this.category.setValue(itemCategory.getCategory_name());
+        this.itemSubCategoryDetail.setValue(itemSubCategoryDetail.getSub_category_detail());
+        this.itemSubCategoryHeader.setValue(itemSubCategoryHeader.getSub_category_header());
+        this.itemCategory.setValue(itemCategory.getCategory_name());
     }
 
     private void clearComboBoxes() {
-        this.subCategoryDetail.getItems().clear();
-        this.subCategoryHeader.getItems().clear();
-        this.category.getItems().clear();
+        this.itemSubCategoryDetail.getItems().clear();
+        this.itemSubCategoryHeader.getItems().clear();
+        this.itemCategory.getItems().clear();
     }
 
     private void itemNameonChange() {
@@ -315,7 +315,7 @@ public class EditItemController {
             lowStock.setText(Integer.toString(item.get().getLow_stock()));
             sku.setText(Integer.toString(item.get().getSku()));
             averageCost.setText(Double.toString(item.get().getCost()));
-            subCategoryDetail.setValue(item.get().getSub_category_detail());
+            itemSubCategoryDetail.setValue(item.get().getSub_category_detail());
         }
     }
 
@@ -343,7 +343,7 @@ public class EditItemController {
     }
 
     private void subCategoryDetailOnChange() {
-        this.subCategoryDetail.valueProperty().addListener((observable, oldValue, newValue) -> {
+        this.itemSubCategoryDetail.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
                 selectedItem.setSub_category_detail(newValue.toString());
             }
@@ -354,11 +354,11 @@ public class EditItemController {
     public void updateSubCategoryHeader(ActionEvent actionEvent) {
         try {
             List<ItemSubCategoryHeader> subCategories = StreamSupport.stream(this.subCategoryHeaderPreLoaded.spliterator(), false)
-                    .filter(e -> e.getCategory().equalsIgnoreCase(this.category.getValue().toString())).collect(Collectors.toList());
-            this.subCategoryHeader.getItems().clear();
-            this.subCategoryDetail.getItems().clear();
+                    .filter(e -> e.getCategory().equalsIgnoreCase(this.itemCategory.getValue().toString())).collect(Collectors.toList());
+            this.itemSubCategoryHeader.getItems().clear();
+            this.itemSubCategoryDetail.getItems().clear();
             subCategories.stream().forEach(s -> {
-                this.subCategoryHeader.getItems().add(s.getSub_category_header());
+                this.itemSubCategoryHeader.getItems().add(s.getSub_category_header());
             });
         } catch (NullPointerException nullPointerException) {
 
@@ -369,10 +369,10 @@ public class EditItemController {
     public void updateSubCategoryDetail(ActionEvent actionEvent) {
         try {
             List<ItemSubCategoryDetail> itemSubCategoryDetailList = StreamSupport.stream(this.subCategoryDetailPreLoaded.spliterator(), false)
-                    .filter(e -> e.getSub_category_header().equalsIgnoreCase(this.subCategoryHeader.getValue().toString())).collect(Collectors.toList());
-            this.subCategoryDetail.getItems().clear();
+                    .filter(e -> e.getSub_category_header().equalsIgnoreCase(this.itemSubCategoryHeader.getValue().toString())).collect(Collectors.toList());
+            this.itemSubCategoryDetail.getItems().clear();
             itemSubCategoryDetailList.stream().forEach(d -> {
-                this.subCategoryDetail.getItems().add(d.getSub_category_detail());
+                this.itemSubCategoryDetail.getItems().add(d.getSub_category_detail());
             });
         } catch (NullPointerException nullPointerException) {
 
@@ -423,7 +423,7 @@ public class EditItemController {
         supplierGroup.setText("");
         receiptNumber.setText("");
         purchaseOrderNumber.setText("");
-        subCategoryDetail.setValue(getConfigValue(defaultCategoryData));
+        itemSubCategoryDetail.setValue(getConfigValue(defaultCategoryData));
     }
 
     private void resetSelectedItem() {

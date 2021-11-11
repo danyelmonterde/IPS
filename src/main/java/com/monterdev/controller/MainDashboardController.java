@@ -5,12 +5,10 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
+import com.monterdev.constants.GlobalConfiguration;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
-import com.monterdev.util.AppTime;
-import com.monterdev.util.Prompt;
-import com.monterdev.util.SearchUtil;
-import com.monterdev.util.StageLoader;
+import com.monterdev.util.*;
 import javafx.animation.TranslateTransition;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -42,15 +40,11 @@ import org.springframework.util.ObjectUtils;
 import java.io.IOException;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.monterdev.constants.GlobalConfiguration.defaultCategoryData;
-import static com.monterdev.constants.GlobalConfiguration.getConfigValue;
+import static com.monterdev.constants.GlobalConfiguration.*;
 import static com.monterdev.util.ComponentCreator.createButtonWithoutText;
 import static com.monterdev.util.ComponentCreator.createTextField;
 import static com.monterdev.util.QrCodeUtil.readQrCodeImage;
@@ -158,6 +152,9 @@ public class MainDashboardController implements Initializable {
     private SearchUtil searchUtil;
 
     @Autowired
+    private ReportUtil reportUtil;
+
+    @Autowired
     private RequisitionIssueSlip requisitionIssueSlip;
 
     @Autowired
@@ -178,6 +175,9 @@ public class MainDashboardController implements Initializable {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Autowired
+    private UnitRepository unitRepository;
+
     private List<String> responseList = new ArrayList<>();
 
     private static int rowIndex = 0;
@@ -195,10 +195,9 @@ public class MainDashboardController implements Initializable {
     private TranslateTransition slideMainAnchorpane = new TranslateTransition();
 
     private TranslateTransition slideSearchPane = new TranslateTransition();
-    //    @Autowired
-//    private ReportUtil reportUtil;
+
     @FXML
-    private JFXButton releaseItemTest;
+    private JFXButton releaseItemButton;
 
     private double totalSales =0; //;total amount na may 20% na patong pag new
 
@@ -345,6 +344,7 @@ public class MainDashboardController implements Initializable {
                 currentItem.setQuantity(0);
                 currentItem.setSub_category_detail(s.getSub_category_detail());
                 currentItem.setItem_name(s.getItem_name());
+                currentItem.setUnit(s.getUnit());
             }
         });
 
@@ -397,9 +397,14 @@ public class MainDashboardController implements Initializable {
         JFXComboBox unit = new JFXComboBox();
         unit.setPromptText("SELECT ITEM UNIT");
         unit.setId(String.valueOf(currentIndex));
+        Iterable<Unit> units = unitRepository.findAll();
+        units.forEach(u ->{
+            unit.getItems().add(u);
+        });
+
         unit.valueProperty().addListener((observable,oldValue,newValue)->{
             if(oldValue!=newValue){
-
+                currentItem.setUnit((String) newValue);
             }
         });
 
@@ -448,18 +453,51 @@ public class MainDashboardController implements Initializable {
     public void getReportsModule(ActionEvent actionEvent) {
         resetHboxes();
         currentLocationBanner.setText("Reports Module");
-        Label label = new Label("Reports Module");
-        JFXButton getReport = new JFXButton("Generate List of Items");
-        getReport.setOnAction(e -> {
-//            try {
-//                reportUtil.generateReport();
-//            } catch (JRException ex) {
-//                ex.printStackTrace();
-//            } catch (SQLException ex) {
-//                ex.printStackTrace();
-//            }
+
+        JFXComboBox availableReports = new JFXComboBox();
+        JFXComboBox monthsList = new JFXComboBox();
+        JFXComboBox yearList = new JFXComboBox();
+
+        String [] reports = getAvailableReports().split(",");
+        String [] months = getMonthsofCalender().split(",");
+        String [] years = getCalenderYears().split(",");
+
+        availableReports.getItems().addAll(Arrays.asList(reports));
+        monthsList.getItems().addAll(Arrays.asList(months));
+        yearList.getItems().addAll(Arrays.asList(years));
+
+        availableReports.valueProperty().addListener((observable,oldValue,newValue)->{
+            if(oldValue!=newValue){
+                reportUtil.setSelectedReport((String) newValue);
+            }
         });
-        topHbox.getChildren().addAll(label, getReport);
+
+        monthsList.valueProperty().addListener((observable,oldValue,newValue)->{
+            if(oldValue!=newValue){
+                reportUtil.setSelectedMonth((String) newValue);
+            }
+        });
+
+        yearList.valueProperty().addListener((observable,oldValue,newValue)->{
+            if(oldValue!=newValue){
+                reportUtil.setSelectedYear((String) newValue);
+            }
+        });
+
+        JFXButton getReport = new JFXButton("Generate Report");
+        getReport.setOnAction(e -> {
+            try {
+                //new StageLoader().load(MainReportController.class, applicationContext);
+                reportUtil.generateReport();
+            } catch (Exception exception){
+
+            }
+        });
+        topHbox.getChildren().addAll(availableReports,monthsList,yearList, getReport);
+        HBox.setMargin(availableReports, new Insets(20,0,0,20));
+        HBox.setMargin(monthsList, new Insets(20,0,0,20));
+        HBox.setMargin(yearList, new Insets(20,0,0,20));
+        HBox.setMargin(getReport, new Insets(20,0,0,20));
     }
 
     private void resetHboxes() {
@@ -475,7 +513,6 @@ public class MainDashboardController implements Initializable {
         editItemController.create();
         currentLocationBanner.setText("Inventory");
         topHbox.getChildren().addAll(itemListController.createItemList());
-
     }
 
     private void resetSelectedItem() {
@@ -692,15 +729,6 @@ public class MainDashboardController implements Initializable {
                 history.setSub_category_detail(item.getSub_category_detail());
                 history.setReason("RELEASE ITEM");
 
-
-                int inStock = item.getIn_stock() - item.getQuantity();
-                item.setQuantity(inStock);
-                item.setIn_stock(inStock);
-                item.setTag(null);
-
-                history.setStock_after(inStock);
-                historyRepository.save(history);
-
                 if(requisitionIssueSlip.getIs_customer_new()==1){
                     totalCost+=item.getCost() * item.getQuantity();
                     totalSales+=(item.getCost()+(item.getCost()*.2)) * item.getQuantity();
@@ -710,6 +738,16 @@ public class MainDashboardController implements Initializable {
                     totalSales+= item.getCost() * item.getQuantity();
                     totalIncome = totalSales - totalCost;
                 }
+
+                int inStock = item.getIn_stock() - item.getQuantity();
+                item.setQuantity(inStock);
+                item.setIn_stock(inStock);
+                item.setTag(null);
+
+                history.setStock_after(inStock);
+                historyRepository.save(history);
+
+
 
 
             });

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane minWidth="-Infinity" prefHeight="452.0" prefWidth="990.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.CreateRequisitionTemplateController">
+   <children>
+      <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label text="Create Requisition Issue Slip Template">
+               <VBox.margin>
+                  <Insets left="20.0" top="20.0" />
+               </VBox.margin>
+               <font>
+                  <Font name="Roboto Black" size="15.0" />
+               </font>
+            </Label>
+            <Label text="(Add desired fields for your custom RIS Form">
+               <VBox.margin>
+                  <Insets left="20.0" />
+               </VBox.margin>
+            </Label>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <JFXButton fx:id="addTemplateBtn" buttonType="RAISED" onAction="#addTemplate" style="-fx-background-color: white;" text="ADD TEMPLATE" textFill="#174577">
+                     <font>
+                        <Font name="Roboto Black" size="12.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets bottom="20.0" left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXButton>
+                  <JFXButton fx:id="deleteAllBtn" buttonType="RAISED" layoutX="30.0" layoutY="30.0" onAction="#deleteAll" style="-fx-background-color: white;" text="DELETE ALL" textFill="#174577">
+                     <font>
+                        <Font name="Roboto Black" size="12.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets bottom="20.0" left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXButton>
+               </children>
+            </HBox>
+            <ScrollPane minWidth="-Infinity" prefHeight="200.0" prefWidth="1280.0">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="7000.0" prefWidth="1280.0">
+                     <children>
+                        <VBox fx:id="risTemplateContainer" prefHeight="232.0" prefWidth="687.0" AnchorPane.bottomAnchor="7000.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+              </content>
+            </ScrollPane>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <JFXButton fx:id="cancelBtn" buttonType="RAISED" onAction="#cancel" style="-fx-background-color: RED;" text="CANCEL" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXButton>
+                  <JFXButton fx:id="saveBtn" buttonType="RAISED" defaultButton="true" onAction="#save" style="-fx-background-color: GREEN;" text="SAVE TEMPLATE" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXButton>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

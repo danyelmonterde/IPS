@@ -135,4 +135,9 @@ public class OnloadConfig {
     public List<RisTypeFields> risTypeFields() {
         return new ArrayList<>();
     }
+
+    @Bean
+    public Reports reports(){
+        return new Reports();
+    }
 }

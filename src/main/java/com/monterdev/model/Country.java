@@ -1,0 +1,15 @@
+package com.monterdev.model;
+
+public class Country extends BaseObject {
+
+    private Integer code;
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+}

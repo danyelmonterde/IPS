@@ -7,10 +7,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface SubCategoryHeaderRepository extends CrudRepository<ItemSubCategoryHeader, Integer> {
 
-    @Query(value = "SELECT * FROM subcategoryheader WHERE sub_category_header=:sub_category_header", nativeQuery = true)
+    @Query(value = "SELECT * FROM itemsubcategoryheader WHERE sub_category_header=:sub_category_header", nativeQuery = true)
     ItemSubCategoryHeader findBySubCategoryHeader(@Param("sub_category_header") String sub_category_header);
 
-    @Query(value = "SELECT * FROM subcategoryheader WHERE category=:category", nativeQuery = true)
+    @Query(value = "SELECT * FROM itemsubcategoryheader WHERE category=:category", nativeQuery = true)
     ItemSubCategoryHeader findByCategory(@Param("category") String category);
 
 }

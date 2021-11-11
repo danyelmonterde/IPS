@@ -1,8 +1,6 @@
 package com.monterdev.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -11,6 +9,8 @@ import javax.persistence.*;
 @Entity
 @Builder
 @Table(name = "reports")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Reports {
 
     @Id

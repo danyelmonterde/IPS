@@ -8,6 +8,7 @@ import com.monterdev.model.RisType;
 import com.monterdev.model.RisTypeFields;
 import com.monterdev.model.SelectedRisTemplate;
 import com.monterdev.repository.RisTypeRepository;
+import com.monterdev.util.AppTime;
 import com.monterdev.util.ControlNumberGenerator;
 import com.monterdev.util.Prompt;
 import javafx.collections.ObservableList;
@@ -91,7 +92,7 @@ public class RisDetailsController implements Initializable {
                 if (data.getRisfieldtype().equalsIgnoreCase(TEXT) || data.getRisfieldtype().equalsIgnoreCase(MONEY) || data.getRisfieldtype().equalsIgnoreCase(NUMBER)) {
                     addTextFieldToContainer(data, createTextField(data.getRisfield(), ""));
                 } else if (data.getRisfieldtype().equalsIgnoreCase(DATE)) {
-                    addDatePickerToContainer(data,LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MMM/yyyy")));
+                    addDatePickerToContainer(data,LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MMM-yyyy")));
                 }
             });
         } else {
@@ -123,7 +124,7 @@ public class RisDetailsController implements Initializable {
         JFXDatePicker dynamicDatePicker = createDateField(data.getRisfield(), currentIndex);
         dynamicDatePicker.setId(data.getRisfield());
         dynamicDatePicker.setAccessibleText(data.getRisfieldtype());
-        dynamicDatePicker.setValue(LocalDate.parse(stringDate,DateTimeFormatter.ofPattern("dd/MMM/yyyy")));
+        dynamicDatePicker.setValue(LocalDate.parse(stringDate,DateTimeFormatter.ofPattern("dd-MMM-yyyy")));
         risContainer.getChildren().add(dynamicDatePicker);
         HBox.setMargin(dynamicDatePicker, new Insets(20, 0, 0, 20));
         currentIndex++;
@@ -174,6 +175,9 @@ public class RisDetailsController implements Initializable {
         requisitionIssueSlip.setRequisition_and_issue_slip_number(risNumber.getText());
         requisitionIssueSlip.setPurpose(risPurpose.getText());
         requisitionIssueSlip.setControl_number(generatedControlNumber);
+        requisitionIssueSlip.setRistype(selectedRisTemplate.getSelectedRisTemplate());
+        requisitionIssueSlip.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:MM:SS")));
+
         risTypeFieldsList.clear();
         successFields =0;
         ObservableList<Node> risContainerChildren = risContainer.getChildren();
