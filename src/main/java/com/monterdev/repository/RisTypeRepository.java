@@ -11,4 +11,5 @@ public interface RisTypeRepository extends CrudRepository<RisType, Integer> {
 
     @Query(value = "SELECT * FROM ristype WHERE ristype=:risType", nativeQuery = true)
     List<RisType> findByRisType(@Param("risType") String risType);
+
 }

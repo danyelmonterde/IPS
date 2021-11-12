@@ -458,13 +458,17 @@ public class MainDashboardController implements Initializable {
         JFXComboBox monthsList = new JFXComboBox();
         JFXComboBox yearList = new JFXComboBox();
 
+
         String [] reports = getAvailableReports().split(",");
         String [] months = getMonthsofCalender().split(",");
         String [] years = getCalenderYears().split(",");
 
+
         availableReports.getItems().addAll(Arrays.asList(reports));
         monthsList.getItems().addAll(Arrays.asList(months));
         yearList.getItems().addAll(Arrays.asList(years));
+
+
 
         availableReports.valueProperty().addListener((observable,oldValue,newValue)->{
             if(oldValue!=newValue){
@@ -483,6 +487,7 @@ public class MainDashboardController implements Initializable {
                 reportUtil.setSelectedYear((String) newValue);
             }
         });
+
 
         JFXButton getReport = new JFXButton("Generate Report");
         getReport.setOnAction(e -> {
