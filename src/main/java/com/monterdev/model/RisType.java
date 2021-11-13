@@ -25,4 +25,6 @@ public class RisType {
     private String risfield;
 
     private String risfieldtype;
+
+    private String risname;
 }
