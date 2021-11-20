@@ -96,10 +96,6 @@
     {
       "configId": "CLIENT_ACRONYM",
       "configValue": "IQWD"
-    }  ,
-    {
-      "configId": "DEFAULT_SUB_CATEGORY_DATA",
-      "configValue": "NEW CONNECTION/SALE OF MATERIALS"
     }
   ]
 }

@@ -1,10 +1,7 @@
 package com.monterdev.configuration;
 
 import com.monterdev.model.*;
-import com.monterdev.repository.CategoryRepository;
-import com.monterdev.repository.ItemsRepository;
-import com.monterdev.repository.SubCategoryDetailsRepository;
-import com.monterdev.repository.SubCategoryHeaderRepository;
+import com.monterdev.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -37,6 +34,18 @@ public class OnloadConfig {
 
     @Autowired
     private ItemsRepository itemsRepository;
+
+    @Autowired
+    private InventoryTypeRepository inventoryTypeRepository;
+
+    @Autowired
+    private ReportNamesRepository reportNamesRepository;
+
+    @Autowired
+    private RisTypeRepository risTypeRepository;
+
+    @Autowired
+    private RisTypeNamesRepository risTypeNamesRepository;
 
     @Bean
     public RequisitionIssueSlip requisitionIssueSlip() {
@@ -77,7 +86,6 @@ public class OnloadConfig {
 
     @Bean(name = "mysqlDatasource")
     public DataSource dataSource() {
-        System.out.println("datasource creation");
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
         dataSourceBuilder.url("jdbc:mysql://localhost:3306/iqwddbv2?&serverTimezone=UTC");
         dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
@@ -137,7 +145,24 @@ public class OnloadConfig {
     }
 
     @Bean
-    public Reports reports(){
+    public List<RisTypeNames> risTemplates(){
+        return risTypeNamesRepository.findAllRisTypeNames();
+    }
+
+
+    @Bean
+    public Reports reports() {
         return new Reports();
+    }
+
+    @Bean
+    public List<InventoryType> inventoryType() {
+        List<InventoryType> inventoryTypeList = inventoryTypeRepository.findAllInventoryType();
+        return inventoryTypeList;
+    }
+
+    @Bean
+    public List<ReportNames> reportNamesList() {
+        return reportNamesRepository.findAllAvailableReports();
     }
 }

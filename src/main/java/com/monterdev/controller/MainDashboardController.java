@@ -178,6 +178,9 @@ public class MainDashboardController implements Initializable {
     @Autowired
     private UnitRepository unitRepository;
 
+    @Autowired
+    private ReportNamesRepository reportNamesRepository;
+
     private List<String> responseList = new ArrayList<>();
 
     private static int rowIndex = 0;
@@ -458,13 +461,22 @@ public class MainDashboardController implements Initializable {
         JFXComboBox monthsList = new JFXComboBox();
         JFXComboBox yearList = new JFXComboBox();
 
+        availableReports.setPromptText("CHOOSE TYPE OF REPORT");
+        monthsList.setPromptText("SELECT MONTH OF REPORT");
+        yearList.setPromptText("SELECT YEAR OF REPORT");
 
-        String [] reports = getAvailableReports().split(",");
+        yearList.setLabelFloat(true);
+        monthsList.setLabelFloat(true);
+        availableReports.setLabelFloat(true);
+
+        List<ReportNames> reports = reportNamesRepository.findAllAvailableReports();
         String [] months = getMonthsofCalender().split(",");
         String [] years = getCalenderYears().split(",");
 
+        reports.stream().forEach(report ->{
+            availableReports.getItems().add(report.getName());
+        });
 
-        availableReports.getItems().addAll(Arrays.asList(reports));
         monthsList.getItems().addAll(Arrays.asList(months));
         yearList.getItems().addAll(Arrays.asList(years));
 
@@ -489,20 +501,22 @@ public class MainDashboardController implements Initializable {
         });
 
 
-        JFXButton getReport = new JFXButton("Generate Report");
+        JFXButton getReport = new JFXButton("Generate Single Report");
         getReport.setOnAction(e -> {
             try {
                 //new StageLoader().load(MainReportController.class, applicationContext);
                 reportUtil.generateReport();
             } catch (Exception exception){
-
+                System.out.println(exception.getLocalizedMessage());
             }
         });
+
+
         topHbox.getChildren().addAll(availableReports,monthsList,yearList, getReport);
-        HBox.setMargin(availableReports, new Insets(20,0,0,20));
-        HBox.setMargin(monthsList, new Insets(20,0,0,20));
-        HBox.setMargin(yearList, new Insets(20,0,0,20));
-        HBox.setMargin(getReport, new Insets(20,0,0,20));
+        HBox.setMargin(availableReports, new Insets(20,0,20,20));
+        HBox.setMargin(monthsList, new Insets(20,0,20,20));
+        HBox.setMargin(yearList, new Insets(20,0,20,20));
+        HBox.setMargin(getReport, new Insets(20,0,20,20));
     }
 
     private void resetHboxes() {
@@ -733,6 +747,7 @@ public class MainDashboardController implements Initializable {
                 history.setAdjustment(item.getQuantity()*-1);
                 history.setSub_category_detail(item.getSub_category_detail());
                 history.setReason("RELEASE ITEM");
+                history.setItem_category(item.getItem_category());
 
                 if(requisitionIssueSlip.getIs_customer_new()==1){
                     totalCost+=item.getCost() * item.getQuantity();
@@ -769,8 +784,29 @@ public class MainDashboardController implements Initializable {
 
                 if (!ObjectUtils.isEmpty(requisitionIssueSlip)) {
                     if (!ObjectUtils.isEmpty(risRepository.save(requisitionIssueSlip))) {
-                        Prompt.success("Item released!");
+                        if(!ObjectUtils.isEmpty(risTypeFieldsList)){
+                            risTypeFieldsList.stream().forEach(data ->{
+                                risTypeFieldsRepository.save(data);
+                            });
+                            Prompt.success("Item released!");
+                            risTypeFieldsList.clear();
+                        }else{
+                            Prompt.failed("Item could not be released! Please check RIS details!");
+                        }
+                    }else{
+                        Prompt.failed("Item could not be released! Please check RIS details!");
                     }
+
+                    Sales sales = new Sales();
+                    sales.setControl_number(requisitionIssueSlip.getControl_number());
+                    sales.setTotal_sales(totalSales);
+                    sales.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern("dd-MMM-YYYY")));
+                    sales.setIncome(totalIncome);
+                    sales.setTotal_cost(totalCost);
+
+                    salesRepository.save(sales);
+
+                    customerRepository.save(customer);
                 } else {
                     Prompt.failed("Item could not be released! Please check RIS details!");
                 }
@@ -778,20 +814,7 @@ public class MainDashboardController implements Initializable {
             } else {
                 Prompt.failed("An error occured while saving!");
             }
-            risTypeFieldsList.stream().forEach(data ->{
-                risTypeFieldsRepository.save(data);
-            });
 
-            Sales sales = new Sales();
-            sales.setControl_number(requisitionIssueSlip.getControl_number());
-            sales.setTotal_sales(totalSales);
-            sales.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern("dd-MMM-YYYY")));
-            sales.setIncome(totalIncome);
-            sales.setTotal_cost(totalCost);
-
-            salesRepository.save(sales);
-
-            customerRepository.save(customer);
 
         } else {
             Prompt.failed("Please enter valid input!");

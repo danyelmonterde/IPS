@@ -1,11 +1,23 @@
 {
   "customConfigurations": [
     {
-      "configId": "IQWD_REPORTS_1",
+      "configId": "COMPANY_NAME",
+      "configValue": "INFANTA QUEZON WATER DISTRICT"
+    },
+    {
+      "configId": "COMPANY_ADDRESS",
+      "configValue": "Infanta, Quezon"
+    },
+    {
+      "configId": "COMPANY_CONTACT_NUMBER",
       "configValue": ""
     },
     {
-      "configId": "IQWD_REPORTS_2",
+      "configId": "COMPANY_LOGO",
+      "configValue": ""
+    },
+    {
+      "configId": "CM-SOM",
       "configValue": ""
     }
   ]

@@ -3,9 +3,7 @@ package com.monterdev.controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import com.monterdev.model.Customer;
-import com.monterdev.model.RequisitionIssueSlip;
-import com.monterdev.model.SelectedRisTemplate;
+import com.monterdev.model.*;
 import com.monterdev.util.AppTime;
 import com.monterdev.util.StageLoader;
 import javafx.event.ActionEvent;
@@ -22,6 +20,7 @@ import org.springframework.stereotype.Component;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static com.monterdev.constants.GlobalConfiguration.*;
@@ -82,6 +81,9 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     @Autowired
     private SelectedRisTemplate selectedRisTemplate;
 
+    @Autowired
+    private List<RisTypeNames> risTemplates;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setDate();
@@ -138,8 +140,7 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     }
 
     public void comboRisTemplateOnload() {
-        String [] risTemplates = getRisTemplates().split(",");
-        Arrays.asList(risTemplates).stream().forEach(d -> this.comboRisTemplate.getItems().add(d));
+        risTemplates.stream().forEach(d -> this.comboRisTemplate.getItems().add(d.getName()));
     }
 
     public void setFirstName() {

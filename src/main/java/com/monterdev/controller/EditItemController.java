@@ -69,6 +69,9 @@ public class EditItemController {
     private JFXComboBox itemSubCategoryDetail;
 
     @FXML
+    private JFXComboBox comboUnit;
+
+    @FXML
     private JFXTextField quantity;
 
     @FXML
@@ -155,6 +158,9 @@ public class EditItemController {
     @Autowired
     private SearchUtil searchUtil;
 
+    @Autowired
+    private UnitRepository unitRepository;
+
     private List<Item> resultsList = new ArrayList<>();
 
     private List<String> responseList = new ArrayList<>();
@@ -170,14 +176,17 @@ public class EditItemController {
         sku.setText(Integer.toString(selectedItem.getSku()));
         inStock.setText(Integer.toString(selectedItem.getIn_stock()));
         lowStock.setText(Integer.toString(selectedItem.getLow_stock()));
+        itemSubCategoryDetail.setValue(selectedItem.getSub_category_detail());
+        comboUnit.setValue(selectedItem.getUnit());
         checkIfItemNameExists();
 
 
         ItemSubCategoryDetail itemSubCategoryDetail = subCategoryDetailsRepository.findBySubCategoryDetail(selectedItem.getSub_category_detail());
         ItemSubCategoryHeader itemSubCategoryHeader = subCategoryHeaderRepository.findBySubCategoryHeader(itemSubCategoryDetail.getSub_category_header());
         ItemCategory itemCategory = categoryRepository.findByCategory(itemSubCategoryHeader.getCategory());
+        List<Unit> itemUnits = unitRepository.findAllItemUnits();
 
-        loadCategories(itemSubCategoryDetail, itemSubCategoryHeader, itemCategory);
+        loadCategories(itemSubCategoryDetail, itemSubCategoryHeader, itemCategory,itemUnits);
 
         itemNameonChange();
 
@@ -187,9 +196,39 @@ public class EditItemController {
 
         subCategoryDetailOnChange();
 
+        subCategoryHeaderOnChange();
+
+        categoryHeaderOnChange();
+
         purchaseCostOnChange();
 
+        comboUnitOnChange();
+
         trackStockHbox.setVisible(false);
+    }
+
+    private void comboUnitOnChange() {
+        this.comboUnit.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                selectedItem.setUnit(newValue.toString());
+            }
+        });
+    }
+
+    private void categoryHeaderOnChange() {
+        this.itemCategory.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                selectedItem.setItem_category(newValue.toString());
+            }
+        });
+    }
+
+    private void subCategoryHeaderOnChange() {
+        this.itemSubCategoryHeader.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                selectedItem.setItem_category_header(newValue.toString());
+            }
+        });
     }
 
     private void checkIfItemNameExists() {
@@ -231,7 +270,7 @@ public class EditItemController {
     }
 
 
-    private void loadCategories(ItemSubCategoryDetail itemSubCategoryDetail, ItemSubCategoryHeader itemSubCategoryHeader, ItemCategory itemCategory) {
+    private void loadCategories(ItemSubCategoryDetail itemSubCategoryDetail, ItemSubCategoryHeader itemSubCategoryHeader, ItemCategory itemCategory, List<Unit> unitList) {
         clearComboBoxes();
         subCategoryDetailPreLoaded.forEach(itemSubCategoryDetail1 -> {
             this.itemSubCategoryDetail.getItems().add(itemSubCategoryDetail1.getSub_category_detail());
@@ -243,6 +282,10 @@ public class EditItemController {
 
         categoryPreLoaded.forEach(itemCategory1 -> {
             this.itemCategory.getItems().add(itemCategory1.getCategory_name());
+        });
+
+        unitList.stream().forEach(e ->{
+            comboUnit.getItems().add(e.getUnit());
         });
         this.itemSubCategoryDetail.setValue(itemSubCategoryDetail.getSub_category_detail());
         this.itemSubCategoryHeader.setValue(itemSubCategoryHeader.getSub_category_header());
@@ -435,6 +478,8 @@ public class EditItemController {
         selectedItem.setMargin(0.0);
         selectedItem.setCost(0.0);
         selectedItem.setIn_stock(0);
+        selectedItem.setItem_category("");
+        selectedItem.setItem_category_header("");
         selectedItem.setSub_category_detail(getConfigValue(defaultCategoryData));
     }
 
@@ -461,6 +506,7 @@ public class EditItemController {
                 double finalAverageCost = totalCost / totalQuantity;
                 selectedItem.setCost(DataUtil.formatToDouble(finalAverageCost));
                 selectedItem.setIn_stock(realInstock + realQuantity);
+
             } else {
                 selectedItem.setIn_stock(Integer.parseInt(quantity.getText()));
             }
@@ -516,6 +562,7 @@ public class EditItemController {
         purchaseOrder.setQuantity(Integer.parseInt(quantity.getText()));
         purchaseOrder.setSku(item.getSku());
         purchaseOrder.setIn_stock(item.getIn_stock());
+        purchaseOrder.setItem_category(selectedItem.getItem_category());
         purchaseOrder.setAmount(Integer.parseInt(quantity.getText()) * Double.parseDouble(purchaseCost.getText()));
         return purchaseOrder;
     }

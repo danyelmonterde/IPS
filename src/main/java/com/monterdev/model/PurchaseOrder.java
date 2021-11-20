@@ -20,6 +20,8 @@ public class PurchaseOrder {
 
     private String item_name;
 
+    private String item_category;
+
     private int in_stock;
 
     private int quantity;

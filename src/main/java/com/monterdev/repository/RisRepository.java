@@ -13,6 +13,12 @@ public interface RisRepository extends CrudRepository<RequisitionIssueSlip, Inte
     @Query(value = "SELECT *\n" +
             "  FROM requisitionissueslip\n" +
             " WHERE ( UNIX_TIMESTAMP(STR_TO_DATE(requisitionissueslip.date_transacted, '%d-%b-%Y %s'))) >= UNIX_TIMESTAMP(LAST_DAY(STR_TO_DATE(:dateSpecified, '%d-%b-%Y %s')) + INTERVAL 1 DAY - INTERVAL 1 MONTH)\n" +
-            "   AND (UNIX_TIMESTAMP(STR_TO_DATE(requisitionissueslip.date_transacted, '%d-%b-%Y %s'))) <  UNIX_TIMESTAMP(LAST_DAY(STR_TO_DATE(:dateSpecified, '%d-%b-%Y %s')) + INTERVAL 1 DAY);", nativeQuery = true)
-    List<RequisitionIssueSlip> findAllRequisitionSlipByCurrentMonthOfTheSpecifiedDate (@Param("dateSpecified") String dateSpecified);
+            "   AND (UNIX_TIMESTAMP(STR_TO_DATE(requisitionissueslip.date_transacted, '%d-%b-%Y %s'))) <  UNIX_TIMESTAMP(LAST_DAY(STR_TO_DATE(:dateSpecified, '%d-%b-%Y %s')) + INTERVAL 1 DAY) AND ristype = :risType", nativeQuery = true)
+    List<RequisitionIssueSlip> findAllRequisitionSlipByCurrentMonthOfTheSpecifiedDate (@Param("dateSpecified") String dateSpecified, @Param("risType") String risType);
+
+    @Query(value = "SELECT ristype\n" +
+            "  FROM requisitionissueslip\n" +
+            " WHERE ( UNIX_TIMESTAMP(STR_TO_DATE(requisitionissueslip.date_transacted, '%d-%b-%Y %s'))) >= UNIX_TIMESTAMP(LAST_DAY(STR_TO_DATE(:dateSpecified, '%d-%b-%Y %s')) + INTERVAL 1 DAY - INTERVAL 1 MONTH)\n" +
+            "   AND (UNIX_TIMESTAMP(STR_TO_DATE(requisitionissueslip.date_transacted, '%d-%b-%Y %s'))) <  UNIX_TIMESTAMP(LAST_DAY(STR_TO_DATE(:dateSpecified, '%d-%b-%Y %s')) + INTERVAL 1 DAY) AND ristype IN (SELECT name FROM ristypenames WHERE inventorytype = :inventorytype) GROUP BY ristype", nativeQuery = true)
+    List<String> findAllRISTypeByCurrentMonthOfDateSpecifiedAndInventoryType (@Param("dateSpecified") String dateSpecified, @Param("inventorytype") String inventorytype);
 }

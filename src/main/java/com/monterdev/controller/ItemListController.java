@@ -325,7 +325,12 @@ public class ItemListController {
         dataSize = itemLists.size();
         maxSku = itemLists.get(dataSize - 1).getSku();
         tableView.getItems().clear();
-        itemObservableList = FXCollections.observableArrayList(itemLists.subList(currentPageValue * rowsPerPageCombo - rowsPerPageCombo, (currentPageValue * rowsPerPageCombo)));
+        if(dataSize<10){
+            itemObservableList = FXCollections.observableArrayList(itemLists.subList(currentPageValue * rowsPerPageCombo - rowsPerPageCombo, dataSize));
+        }else{
+            itemObservableList = FXCollections.observableArrayList(itemLists.subList(currentPageValue * rowsPerPageCombo - rowsPerPageCombo, (currentPageValue * rowsPerPageCombo)));
+        }
+
         setFooterOffValue();
         tableView.getItems().setAll(itemObservableList);
         ObservableList<Item> cellData = FXCollections.observableArrayList();
@@ -342,6 +347,9 @@ public class ItemListController {
                 selectedItem.setIn_stock(cellData.get(0).getIn_stock());
                 selectedItem.setSku(cellData.get(0).getSku());
                 selectedItem.setIn_stock(cellData.get(0).getIn_stock());
+                selectedItem.setItem_category_header(cellData.get(0).getItem_category_header());
+                selectedItem.setItem_category(cellData.get(0).getItem_category());
+                selectedItem.setUnit(cellData.get(0).getUnit());
                 new StageLoader().load(EditItemController.class, x, applicationContext, "");
             }
         });

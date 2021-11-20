@@ -83,40 +83,43 @@ public class RisDetailsController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        if (ObjectUtils.isEmpty(risTypeFieldsList)) {
-            generatedControlNumber = controlNumberGenerator.generate();
-            List<RisType> risType = risTypeRepository.findByRisType(selectedRisTemplate.getSelectedRisTemplate());
-            numberOfFields = risType.size();
-            risTemplateLabel.setText(selectedRisTemplate.getSelectedRisTemplate() + " - " + generatedControlNumber);
-            risType.stream().forEach(data -> {
-                if (data.getRisfieldtype().equalsIgnoreCase(TEXT) || data.getRisfieldtype().equalsIgnoreCase(MONEY) || data.getRisfieldtype().equalsIgnoreCase(NUMBER)) {
-                    addTextFieldToContainer(data, createTextField(data.getRisfield(), ""));
-                } else if (data.getRisfieldtype().equalsIgnoreCase(DATE)) {
-                    addDatePickerToContainer(data,LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MMM-yyyy")));
-                }
-            });
-        } else {
-            currentIndex=0;
-            successFields =0;
-            numberOfFields = risTypeFieldsList.size();
-            risContainer.getChildren().clear();
-            risNumber.setText(requisitionIssueSlip.getRequisition_and_issue_slip_number());
-            risPurpose.setText(requisitionIssueSlip.getPurpose());
-            risTypeFieldsList.stream().forEach(data -> {
-                if (data.getRis_field_type().equalsIgnoreCase(TEXT) || data.getRis_field_type().equalsIgnoreCase(NUMBER) || data.getRis_field_type().equalsIgnoreCase(MONEY)) {
-                    generatedControlNumber = data.getControl_number();
-                    RisType risType = new RisType();
-                    risType.setRisfieldtype(data.getRis_field_type());
-                    risType.setRisfield(data.getRis_field());
-                    addTextFieldToContainer(risType, createTextField(data.getRis_field(), data.getRis_value()));
-                } else if (data.getRis_field_type().equalsIgnoreCase(DATE)) {
-                    generatedControlNumber = data.getControl_number();
-                    RisType risType = new RisType();
-                    risType.setRisfieldtype(data.getRis_field_type());
-                    addDatePickerToContainer(risType,data.getRis_value());
-                }
-            });
-        }
+
+            if (ObjectUtils.isEmpty(risTypeFieldsList)) {
+                generatedControlNumber = controlNumberGenerator.generate();
+                List<RisType> risType = risTypeRepository.findByRisType(selectedRisTemplate.getSelectedRisTemplate());
+                numberOfFields = risType.size();
+                risTemplateLabel.setText(selectedRisTemplate.getSelectedRisTemplate() + " - " + generatedControlNumber);
+                risType.stream().forEach(data -> {
+                    if (data.getRisfieldtype().equalsIgnoreCase(TEXT) || data.getRisfieldtype().equalsIgnoreCase(MONEY) || data.getRisfieldtype().equalsIgnoreCase(NUMBER)) {
+                        addTextFieldToContainer(data, createTextField(data.getRisfield(), ""));
+                    } else if (data.getRisfieldtype().equalsIgnoreCase(DATE)) {
+                        addDatePickerToContainer(data,LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MMM-yyyy")));
+                    }
+                });
+            } else {
+                currentIndex=0;
+                successFields =0;
+                numberOfFields = risTypeFieldsList.size();
+                risContainer.getChildren().clear();
+                risNumber.setText(requisitionIssueSlip.getRequisition_and_issue_slip_number());
+                risPurpose.setText(requisitionIssueSlip.getPurpose());
+                risTypeFieldsList.stream().forEach(data -> {
+                    if (data.getRis_field_type().equalsIgnoreCase(TEXT) || data.getRis_field_type().equalsIgnoreCase(NUMBER) || data.getRis_field_type().equalsIgnoreCase(MONEY)) {
+                        generatedControlNumber = data.getControl_number();
+                        RisType risType = new RisType();
+                        risType.setRisfieldtype(data.getRis_field_type());
+                        risType.setRisfield(data.getRis_field());
+                        addTextFieldToContainer(risType, createTextField(data.getRis_field(), data.getRis_value()));
+                    } else if (data.getRis_field_type().equalsIgnoreCase(DATE)) {
+                        generatedControlNumber = data.getControl_number();
+                        RisType risType = new RisType();
+                        risType.setRisfieldtype(data.getRis_field_type());
+                        addDatePickerToContainer(risType,data.getRis_value());
+                    }
+                });
+            }
+
+
 
     }
 

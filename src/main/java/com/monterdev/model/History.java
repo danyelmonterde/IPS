@@ -23,6 +23,8 @@ public class History {
 
     private String item_name;
 
+    private String item_category;
+
     private String reason;
 
     private int adjustment;

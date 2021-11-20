@@ -37,16 +37,20 @@ public class Item {
 
     private String unit;
 
+    private String item_category;
+
+    private String item_category_header;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Item item = (Item) o;
-        return sku == item.sku && quantity == item.quantity && Double.compare(item.cost, cost) == 0 && Double.compare(item.margin, margin) == 0 && in_stock == item.in_stock && low_stock == item.low_stock && Objects.equals(item_name, item.item_name) && Objects.equals(sub_category_detail, item.sub_category_detail) && Objects.equals(tag, item.tag) && Objects.equals(unit, item.unit);
+        return sku == item.sku && quantity == item.quantity && Double.compare(item.cost, cost) == 0 && Double.compare(item.margin, margin) == 0 && in_stock == item.in_stock && low_stock == item.low_stock && Objects.equals(item_name, item.item_name) && Objects.equals(sub_category_detail, item.sub_category_detail) && Objects.equals(tag, item.tag) && Objects.equals(unit, item.unit) && Objects.equals(item_category, item.item_category) && Objects.equals(item_category_header, item.item_category_header);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sku, item_name, sub_category_detail, quantity, cost, margin, in_stock, low_stock, tag, unit);
+        return Objects.hash(sku, item_name, sub_category_detail, quantity, cost, margin, in_stock, low_stock, tag, unit, item_category, item_category_header);
     }
 }

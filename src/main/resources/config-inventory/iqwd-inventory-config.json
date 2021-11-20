@@ -1,10 +1,6 @@
 {
   "customConfigurations": [
     {
-      "configId": "DEFAULT_CATEGORY_DATA",
-      "configValue": "TEST-CATEGORY-1"
-    },
-    {
       "configId": "CAPTURED_QR_CODE_DIRECTORY",
       "configValue": "C:\\Users\\Daniel\\Desktop\\CapturedQrCode\\out.png"
     },
@@ -21,21 +17,10 @@
     }, {
       "configId": "CUSTOMER_TYPES",
       "configValue": "OLD,NEW"
-    }, {
-      "configId": "RIS_TEMPLATES",
-      "configValue": "CM-NEW CONNECTION,CM-REPAIRS AND MAINTENANCE,CM-CONSTRUCTION WORK IN PROGRESS,CM-PUMPING STATION EXPENSES,CM-ACCOUNTS RECEIVABLE,CM-OTHER DEFERRED CREDITS"
-    },
-     {
-      "configId": "INVENTORY_TYPES",
-      "configValue": "WATER METERS,CONSTRUCTION MATERIALS,CHEMICALS AND FILTERING SUPPLIES,OFFICE SUPPLIES,ACCOUNTABLE FORMS,NON-ACCOUNTABLE FORMS,PPE,MEDICAL SUPPLIES"
     },
     {
       "configId": "RIS_FIELD_TYPES",
       "configValue": "TEXT_FORMAT,NUMBER_FORMAT,MONEY_FORMAT,DATE_FORMAT"
-    },
-    {
-      "configId": "AVAILABLE_REPORTS",
-      "configValue": "Construction Materials(New Connection),Construction Materials(Repairs and Maintenance),Construction Materials(Construction Work in Progress),Construction Materials(Pumping Station Expenses),Construction Materials(Accounts Receivable),Construction Materials(Other Deferred Credits)"
     },
     {
       "configId": "CALENDAR_MONTHS",
@@ -44,6 +29,10 @@
     {
       "configId": "CALENDAR_YEARS",
       "configValue": "2020,2021,2022,2023,2024,2025,2025,2027,2028,2029,2030,2031,2032,2033,2034,2035"
+    },
+    {
+      "configId": "DEFAULT_CATEGORY_DATA",
+      "configValue": "TEST-CATEGORY-1"
     }
   ]
 }

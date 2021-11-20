@@ -24,18 +24,16 @@ public class GlobalConfiguration {
     private static final String apiUrl;
     private static final String windowTitle;
     private static final String defaultId;
-    public static final String defaultCategoryData; //DON'T FORGET TO CHANGE ON PRODUCTION
     public static final String capturedQrCodeDirectory; //DON'T FORGET TO CHANGE ON PRODUCTION
     public static final String generatedQrCodeDirectory; //DON'T FORGET TO CHANGE ON PRODUCTION
     public static final String clientAcronym;
-    public static final String defaultSubCategoryData;
     public static final String customerTypes;
-    public static final String risTemplates;
-    public static final String inventoryTypes;
     public static final String risFieldTypes;
-    public static final String availableReports;
     public static final String months;
     public static final String years;
+    public static final String defaultCategoryData;
+    public static final String companyName;
+    public static final String companyAddress;
 
     static {
         homePage = "HOME_PAGE";
@@ -43,18 +41,16 @@ public class GlobalConfiguration {
         apiUrl = "API_URL";
         defaultId = "DEFAULT_ID";
         windowTitle = "WINDOW_TITLE";
-        defaultCategoryData = "DEFAULT_CATEGORY_DATA";
         capturedQrCodeDirectory = "CAPTURED_QR_CODE_DIRECTORY";
         generatedQrCodeDirectory = "GENERATED_QR_CODE_DIRECTORY";
         clientAcronym = "CLIENT_ACRONYM";
-        defaultSubCategoryData = "DEFAULT_SUB_CATEGORY_DATA";
         customerTypes = "CUSTOMER_TYPES";
-        risTemplates = "RIS_TEMPLATES";
-        inventoryTypes = "INVENTORY_TYPES";
         risFieldTypes = "RIS_FIELD_TYPES";
-        availableReports = "AVAILABLE_REPORTS";
         months = "CALENDAR_MONTHS";
         years = "CALENDAR_YEARS";
+        defaultCategoryData = "DEFAULT_CATEGORY_DATA";
+        companyName = "COMPANY_NAME";
+        companyAddress = "COMPANY_ADDRESS";
     }
 
 
@@ -79,25 +75,10 @@ public class GlobalConfiguration {
         return getConfigValue(clientAcronym);
     }
 
-    public static String getDefaultSubCategoryData() {
-        return getConfigValue(defaultSubCategoryData);
-    }
-
     public static String getCustomerTypes() {
         return getConfigValue(customerTypes);
     }
 
-    public static String getRisTemplates() {
-        return getConfigValue(risTemplates);
-    }
-
-    public static String getInventoryTypes() {
-        return getConfigValue(inventoryTypes);
-    }
-
-    public static String getAvailableReports() {
-        return getConfigValue(availableReports);
-    }
     public static String getCalenderYears() {
         return getConfigValue(years);
     }

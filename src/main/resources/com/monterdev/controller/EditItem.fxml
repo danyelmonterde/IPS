@@ -144,9 +144,14 @@
                         </JFXTextField>
                         <Label minWidth="-Infinity" text="If item already exists, average cost is auto-computed">
                            <VBox.margin>
-                              <Insets bottom="20.0" left="20.0" top="10.0" />
+                              <Insets left="20.0" top="10.0" />
                            </VBox.margin>
                         </Label>
+                        <JFXComboBox fx:id="comboUnit" labelFloat="true" promptText="Unit">
+                           <VBox.margin>
+                              <Insets left="20.0" top="20.0" />
+                           </VBox.margin>
+                        </JFXComboBox>
                      </children>
                      <padding>
                         <Insets right="20.0" />
