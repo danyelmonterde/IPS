@@ -18,19 +18,12 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.ScheduledExecutorService;
 
 @Configuration
 public class OnloadConfig {
 
     @Autowired
     private CategoryRepository categoryRepository;
-
-    @Autowired
-    private SubCategoryDetailsRepository subCategoryDetailsRepository;
-
-    @Autowired
-    private SubCategoryHeaderRepository subCategoryHeaderRepository;
 
     @Autowired
     private ItemsRepository itemsRepository;
@@ -46,6 +39,9 @@ public class OnloadConfig {
 
     @Autowired
     private RisTypeNamesRepository risTypeNamesRepository;
+
+    @Autowired
+    private UnitRepository unitRepository;
 
     @Bean
     public RequisitionIssueSlip requisitionIssueSlip() {
@@ -63,17 +59,6 @@ public class OnloadConfig {
         return categoryRepository.findAll();
     }
 
-    @Bean
-    public Iterable<ItemSubCategoryHeader> subCategoryHeader() {
-        return subCategoryHeaderRepository.findAll();
-    }
-
-    @Bean
-    public Iterable<ItemSubCategoryDetail> subCategoryDetail() {
-        return subCategoryDetailsRepository.findAll();
-    }
-
-    private ScheduledExecutorService timer;
 
     @Bean
     @Qualifier("itemLists")
@@ -145,7 +130,7 @@ public class OnloadConfig {
     }
 
     @Bean
-    public List<RisTypeNames> risTemplates(){
+    public List<RisTypeNames> risTemplates() {
         return risTypeNamesRepository.findAllRisTypeNames();
     }
 
@@ -164,5 +149,11 @@ public class OnloadConfig {
     @Bean
     public List<ReportNames> reportNamesList() {
         return reportNamesRepository.findAllAvailableReports();
+    }
+
+
+    @Bean
+    public List<Unit> unitList(){
+        return unitRepository.findAllItemUnits();
     }
 }

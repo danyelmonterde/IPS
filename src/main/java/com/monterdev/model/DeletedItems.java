@@ -19,13 +19,9 @@ public class DeletedItems {
 
     private String item_name;
 
-    private String sub_category_detail;
-
     private int quantity;
 
     private double cost;
-
-    private double margin;
 
     private int in_stock;
 
@@ -38,11 +34,11 @@ public class DeletedItems {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeletedItems that = (DeletedItems) o;
-        return sku == that.sku && quantity == that.quantity && Double.compare(that.cost, cost) == 0 && Double.compare(that.margin, margin) == 0 && in_stock == that.in_stock && low_stock == that.low_stock && Objects.equals(item_name, that.item_name) && Objects.equals(sub_category_detail, that.sub_category_detail) && Objects.equals(tag, that.tag);
+        return sku == that.sku && quantity == that.quantity && Double.compare(that.cost, cost) == 0 && in_stock == that.in_stock && low_stock == that.low_stock && Objects.equals(item_name, that.item_name) && Objects.equals(tag, that.tag);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sku, item_name, sub_category_detail, quantity, cost, margin, in_stock, low_stock, tag);
+        return Objects.hash(sku, item_name, quantity, cost, in_stock, low_stock, tag);
     }
 }

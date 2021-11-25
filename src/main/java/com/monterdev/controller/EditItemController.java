@@ -29,8 +29,6 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.monterdev.constants.ItemsUIConfiguration.*;
 import static com.monterdev.util.ComponentCreator.createSearchBox;
@@ -60,13 +58,7 @@ public class EditItemController {
     private HBox trackStockHbox;
 
     @FXML
-    private JFXComboBox itemCategory;
-
-    @FXML
-    private JFXComboBox itemSubCategoryHeader;
-
-    @FXML
-    private JFXComboBox itemSubCategoryDetail;
+    private JFXComboBox itemCategoryCombo;
 
     @FXML
     private JFXComboBox comboUnit;
@@ -118,23 +110,12 @@ public class EditItemController {
     @Autowired
     private ConfigurableApplicationContext applicationContext;
 
-    @Autowired
-    private SubCategoryDetailsRepository subCategoryDetailsRepository;
-
-    @Autowired
-    private SubCategoryHeaderRepository subCategoryHeaderRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
 
     @Autowired
     private ItemsRepository itemsRepository;
-
-    @Autowired
-    private Iterable<ItemSubCategoryDetail> subCategoryDetailPreLoaded;
-
-    @Autowired
-    private Iterable<ItemSubCategoryHeader> subCategoryHeaderPreLoaded;
 
     @Autowired
     private Iterable<ItemCategory> categoryPreLoaded;
@@ -176,27 +157,23 @@ public class EditItemController {
         sku.setText(Integer.toString(selectedItem.getSku()));
         inStock.setText(Integer.toString(selectedItem.getIn_stock()));
         lowStock.setText(Integer.toString(selectedItem.getLow_stock()));
-        itemSubCategoryDetail.setValue(selectedItem.getSub_category_detail());
         comboUnit.setValue(selectedItem.getUnit());
         checkIfItemNameExists();
 
+        ItemCategory itemCategory = null;
+        if(ObjectUtils.isEmpty(selectedItem.getItem_category())){
+            itemCategory = categoryRepository.findByCategory("CONSTRUCTION MATERIALS");
+        }
 
-        ItemSubCategoryDetail itemSubCategoryDetail = subCategoryDetailsRepository.findBySubCategoryDetail(selectedItem.getSub_category_detail());
-        ItemSubCategoryHeader itemSubCategoryHeader = subCategoryHeaderRepository.findBySubCategoryHeader(itemSubCategoryDetail.getSub_category_header());
-        ItemCategory itemCategory = categoryRepository.findByCategory(itemSubCategoryHeader.getCategory());
         List<Unit> itemUnits = unitRepository.findAllItemUnits();
 
-        loadCategories(itemSubCategoryDetail, itemSubCategoryHeader, itemCategory,itemUnits);
+        loadCategories(itemCategory, itemUnits);
 
         itemNameonChange();
 
         quantityOnChange();
 
         lowStockOnChange();
-
-        subCategoryDetailOnChange();
-
-        subCategoryHeaderOnChange();
 
         categoryHeaderOnChange();
 
@@ -216,20 +193,13 @@ public class EditItemController {
     }
 
     private void categoryHeaderOnChange() {
-        this.itemCategory.valueProperty().addListener((observable, oldValue, newValue) -> {
+        this.itemCategoryCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
                 selectedItem.setItem_category(newValue.toString());
             }
         });
     }
 
-    private void subCategoryHeaderOnChange() {
-        this.itemSubCategoryHeader.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldValue != newValue) {
-                selectedItem.setItem_category_header(newValue.toString());
-            }
-        });
-    }
 
     private void checkIfItemNameExists() {
         if (!ObjectUtils.isEmpty(name)) {
@@ -270,32 +240,23 @@ public class EditItemController {
     }
 
 
-    private void loadCategories(ItemSubCategoryDetail itemSubCategoryDetail, ItemSubCategoryHeader itemSubCategoryHeader, ItemCategory itemCategory, List<Unit> unitList) {
+    private void loadCategories(ItemCategory itemCategory, List<Unit> unitList) {
         clearComboBoxes();
-        subCategoryDetailPreLoaded.forEach(itemSubCategoryDetail1 -> {
-            this.itemSubCategoryDetail.getItems().add(itemSubCategoryDetail1.getSub_category_detail());
-        });
-
-        subCategoryHeaderPreLoaded.forEach(itemSubCategoryHeader1 -> {
-            this.itemSubCategoryHeader.getItems().add(itemSubCategoryHeader1.getSub_category_header());
-        });
 
         categoryPreLoaded.forEach(itemCategory1 -> {
-            this.itemCategory.getItems().add(itemCategory1.getCategory_name());
+            this.itemCategoryCombo.getItems().add(itemCategory1.getCategory_name());
         });
 
-        unitList.stream().forEach(e ->{
+        unitList.stream().forEach(e -> {
             comboUnit.getItems().add(e.getUnit());
         });
-        this.itemSubCategoryDetail.setValue(itemSubCategoryDetail.getSub_category_detail());
-        this.itemSubCategoryHeader.setValue(itemSubCategoryHeader.getSub_category_header());
-        this.itemCategory.setValue(itemCategory.getCategory_name());
+
+        this.itemCategoryCombo.setValue(selectedItem.getItem_category());
     }
 
     private void clearComboBoxes() {
-        this.itemSubCategoryDetail.getItems().clear();
-        this.itemSubCategoryHeader.getItems().clear();
-        this.itemCategory.getItems().clear();
+
+        this.itemCategoryCombo.getItems().clear();
     }
 
     private void itemNameonChange() {
@@ -358,7 +319,7 @@ public class EditItemController {
             lowStock.setText(Integer.toString(item.get().getLow_stock()));
             sku.setText(Integer.toString(item.get().getSku()));
             averageCost.setText(Double.toString(item.get().getCost()));
-            itemSubCategoryDetail.setValue(item.get().getSub_category_detail());
+            itemCategoryCombo.setValue(item.get().getItem_category());
         }
     }
 
@@ -385,42 +346,6 @@ public class EditItemController {
         });
     }
 
-    private void subCategoryDetailOnChange() {
-        this.itemSubCategoryDetail.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldValue != newValue) {
-                selectedItem.setSub_category_detail(newValue.toString());
-            }
-        });
-    }
-
-
-    public void updateSubCategoryHeader(ActionEvent actionEvent) {
-        try {
-            List<ItemSubCategoryHeader> subCategories = StreamSupport.stream(this.subCategoryHeaderPreLoaded.spliterator(), false)
-                    .filter(e -> e.getCategory().equalsIgnoreCase(this.itemCategory.getValue().toString())).collect(Collectors.toList());
-            this.itemSubCategoryHeader.getItems().clear();
-            this.itemSubCategoryDetail.getItems().clear();
-            subCategories.stream().forEach(s -> {
-                this.itemSubCategoryHeader.getItems().add(s.getSub_category_header());
-            });
-        } catch (NullPointerException nullPointerException) {
-
-        }
-
-    }
-
-    public void updateSubCategoryDetail(ActionEvent actionEvent) {
-        try {
-            List<ItemSubCategoryDetail> itemSubCategoryDetailList = StreamSupport.stream(this.subCategoryDetailPreLoaded.spliterator(), false)
-                    .filter(e -> e.getSub_category_header().equalsIgnoreCase(this.itemSubCategoryHeader.getValue().toString())).collect(Collectors.toList());
-            this.itemSubCategoryDetail.getItems().clear();
-            itemSubCategoryDetailList.stream().forEach(d -> {
-                this.itemSubCategoryDetail.getItems().add(d.getSub_category_detail());
-            });
-        } catch (NullPointerException nullPointerException) {
-
-        }
-    }
 
     public void viewHistory(ActionEvent actionEvent) {
     }
@@ -436,9 +361,7 @@ public class EditItemController {
                             .item_name(selectedItem.getItem_name())
                             .in_stock(selectedItem.getIn_stock())
                             .low_stock(selectedItem.getLow_stock())
-                            .margin(selectedItem.getMargin())
                             .sku(selectedItem.getSku())
-                            .sub_category_detail(selectedItem.getSub_category_detail())
                             .tag(selectedItem.getTag())
                             .build();
                     if (!ObjectUtils.isEmpty(deletedItemsRepository.save(deletedItems))) {
@@ -466,7 +389,7 @@ public class EditItemController {
         supplierGroup.setText("");
         receiptNumber.setText("");
         purchaseOrderNumber.setText("");
-        itemSubCategoryDetail.setValue(getConfigValue(defaultCategoryData));
+
     }
 
     private void resetSelectedItem() {
@@ -475,12 +398,9 @@ public class EditItemController {
         selectedItem.setLow_stock(0);
         selectedItem.setQuantity(0);
         selectedItem.setSku(0);
-        selectedItem.setMargin(0.0);
         selectedItem.setCost(0.0);
         selectedItem.setIn_stock(0);
         selectedItem.setItem_category("");
-        selectedItem.setItem_category_header("");
-        selectedItem.setSub_category_detail(getConfigValue(defaultCategoryData));
     }
 
     public void cancel(ActionEvent actionEvent) {
@@ -491,7 +411,7 @@ public class EditItemController {
     }
 
     public void save(ActionEvent actionEvent) {
-        if(!ObjectUtils.isEmpty(name.getText())){
+        if (!ObjectUtils.isEmpty(name.getText())) {
             selectedItem.setTag(null);
             if (!sku.getText().equalsIgnoreCase("0")) {
                 //EXISTING ITEM
@@ -574,4 +494,6 @@ public class EditItemController {
             trackStockHbox.setVisible(false);
         }
     }
+
+
 }

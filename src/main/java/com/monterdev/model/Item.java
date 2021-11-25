@@ -1,6 +1,5 @@
 package com.monterdev.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
@@ -21,13 +20,9 @@ public class Item {
 
     private String item_name;
 
-    private String sub_category_detail;
-
     private int quantity;
 
     private double cost;
-
-    private double margin;
 
     private int in_stock;
 
@@ -39,18 +34,17 @@ public class Item {
 
     private String item_category;
 
-    private String item_category_header;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Item item = (Item) o;
-        return sku == item.sku && quantity == item.quantity && Double.compare(item.cost, cost) == 0 && Double.compare(item.margin, margin) == 0 && in_stock == item.in_stock && low_stock == item.low_stock && Objects.equals(item_name, item.item_name) && Objects.equals(sub_category_detail, item.sub_category_detail) && Objects.equals(tag, item.tag) && Objects.equals(unit, item.unit) && Objects.equals(item_category, item.item_category) && Objects.equals(item_category_header, item.item_category_header);
+        return sku == item.sku && quantity == item.quantity && Double.compare(item.cost, cost) == 0 && in_stock == item.in_stock && low_stock == item.low_stock && Objects.equals(item_name, item.item_name) && Objects.equals(tag, item.tag) && Objects.equals(unit, item.unit) && Objects.equals(item_category, item.item_category);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sku, item_name, sub_category_detail, quantity, cost, margin, in_stock, low_stock, tag, unit, item_category, item_category_header);
+        return Objects.hash(sku, item_name, quantity, cost, in_stock, low_stock, tag, unit, item_category);
     }
 }

@@ -5,7 +5,6 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
-import com.monterdev.constants.GlobalConfiguration;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
 import com.monterdev.util.*;
@@ -124,6 +123,12 @@ public class MainDashboardController implements Initializable {
     private JFXButton backupMenu;
 
     @FXML
+    private JFXButton releaseItemButton;
+
+    @FXML
+    private JFXButton addItemButton;
+
+    @FXML
     private Label sku;
 
     @Autowired
@@ -198,9 +203,6 @@ public class MainDashboardController implements Initializable {
     private TranslateTransition slideMainAnchorpane = new TranslateTransition();
 
     private TranslateTransition slideSearchPane = new TranslateTransition();
-
-    @FXML
-    private JFXButton releaseItemButton;
 
     private double totalSales =0; //;total amount na may 20% na patong pag new
 
@@ -310,6 +312,13 @@ public class MainDashboardController implements Initializable {
         });
 
         refreshReleaseItemsOnMouseHover();
+        addItemOnAction();
+    }
+
+    private void addItemOnAction() {
+        addItemButton.setOnAction(add ->{
+            new StageLoader().load(AddItemController.class, applicationContext);
+        });
     }
 
     private void refreshReleaseItemsOnMouseHover() {
@@ -339,13 +348,11 @@ public class MainDashboardController implements Initializable {
         itemLists.stream().forEach(s -> {
             if (s.getSku() == item.getSku()) {
                 currentItem.setLow_stock(s.getLow_stock());
-                currentItem.setMargin(s.getMargin());
                 currentItem.setTag(null);
                 currentItem.setCost(s.getCost());
                 currentItem.setIn_stock(s.getIn_stock());
                 currentItem.setSku(s.getSku());
                 currentItem.setQuantity(0);
-                currentItem.setSub_category_detail(s.getSub_category_detail());
                 currentItem.setItem_name(s.getItem_name());
                 currentItem.setUnit(s.getUnit());
             }
@@ -531,7 +538,8 @@ public class MainDashboardController implements Initializable {
         resetSelectedItem();
         editItemController.create();
         currentLocationBanner.setText("Inventory");
-        topHbox.getChildren().addAll(itemListController.createItemList());
+        //topHbox.getChildren().addAll(itemListController.createItemList());
+        new StageLoader().load(InventoryListController.class,applicationContext);
     }
 
     private void resetSelectedItem() {
@@ -541,29 +549,34 @@ public class MainDashboardController implements Initializable {
         selectedItem.setLow_stock(0);
         selectedItem.setQuantity(0);
         selectedItem.setSku(0);
-        selectedItem.setMargin(0.0);
         selectedItem.setCost(0.0);
         selectedItem.setIn_stock(0);
-        selectedItem.setSub_category_detail(getConfigValue(defaultCategoryData));
     }
 
     public void getDashboardModule(ActionEvent actionEvent) {
         resetHboxes();
 
-        ImageView addItem = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Purchase-dashboard.jpg", true));
+        ImageView addItem = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/AddItem-dashboard.jpg", true));
         ImageView releaseItem = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Release-dashboard.jpg", true));
         ImageView reports = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Reports-dashboard.jpg", true));
+        ImageView purchaseItem = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Purchase-dashboard.jpg", true));
 
         JFXButton jfxBtnAddItem = new JFXButton();
         JFXButton jfxBtnReleaseItem = new JFXButton();
         JFXButton jfxBtnReports = new JFXButton();
+        JFXButton jfxBtnPurchaseItem = new JFXButton();
 
         jfxBtnAddItem.setGraphic(addItem);
         jfxBtnReleaseItem.setGraphic(releaseItem);
         jfxBtnReports.setGraphic(reports);
+        jfxBtnPurchaseItem.setGraphic(purchaseItem);
+
+        jfxBtnPurchaseItem.setOnAction(e ->{
+            getItemsModule();
+        });
 
         jfxBtnAddItem.setOnAction(e -> {
-            getItemsModule();
+            addItemOnAction();
         });
 
         jfxBtnReleaseItem.setOnAction(f -> {
@@ -582,7 +595,7 @@ public class MainDashboardController implements Initializable {
         companyCopyright.setFont(Font.font("Roboto", FontWeight.MEDIUM, 10.0));
 
 
-        topHbox.getChildren().addAll(jfxBtnAddItem, jfxBtnReleaseItem, jfxBtnReports);
+        topHbox.getChildren().addAll(jfxBtnAddItem,jfxBtnPurchaseItem, jfxBtnReleaseItem, jfxBtnReports);
         midHbox.getChildren().addAll(companyName);
         bottomHbox.getChildren().addAll(companyCopyright);
 
@@ -600,7 +613,8 @@ public class MainDashboardController implements Initializable {
     public void getInventoryModule(ActionEvent actionEvent) {
         resetHboxes();
         currentLocationBanner.setText("Inventory");
-        topHbox.getChildren().addAll(itemListController.createItemList());
+    //    topHbox.getChildren().addAll(itemListController.createItemList());
+        new StageLoader().load(InventoryListController.class,applicationContext);
     }
 
     public void getCustomersModule(ActionEvent actionEvent) {
@@ -745,7 +759,6 @@ public class MainDashboardController implements Initializable {
                 history.setDate(AppTime.now());
                 history.setItem_name(item.getItem_name());
                 history.setAdjustment(item.getQuantity()*-1);
-                history.setSub_category_detail(item.getSub_category_detail());
                 history.setReason("RELEASE ITEM");
                 history.setItem_category(item.getItem_category());
 

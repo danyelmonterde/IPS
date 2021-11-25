@@ -5,9 +5,8 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.monterdev.model.DeletedItems;
 import com.monterdev.model.Item;
+import com.monterdev.repository.ItemsRepository;
 import com.monterdev.util.StageLoader;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -24,14 +23,27 @@ import javafx.scene.layout.VBox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.Message;
+import org.springframework.stereotype.Repository;
 import org.springframework.util.ObjectUtils;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.monterdev.constants.ItemsUIConfiguration.*;
 import static com.monterdev.util.ComponentCreator.*;
+import static org.springframework.data.jpa.domain.Specification.where;
+
 
 public class ItemListController {
 
@@ -41,11 +53,14 @@ public class ItemListController {
     @FXML
     private VBox vBox;
 
+    @Autowired
+    private ItemsRepository itemsRepository;
+
     private static int row = 1;
 
-    private  TableView<Item> tableView = new TableView<>();
+    private TableView<Item> tableView = new TableView<>();
 
-    private  ObservableList<Item> itemObservableList;
+    private ObservableList<Item> itemObservableList;
 
     private static int maxSku = 0;
 
@@ -57,9 +72,6 @@ public class ItemListController {
 
     private static int currentPageValue = 1;
 
-
-    @Autowired
-    @Qualifier("itemLists")
     private List<Item> itemLists;
 
     @Autowired
@@ -72,8 +84,20 @@ public class ItemListController {
 
     private Item selectedItem;
 
-    public AnchorPane createItemList() {
 
+
+    static Specification<Item> hasItemName(String itemName) {
+        return (item, cq, cb) -> cb.equal(item.get("item_name"), itemName);
+    }
+
+    static Specification<Item> itemNameContains(String itemName) {
+        return (item, cq, cb) -> cb.like(item.get("item_name"), "%" + itemName + "%");
+    }
+    public AnchorPane createItemList() {
+        Pageable pageable = PageRequest.of(0,10);
+
+        Page<Item> itemPage = itemsRepository.findAll(where(hasItemName("").or(itemNameContains(""))),pageable);
+        itemLists = itemPage.getContent();
         anchorPane = new AnchorPane();
 
         vBox = new VBox();
@@ -156,10 +180,8 @@ public class ItemListController {
             selectedItem.setLow_stock(0);
             selectedItem.setQuantity(0);
             selectedItem.setSku(0);
-            selectedItem.setMargin(0.0);
             selectedItem.setCost(0.0);
             selectedItem.setIn_stock(0);
-            selectedItem.setSub_category_detail(getConfigValue(defaultCategoryData));
             editItemController.create();
         });
     }
@@ -305,7 +327,7 @@ public class ItemListController {
         TableColumn<Item, String> itemName = new TableColumn<>("Item Name");
         itemName.setCellValueFactory(new PropertyValueFactory<>("item_name"));
         TableColumn<Item, String> category = new TableColumn<>("Category");
-        category.setCellValueFactory(new PropertyValueFactory<>("sub_category_detail"));
+        category.setCellValueFactory(new PropertyValueFactory<>("item_category"));
         TableColumn<Item, String> quantity = new TableColumn<>("Quantity");
         quantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         TableColumn<Item, String> cost = new TableColumn<>("Cost");
@@ -323,11 +345,24 @@ public class ItemListController {
 
 
         dataSize = itemLists.size();
-        maxSku = itemLists.get(dataSize - 1).getSku();
+        maxSku = itemLists.get(itemLists.size() - 1).getSku();
         tableView.getItems().clear();
-        if(dataSize<10){
-            itemObservableList = FXCollections.observableArrayList(itemLists.subList(currentPageValue * rowsPerPageCombo - rowsPerPageCombo, dataSize));
-        }else{
+        if (dataSize < 10) {
+            itemObservableList = FXCollections.observableArrayList(itemLists.subList(currentPageValue * rowsPerPageCombo - rowsPerPageCombo, 10));
+        }
+        else if (dataSize > 10 && dataSize <25) {
+            itemObservableList = FXCollections.observableArrayList(itemLists.subList(currentPageValue * rowsPerPageCombo - rowsPerPageCombo, 10));
+        }
+        else if (dataSize > 25 && dataSize <50) {
+            itemObservableList = FXCollections.observableArrayList(itemLists.subList(currentPageValue * rowsPerPageCombo - rowsPerPageCombo, 10));
+        }
+        else if (dataSize > 50 && dataSize <100) {
+            itemObservableList = FXCollections.observableArrayList(itemLists.subList(currentPageValue * rowsPerPageCombo - rowsPerPageCombo, 10));
+        }
+        else if (dataSize > 100 && dataSize <1000) {
+            itemObservableList = FXCollections.observableArrayList(itemLists.subList(currentPageValue * rowsPerPageCombo - rowsPerPageCombo, 10));
+        }
+        else {
             itemObservableList = FXCollections.observableArrayList(itemLists.subList(currentPageValue * rowsPerPageCombo - rowsPerPageCombo, (currentPageValue * rowsPerPageCombo)));
         }
 
@@ -343,11 +378,9 @@ public class ItemListController {
                 selectedItem.setCost(cellData.get(0).getCost());
                 selectedItem.setItem_name(cellData.get(0).getItem_name());
                 selectedItem.setLow_stock(cellData.get(0).getLow_stock());
-                selectedItem.setSub_category_detail(cellData.get(0).getSub_category_detail());
                 selectedItem.setIn_stock(cellData.get(0).getIn_stock());
                 selectedItem.setSku(cellData.get(0).getSku());
                 selectedItem.setIn_stock(cellData.get(0).getIn_stock());
-                selectedItem.setItem_category_header(cellData.get(0).getItem_category_header());
                 selectedItem.setItem_category(cellData.get(0).getItem_category());
                 selectedItem.setUnit(cellData.get(0).getUnit());
                 new StageLoader().load(EditItemController.class, x, applicationContext, "");
@@ -367,6 +400,8 @@ public class ItemListController {
     @KafkaListener(topics = "new-item-1-second-refresh", groupId = "myGroup", containerFactory = "itemListener")
     public void latestItem(Message<List<Item>> message) {
         boolean hasDataExceeded = (dataSize > (currentPageValue * rowsPerPageCombo)) ? true : false;
+        System.out.println("****************************************** MAX SKU: "+ maxSku);
+        System.out.println("****************************************** MAX SKU from Kafka: "+ message.getPayload().get(0).getSku());
         if (!ObjectUtils.isEmpty(this.tableView.getItems()) && currentPageValue >= 1 && currentPageValue < footerOffValue && currentPageValue < rowsPerPageCombo && message.getPayload().size() > 0 && !hasDataExceeded) {
             setLatestItems(message);
             refreshTableAndIsLastPage(false);
@@ -380,6 +415,7 @@ public class ItemListController {
     private void setLatestItems(Message<List<Item>> message) {
         List<Item> latestItem = message.getPayload();//Always the last  item --> always 1 item
         if (maxSku < latestItem.get(0).getSku()) {
+            System.out.println("**************** pumasok dito , meaning mas mababa sku sa latest sku *****");
             itemLists.add(latestItem.get(0));
             maxSku = latestItem.get(0).getSku();
             dataSize++;
@@ -408,7 +444,6 @@ public class ItemListController {
                     previousitem.setItem_name(updatedItem.getItem_name());
                     previousitem.setCost(updatedItem.getCost());
 
-                    previousitem.setSub_category_detail(updatedItem.getSub_category_detail());
                     //previousitem.setTag("1"); //if THERE IS A POSSIBILITY OF MULTIPLE USER UPDATE ON SAME ITEM, do not set this to 1
                     previousitem.setLow_stock(updatedItem.getLow_stock());
                     previousitem.setIn_stock(updatedItem.getIn_stock());
@@ -444,8 +479,12 @@ public class ItemListController {
     private void refreshTableAndIsLastPage(boolean isLastPage) {
         if (isLastPage) {
             if (!(dataSize % rowsPerPageCombo == 0)) {
-                itemObservableList = FXCollections.observableArrayList(itemLists.subList(dataSize - rowsPerPageCombo, dataSize));
-                tableView.getItems().setAll(itemObservableList);
+                if(dataSize <=10){//minimum row number per page
+                    setObservableListNonLastpage(0,dataSize);
+                }else{
+                    itemObservableList = FXCollections.observableArrayList(itemLists.subList(dataSize - rowsPerPageCombo, dataSize));
+                    tableView.getItems().setAll(itemObservableList);
+                }
             } else {
                 setObservableListNonLastpage(currentPageValue * rowsPerPageCombo - rowsPerPageCombo, currentPageValue * rowsPerPageCombo);
             }

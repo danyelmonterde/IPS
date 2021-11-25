@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="EditItemAnchorpane" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.EditItemController">
+<AnchorPane fx:id="EditItemAnchorpane" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="591.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.EditItemController">
    <children>
       <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
@@ -43,41 +43,15 @@
                               <Insets left="20.0" top="20.0" />
                            </VBox.margin>
                         </Label>
-                        <JFXComboBox fx:id="itemCategory" minWidth="-Infinity" onAction="#updateSubCategoryHeader">
+                        <JFXComboBox fx:id="itemCategoryCombo" minWidth="-Infinity" prefHeight="25.0" prefWidth="278.0">
                            <VBox.margin>
                               <Insets bottom="20.0" left="20.0" />
                            </VBox.margin>
                         </JFXComboBox>
                      </children>
                   </VBox>
-                  <VBox prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <Label minWidth="-Infinity" text="Sub-Category Header">
-                           <VBox.margin>
-                              <Insets top="20.0" />
-                           </VBox.margin>
-                        </Label>
-                        <JFXComboBox fx:id="itemSubCategoryHeader" minWidth="-Infinity" onAction="#updateSubCategoryDetail">
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </JFXComboBox>
-                     </children>
-                  </VBox>
-                  <VBox prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <Label minWidth="-Infinity" text="Sub-Category Detail">
-                           <VBox.margin>
-                              <Insets top="20.0" />
-                           </VBox.margin>
-                        </Label>
-                        <JFXComboBox fx:id="itemSubCategoryDetail" minWidth="-Infinity">
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </JFXComboBox>
-                     </children>
-                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0" />
+                  <VBox prefHeight="200.0" prefWidth="100.0" />
                </children>
                <VBox.margin>
                   <Insets bottom="20.0" left="20.0" top="20.0" />
@@ -147,9 +121,9 @@
                               <Insets left="20.0" top="10.0" />
                            </VBox.margin>
                         </Label>
-                        <JFXComboBox fx:id="comboUnit" labelFloat="true" promptText="Unit">
+                        <JFXComboBox fx:id="comboUnit" labelFloat="true" prefHeight="25.0" prefWidth="211.0" promptText="Unit">
                            <VBox.margin>
-                              <Insets left="20.0" top="20.0" />
+                              <Insets left="20.0" top="10.0" />
                            </VBox.margin>
                         </JFXComboBox>
                      </children>
@@ -171,16 +145,6 @@
                            </VBox.margin>
                         </Label>
                         <JFXTextField fx:id="receiptNumber" promptText="(OPTIONAL)" />
-                        <Label text="P.O#">
-                           <VBox.margin>
-                              <Insets top="20.0" />
-                           </VBox.margin>
-                        </Label>
-                        <JFXTextField fx:id="purchaseOrderNumber" promptText="(OPTIONAL)">
-                           <VBox.margin>
-                              <Insets bottom="20.0" />
-                           </VBox.margin>
-                        </JFXTextField>
                      </children>
                   </VBox>
                   <VBox prefHeight="200.0" prefWidth="100.0">
@@ -193,6 +157,16 @@
                               <Font name="System Bold" size="15.0" />
                            </font>
                         </JFXButton>
+                        <Label text="P.O#">
+                           <VBox.margin>
+                              <Insets left="20.0" top="20.0" />
+                           </VBox.margin>
+                        </Label>
+                        <JFXTextField fx:id="purchaseOrderNumber" promptText="(OPTIONAL)">
+                           <VBox.margin>
+                              <Insets left="20.0" top="10.0" />
+                           </VBox.margin>
+                        </JFXTextField>
                      </children>
                   </VBox>
                </children>
@@ -246,7 +220,7 @@
                   <DropShadow color="LIGHTGRAY" />
                </effect>
             </HBox>
-            <HBox alignment="BOTTOM_LEFT" prefHeight="200.0" prefWidth="200.0" spacing="480.0">
+            <HBox alignment="BOTTOM_LEFT" prefHeight="57.0" prefWidth="1240.0" spacing="480.0">
                <children>
                   <JFXButton fx:id="delete" buttonType="RAISED" cancelButton="true" onAction="#delete" ripplerFill="#cccccc" style="-fx-background-color: red;" textFill="WHITE">
                      <font>

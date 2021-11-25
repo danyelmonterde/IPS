@@ -34,6 +34,7 @@ public class GlobalConfiguration {
     public static final String defaultCategoryData;
     public static final String companyName;
     public static final String companyAddress;
+    public static final String defaultItemCategory;
 
     static {
         homePage = "HOME_PAGE";
@@ -51,6 +52,7 @@ public class GlobalConfiguration {
         defaultCategoryData = "DEFAULT_CATEGORY_DATA";
         companyName = "COMPANY_NAME";
         companyAddress = "COMPANY_ADDRESS";
+        defaultItemCategory = "CONSTRUCTION MATERIALS";
     }
 
 
