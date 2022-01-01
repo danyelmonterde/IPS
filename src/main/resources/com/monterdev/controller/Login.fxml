@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXPasswordField?>
+<?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url(file:/C:/Users/Daniel/Desktop/iqwd-app/src/main/resources/config-ui/IQWD-APP-RESOURCES/Login/bg-960x540px.png);" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.LoginController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="367.0" prefWidth="600.0" style="-fx-background-image: url(file:/C:/Users/Daniel/Desktop/iqwd-app/src/main/resources/config-ui/IQWD-APP-RESOURCES/Login/bg-960x540px.png);" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.LoginController">
    <children>
-      <Label fx:id="lblWelcome" layoutX="31.0" layoutY="26.0" prefHeight="109.0" prefWidth="549.0" text="WELCOME TO IQWD INVENTORY">
+      <Label fx:id="lblWelcome" alignment="CENTER" contentDisplay="CENTER" layoutX="26.0" layoutY="2.0" prefHeight="109.0" prefWidth="549.0" text="IQWD INVENTORY" textAlignment="CENTER">
          <font>
             <Font size="35.0" />
          </font>
       </Label>
-      <Label fx:id="lblUsername" layoutX="108.0" layoutY="175.0" text="Username:" />
-      <Label fx:id="lblPassword" layoutX="110.0" layoutY="224.0" text="Password:" />
-      <TextField fx:id="txtUsername" layoutX="206.0" layoutY="162.0" prefHeight="25.0" prefWidth="288.0" />
-      <TextField fx:id="txtPassword" layoutX="206.0" layoutY="211.0" prefHeight="26.0" prefWidth="288.0" />
-      <Button fx:id="btnForgotPassword" layoutX="22.0" layoutY="322.0" mnemonicParsing="false" onAction="#forgotPassword" styleClass="button-login" stylesheets="@../../../config-ui/IQWD-APP-RESOURCES/Login/login.css" text="FORGOT PASSWORD" />
-      <Button fx:id="btnLogin" layoutX="306.0" layoutY="322.0" mnemonicParsing="false" onAction="#login" text="LOGIN" />
-      <Button fx:id="btnExit" layoutX="526.0" layoutY="322.0" mnemonicParsing="false" onAction="#exitApplication" text="EXIT" />
+      <Label fx:id="lblUsername" layoutX="95.0" layoutY="173.0" text="Username:">
+         <font>
+            <Font size="19.0" />
+         </font></Label>
+      <Label fx:id="lblPassword" layoutX="97.0" layoutY="222.0" text="Password:">
+         <font>
+            <Font size="19.0" />
+         </font></Label>
       <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" visible="false">
          <image>
             <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Login/bg-960x540px.png" />
          </image>
       </ImageView>
+      <JFXButton buttonType="RAISED" layoutX="258.0" layoutY="289.0" style="-fx-background-color: WHITE;" text="LOGIN" />
+      <JFXTextField fx:id="txtUsername" layoutX="209.0" layoutY="169.0" prefHeight="25.0" prefWidth="299.0" />
+      <JFXButton buttonType="RAISED" layoutX="421.0" layoutY="289.0" style="-fx-background-color: WHITE;" text="EXIT" />
+      <JFXPasswordField fx:id="txtPassword" layoutX="209.0" layoutY="224.0" prefHeight="25.0" prefWidth="299.0" />
+      <Label layoutX="26.0" layoutY="328.0" text="version 1.0" />
    </children>
 </AnchorPane>

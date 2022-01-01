@@ -2,7 +2,9 @@ package com.monterdev.model;
 
 import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Objects;
 
 @Getter
@@ -29,16 +31,20 @@ public class DeletedItems {
 
     private String tag;
 
+    private String unit;
+
+    private String item_category;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeletedItems that = (DeletedItems) o;
-        return sku == that.sku && quantity == that.quantity && Double.compare(that.cost, cost) == 0 && in_stock == that.in_stock && low_stock == that.low_stock && Objects.equals(item_name, that.item_name) && Objects.equals(tag, that.tag);
+        return sku == that.sku && quantity == that.quantity && Double.compare(that.cost, cost) == 0 && in_stock == that.in_stock && low_stock == that.low_stock && Objects.equals(item_name, that.item_name) && Objects.equals(tag, that.tag) && Objects.equals(unit, that.unit) && Objects.equals(item_category, that.item_category);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sku, item_name, quantity, cost, in_stock, low_stock, tag);
+        return Objects.hash(sku, item_name, quantity, cost, in_stock, low_stock, tag, unit, item_category);
     }
 }

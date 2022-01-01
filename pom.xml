@@ -22,7 +22,6 @@
     </organization>
 
     <build>
-
         <plugins>
             <plugin>
                 <groupId>com.monterdev</groupId>
@@ -46,12 +45,20 @@
                 <configuration>
                     <fork>true</fork>
                     <mainClass>${start-class}</mainClass>
+                    <includeSystemScope>true</includeSystemScope>
                 </configuration>
                 <executions>
                     <execution>
                         <goals>
                             <goal>repackage</goal>
                         </goals>
+                        <configuration>
+                            <classifier>spring-boot</classifier>
+                            <mainClass>
+                                com.monterdev.app.MainSpringApplication
+                            </mainClass>
+                            <includeSystemScope>true</includeSystemScope>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -183,6 +190,13 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.12.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.3</version>
+        </dependency>
+
+
     </dependencies>
 
 </project>

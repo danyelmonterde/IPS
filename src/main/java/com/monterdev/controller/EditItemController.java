@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -32,6 +33,7 @@ import java.util.Optional;
 
 import static com.monterdev.constants.ItemsUIConfiguration.*;
 import static com.monterdev.util.ComponentCreator.createSearchBox;
+import static com.monterdev.util.ControlNumberGenerator.generateControlNumber;
 
 @Component
 @FxmlView("EditItem.fxml")
@@ -141,6 +143,9 @@ public class EditItemController {
 
     @Autowired
     private UnitRepository unitRepository;
+
+    @Autowired
+    private HistoryRepository historyRepository;
 
     private List<Item> resultsList = new ArrayList<>();
 
@@ -273,7 +278,7 @@ public class EditItemController {
                             listView.getItems().clear();
                             listView.getItems().addAll(responseList);
                             listView.setOnMouseClicked(e -> {
-                                if (e.getClickCount() == 1) {
+                                if (e.getClickCount() == 2) {
                                     setFields(listView.getSelectionModel().getSelectedItem().toString());
                                 }
                             });
@@ -325,23 +330,21 @@ public class EditItemController {
 
 
     private void quantityOnChange() {
-        try {
-            quantity.textProperty().addListener((observable, oldvalue, newvalue) -> {
-                if (oldvalue != newvalue) {
-                    selectedItem.setQuantity(Integer.parseInt(newvalue));
-                }
-
-            });
-        } catch (NumberFormatException numberFormatException) {
-            quantity.setText("0");
-        }
-
+        quantity.textProperty().addListener((observable, oldvalue, newvalue) -> {
+            if (oldvalue != newvalue && StringUtils.isNumeric(newvalue)) {
+                selectedItem.setQuantity(Integer.parseInt(newvalue));
+            }else{
+                quantity.setText("0");
+            }
+        });
     }
 
     private void lowStockOnChange() {
         lowStock.textProperty().addListener((obs, old, newv) -> {
-            if (old != newv) {
+            if (old != newv && StringUtils.isNumeric(newv)) {
                 selectedItem.setLow_stock(Integer.parseInt(newv));
+            }else{
+                lowStock.setText("0");
             }
         });
     }
@@ -359,6 +362,8 @@ public class EditItemController {
                             .cost(selectedItem.getCost())
                             .quantity(Integer.parseInt(quantity.getText()))
                             .item_name(selectedItem.getItem_name())
+                            .item_category(selectedItem.getItem_category())
+                            .unit(selectedItem.getUnit())
                             .in_stock(selectedItem.getIn_stock())
                             .low_stock(selectedItem.getLow_stock())
                             .sku(selectedItem.getSku())
@@ -415,20 +420,22 @@ public class EditItemController {
             selectedItem.setTag(null);
             if (!sku.getText().equalsIgnoreCase("0")) {
                 //EXISTING ITEM
+                //get previous quantity,cost and product of pv q and  pv cost
 
-                double realAverageCost = Double.parseDouble(averageCost.getText());
-                double realPurchaseCost = Double.parseDouble(purchaseCost.getText());
-                int realQuantity = Integer.parseInt(quantity.getText());
-                int realInstock = Integer.parseInt(inStock.getText());
-                double totalQuantity = realInstock + realQuantity;
-                double productOfQuantityandPurchaseCost = realQuantity * realPurchaseCost;
-                double totalCost = realAverageCost + productOfQuantityandPurchaseCost;
-                double finalAverageCost = totalCost / totalQuantity;
+                int previousQuantity =Integer.parseInt(inStock.getText());
+                double previousItemCostPerUnit = Double.parseDouble(averageCost.getText());
+                double previousTotalAmount = previousQuantity * previousItemCostPerUnit;
+
+                int currentQuantity = Integer.parseInt(quantity.getText());
+                double currentItemCostPerUnit = Double.parseDouble(purchaseCost.getText());
+                double currentTotalAmount = currentQuantity * currentItemCostPerUnit;
+
+                double finalAverageCost = (previousTotalAmount + currentTotalAmount) / (previousQuantity + currentQuantity);
                 selectedItem.setCost(DataUtil.formatToDouble(finalAverageCost));
-                selectedItem.setIn_stock(realInstock + realQuantity);
-
-            } else {
-                selectedItem.setIn_stock(Integer.parseInt(quantity.getText()));
+                selectedItem.setIn_stock(currentQuantity + previousQuantity);
+                if(selectedItem.getQuantity()==0){
+                    selectedItem.setQuantity(selectedItem.getIn_stock());
+                }
             }
             Item savedItem = itemsRepository.save(selectedItem);
             if (!ObjectUtils.isEmpty(savedItem)) {
@@ -439,6 +446,8 @@ public class EditItemController {
                 supplierRepository.save(supplierGroup);
                 Qrcode qrcode = setQrCodeData(savedItem);
                 qrcodeRepository.save(qrcode);
+                History history = setHistory(savedItem);
+                historyRepository.save(history);
 
                 try {
                     QrCodeUtil.saveQrCode(Integer.toString(savedItem.getSku()));
@@ -458,6 +467,18 @@ public class EditItemController {
 
     }
 
+    private History setHistory(Item savedItem) {
+        History history = new History();
+        history.setDate(AppTime.now());
+        history.setStock_after(savedItem.getIn_stock());
+        history.setReason("PURCHASED ITEM");
+        history.setAdjustment(savedItem.getQuantity());
+        history.setItem_category(savedItem.getItem_category());
+        history.setItem_name(savedItem.getItem_name());
+
+        return history;
+    }
+
     private Qrcode setQrCodeData(Item savedItem) {
         Qrcode qrcode = new Qrcode();
         qrcode.setQr_code_path(QrCodeUtil.filePath + "\\" + savedItem.getItem_name() + ".jpg");
@@ -467,11 +488,14 @@ public class EditItemController {
     }
 
     private SupplierGroup setSupplierGroup(Item savedItem) {
-        SupplierGroup supplierdata = new SupplierGroup();
-        supplierdata.setSupplier(ObjectUtils.isEmpty(supplierGroup.getText()) ? "NONE" : supplierGroup.getText());
-        supplierdata.setReceipt_number(ObjectUtils.isEmpty(receiptNumber.getText()) ? "NONE" : receiptNumber.getText());
-        supplierdata.setPurchase_order_number(ObjectUtils.isEmpty(purchaseOrderNumber.getText()) ? "NONE" : purchaseOrderNumber.getText());
-        return supplierdata;
+        String controlNumber = generateControlNumber();
+        SupplierGroup supplierDatum = new SupplierGroup();
+        supplierDatum.setSupplier(ObjectUtils.isEmpty(supplierGroup.getText()) ?  controlNumber: supplierGroup.getText());
+        supplierDatum.setReceipt_number(ObjectUtils.isEmpty(receiptNumber.getText()) ? controlNumber : receiptNumber.getText());
+        supplierDatum.setPurchase_order_number(ObjectUtils.isEmpty(purchaseOrderNumber.getText()) ? controlNumber : purchaseOrderNumber.getText());
+        supplierDatum.setDate_created(AppTime.now());
+        supplierDatum.setSku(savedItem.getSku());
+        return supplierDatum;
     }
 
     private PurchaseOrder setPurchaseOrder(Item item) {

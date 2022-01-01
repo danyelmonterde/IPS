@@ -31,6 +31,5 @@ public class History {
 
     private int stock_after;
 
-    private String sub_category_detail;
 
 }

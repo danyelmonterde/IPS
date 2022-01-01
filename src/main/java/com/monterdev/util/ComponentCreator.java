@@ -3,6 +3,7 @@ package com.monterdev.util;
 import com.jfoenix.controls.*;
 import com.monterdev.constants.ItemsUIConfiguration;
 import com.monterdev.model.Item;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
@@ -133,6 +134,7 @@ public class ComponentCreator {
         AnchorPane searchBoxContainer = new AnchorPane();
         VBox searchGroup = new VBox();
         JFXListView searchedItems = new JFXListView();
+        VBox.setMargin(searchedItems,new Insets(-10,0,0,0));
         searchedItems.setPrefHeight(100);
         searchGroup.getChildren().addAll(searchedItems);
         searchBoxContainer.getChildren().addAll(searchGroup);

@@ -3,6 +3,7 @@ package com.monterdev.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,5 +22,9 @@ public class SupplierGroup {
 
     private String receipt_number;
 
+    private int sku;
+
     private String purchase_order_number;
+
+    private LocalDateTime date_created;
 }

@@ -18,6 +18,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -30,9 +31,11 @@ import javafx.util.Duration;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -55,159 +58,114 @@ public class MainDashboardController implements Initializable {
 
     @FXML
     private ImageView Exit;
-
     @FXML
     private Label Menu;
-
     @FXML
     private Label MenuClose;
-
     @FXML
     private AnchorPane sidebarAnchorpane;
-
     @FXML
     private AnchorPane mainAnchorpane;
-
     @FXML
     private AnchorPane searchPane;
-
     @FXML
     private HBox topHbox;
-
     @FXML
     private HBox midHbox;
-
     @FXML
     private HBox bottomHbox;
-
     @FXML
     private JFXButton sidebarReports;
-
     @FXML
     private JFXButton sidebarItems;
-
     @FXML
     private JFXButton sidebarDashboard;
-
     @FXML
     private JFXButton sidebarInventory;
-
     @FXML
     private JFXButton sidebarCustomers;
-
     @FXML
     private JFXButton sidebarSettings;
-
     @FXML
     private Label currentLocationBanner;
-
     @FXML
     private Label companyName;
-
     @FXML
     private Label companyCopyright;
-
     @FXML
     private JFXButton sidebarLogout;
-
     @FXML
     private JFXButton dashboardIconMenu;
-
     @FXML
     private JFXButton addItemMenu;
-
     @FXML
     private JFXButton reportMenu;
-
     @FXML
     private JFXButton backupMenu;
-
     @FXML
     private JFXButton releaseItemButton;
-
     @FXML
     private JFXButton addItemButton;
-
     @FXML
     private Label sku;
-
-    @Autowired
-    private ItemListController itemListController;
+    @FXML
+    private JFXTextField dashboardSearchField;
+    @FXML
+    private TextField dashboardSearchResult;
+    @FXML
+    private JFXListView dashboardLowStock;
+    @FXML
+    private JFXListView dashboardOutofStock;
 
     @Autowired
     private EditItemController editItemController;
-
     @Autowired
     private ConfigurableApplicationContext applicationContext;
-
     @Autowired
     private Item selectedItem;
-
     @Autowired
     @Qualifier("itemLists")
     private List<Item> itemLists;
-
     @Autowired
     private ItemsRepository itemsRepository;
-
     @Autowired
     private RisRepository risRepository;
-
     @Autowired
     private SearchUtil searchUtil;
-
     @Autowired
     private ReportUtil reportUtil;
-
     @Autowired
     private RequisitionIssueSlip requisitionIssueSlip;
-
     @Autowired
     private RisTypeFieldsRepository risTypeFieldsRepository;
-
     @Autowired
     private SalesRepository salesRepository;
-
     @Autowired
     private HistoryRepository historyRepository;
-
     @Autowired
     private List<RisTypeFields> risTypeFieldsList;
-
     @Autowired
     private Customer customer;
-
     @Autowired
     private CustomerRepository customerRepository;
-
     @Autowired
     private UnitRepository unitRepository;
-
     @Autowired
     private ReportNamesRepository reportNamesRepository;
+    @Autowired
+    private SearchEngineController searchEngineController;
 
     private List<String> responseList = new ArrayList<>();
-
     private static int rowIndex = 0;
-
     private int indexToBeRemoved = 0;
-
     private List<Item> itemCart = new ArrayList<>();
-
     private boolean isEmpty = true;
-
     private JFXListView listView = new JFXListView();
-
     private TranslateTransition slide = new TranslateTransition();
-
     private TranslateTransition slideMainAnchorpane = new TranslateTransition();
-
     private TranslateTransition slideSearchPane = new TranslateTransition();
-
     private double totalSales =0; //;total amount na may 20% na patong pag new
-
     private double totalCost = 0; //lahat ng average cost
-
     private double totalIncome = 0; //totalSales - totalCost
 
     @SneakyThrows
@@ -246,7 +204,6 @@ public class MainDashboardController implements Initializable {
                 Menu.setVisible(false);
                 MenuClose.setVisible(true);
             });
-
         });
 
         MenuClose.setOnMouseClicked(event -> {
@@ -275,13 +232,10 @@ public class MainDashboardController implements Initializable {
             mainAnchorpane.setTranslateX(-176);
             searchPane.setTranslateX(-176);
 
-
             slide.setOnFinished((ActionEvent e) -> {
                 Menu.setVisible(true);
                 MenuClose.setVisible(false);
             });
-
-
         });
         sku.textProperty().addListener((obs, oldValue, newValue) -> {
 
@@ -313,6 +267,7 @@ public class MainDashboardController implements Initializable {
 
         refreshReleaseItemsOnMouseHover();
         addItemOnAction();
+        searchItemOnDashboard();
     }
 
     private void addItemOnAction() {
@@ -388,6 +343,12 @@ public class MainDashboardController implements Initializable {
             if (oldValue != newValue) {
                 itemCart.get(Integer.parseInt(cost.getId())).setCost(Double.parseDouble(newValue));
                 amount.setText(String.format("%.2f", currentItem.getQuantity() * Double.parseDouble(newValue)));
+
+                if(requisitionIssueSlip.getIs_customer_new()==1){
+                    amount.setText(String.format("%.2f", currentItem.getQuantity() * Double.parseDouble(newValue)+(Double.parseDouble(newValue)*.2)));
+                }else{
+                    amount.setText(String.format("%.2f", currentItem.getQuantity() * Double.parseDouble(newValue)));
+                }
                 currentItem.setCost(Double.parseDouble(newValue));
             }
         });
@@ -399,7 +360,11 @@ public class MainDashboardController implements Initializable {
             if (oldValue != newValue) {
                 currentItem.setQuantity(Integer.parseInt(newValue));
                 itemCart.get(Integer.parseInt(quantity.getId())).setQuantity(Integer.parseInt(newValue));
-                amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
+                if(requisitionIssueSlip.getIs_customer_new()==1){
+                    amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()+(currentItem.getCost()*.2)));
+                }else{
+                    amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
+                }
 
             }
         });
@@ -451,7 +416,6 @@ public class MainDashboardController implements Initializable {
         HBox.setMargin(quantity, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(cost, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(amount, new Insets(50.0, 0.0, 0.0, 20.0));
-
         HBox.setMargin(delete, new Insets(35.0, 0.0, 0.0, 20.0));
         hBox.getChildren().addAll(name, quantity, cost, amount, delete);
 
@@ -533,13 +497,12 @@ public class MainDashboardController implements Initializable {
         bottomHbox.getChildren().clear();
     }
 
-    public void getItemsModule() {
+    public void getPurchaseItemModule() {
         resetHboxes();
         resetSelectedItem();
         editItemController.create();
-        currentLocationBanner.setText("Inventory");
-        //topHbox.getChildren().addAll(itemListController.createItemList());
-        new StageLoader().load(InventoryListController.class,applicationContext);
+        currentLocationBanner.setText("Inventory Overview");
+
     }
 
     private void resetSelectedItem() {
@@ -572,11 +535,11 @@ public class MainDashboardController implements Initializable {
         jfxBtnPurchaseItem.setGraphic(purchaseItem);
 
         jfxBtnPurchaseItem.setOnAction(e ->{
-            getItemsModule();
+            getPurchaseItemModule();
         });
 
         jfxBtnAddItem.setOnAction(e -> {
-            addItemOnAction();
+            new StageLoader().load(AddItemController.class, applicationContext);
         });
 
         jfxBtnReleaseItem.setOnAction(f -> {
@@ -825,7 +788,7 @@ public class MainDashboardController implements Initializable {
                 }
 
             } else {
-                Prompt.failed("An error occured while saving!");
+                Prompt.failed("An error occurred while saving!");
             }
 
 
@@ -843,4 +806,45 @@ public class MainDashboardController implements Initializable {
         getCustomizeRIS();
         createRequisitionIssueSlip();
     }
+
+    public void searchItemOnDashboard() {
+        dashboardSearchField.textProperty().addListener((ob, ov, nv) -> {
+            if (ov != nv) {
+                List<Item> itemList = itemsRepository.findAll(hasItemName(nv));
+                if (!ObjectUtils.isEmpty(itemList)) {
+                    setItemResultOnDashboard(itemList.get(0).getItem_name());
+                }
+            }
+        });
+        dashboardSearchField.setOnKeyPressed(e->{
+            if(e.getCode() == KeyCode.BACK_SPACE){
+                dashboardSearchResult.setText("");
+            }else if(e.getCode() == KeyCode.ENTER){
+                System.out.println("ENTERED WORD IS: "+dashboardSearchResult.getText());
+            }
+        });
+
+    }
+
+    private void setItemResultOnDashboard(String result) {
+
+        dashboardSearchResult.textProperty().addListener((ob, ov, nv) -> {
+            if (ov != nv) {
+
+            }
+        });
+
+        dashboardSearchResult.setText(result);
+    }
+
+    private Specification<Item> hasItemName(String itemName) {
+        return (item, cq, cb) -> cb.like(item.get("item_name"), "%" + itemName + "%");
+    }
+
+    private Specification<Item> hasSku(String sku) {
+        return (item, cq, cb) -> cb.like(item.get("sku"), "%" + sku + "%");
+    }
+
+
+
 }

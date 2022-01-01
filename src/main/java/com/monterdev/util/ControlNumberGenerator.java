@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class ControlNumberGenerator {
 
     public String generate(){
-            return GlobalConfiguration.getClientAcronym()+"-"+ getYear() +"-"+getMonth()+"-"+ RandomStringUtils.randomAlphanumeric(8);
+            return GlobalConfiguration.getClientAcronym()+"-"+ getYear() +"-"+getMonth()+"-"+ generateControlNumber();
     }
 
     private int getYear(){
@@ -21,5 +21,9 @@ public class ControlNumberGenerator {
     private int getMonth(){
         LocalDateTime now = LocalDateTime.now();
         return now.getMonthValue();
+    }
+
+    public static String generateControlNumber(){
+        return RandomStringUtils.randomAlphanumeric(8);
     }
 }
