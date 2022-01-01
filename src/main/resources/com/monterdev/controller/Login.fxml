@@ -29,10 +29,10 @@
             <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Login/bg-960x540px.png" />
          </image>
       </ImageView>
-      <JFXButton buttonType="RAISED" layoutX="258.0" layoutY="289.0" style="-fx-background-color: WHITE;" text="LOGIN" />
+      <JFXButton fx:id="btnLogin" buttonType="RAISED" layoutX="258.0" layoutY="289.0" style="-fx-background-color: WHITE;" text="LOGIN" />
       <JFXTextField fx:id="txtUsername" layoutX="209.0" layoutY="169.0" prefHeight="25.0" prefWidth="299.0" />
-      <JFXButton buttonType="RAISED" layoutX="421.0" layoutY="289.0" style="-fx-background-color: WHITE;" text="EXIT" />
+      <JFXButton fx:id="btnExit" buttonType="RAISED" layoutX="421.0" layoutY="289.0" style="-fx-background-color: WHITE;" text="EXIT" />
       <JFXPasswordField fx:id="txtPassword" layoutX="209.0" layoutY="224.0" prefHeight="25.0" prefWidth="299.0" />
-      <Label layoutX="26.0" layoutY="328.0" text="version 1.0" />
+      <Label fx:id="lblVersion" layoutX="26.0" layoutY="328.0" text="version 1.0" />
    </children>
 </AnchorPane>
