@@ -2,6 +2,7 @@ package com.monterdev.app;
 
 import com.monterdev.configuration.JsonFileConfiguration;
 import com.monterdev.constants.GlobalConfiguration;
+import com.monterdev.controller.LoginController;
 import com.monterdev.controller.MainDashboardController;
 import com.monterdev.exception.IqwdException;
 import com.monterdev.util.StageLoader;
@@ -26,7 +27,7 @@ public class MainJavaFXApplication extends Application {
             GlobalConfiguration globalConfiguration = new GlobalConfiguration();
             JsonFileConfiguration jsonFileConfiguration = applicationContext.getBean(JsonFileConfiguration.class);
             globalConfiguration.setJsonFileConfiguration(jsonFileConfiguration);
-            new StageLoader().loadTest(MainDashboardController.class,applicationContext, primaryStage);
+            new StageLoader().loadTest(LoginController.class,applicationContext, primaryStage);
         } catch (IqwdException iqwdException) {
             LOGGER.error(iqwdException.getCode(), iqwdException.getMessage());
         }

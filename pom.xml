@@ -195,6 +195,11 @@
             <artifactId>opencsv</artifactId>
             <version>5.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>5.6.1</version>
+        </dependency>
 
 
     </dependencies>

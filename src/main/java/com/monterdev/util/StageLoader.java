@@ -87,7 +87,7 @@ public class StageLoader {
     private void TestStage(Parent root, Stage primaryStage) {
 
         primaryStage.initStyle(StageStyle.UNDECORATED);
-        primaryStage.setFullScreen(true);
+        primaryStage.setFullScreen(false);
 
         root.setOnMousePressed(event -> {
             x = event.getSceneX();
