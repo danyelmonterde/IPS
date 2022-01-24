@@ -5,15 +5,20 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.monterdev.model.Item;
 import com.monterdev.model.ItemCategory;
+import com.monterdev.model.Qrcode;
 import com.monterdev.model.Unit;
 import com.monterdev.repository.ItemsRepository;
+import com.monterdev.repository.QrcodeRepository;
+import com.monterdev.util.AppTime;
 import com.monterdev.util.Prompt;
+import com.monterdev.util.QrCodeUtil;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.stage.Stage;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -71,6 +76,9 @@ public class AddItemController implements Initializable {
     @Autowired
     private ItemsRepository itemsRepository;
 
+    @Autowired
+    private QrcodeRepository qrcodeRepository;
+
     private Item item;
 
     @Override
@@ -96,20 +104,43 @@ public class AddItemController implements Initializable {
 
     private void saveOnAction() {
         save.setOnAction(e->{
-            if(!ObjectUtils.isEmpty(item)){
-                if(!ObjectUtils.isEmpty(itemsRepository.save(item))){
-                    Prompt.success("Item was successfully added!");
-                    Stage stage = (Stage) name.getScene().getWindow();
-                    stage.close();
-                }else{
-                    Prompt.failed("Item was not saved!");
+            if(!ObjectUtils.isEmpty(item.getItem_name()) && !ObjectUtils.isEmpty(item.getUnit())){
+                try{
+                    if(!ObjectUtils.isEmpty(itemsRepository.save(item))){
+                        Qrcode qrcode = setQrCodeData(item);
+                        qrcodeRepository.save(qrcode);
+                        Prompt.success("Item was successfully added!");
+                        Stage stage = (Stage) name.getScene().getWindow();
+                        stage.close();
+                        try {
+                            QrCodeUtil.saveQrCode(String.valueOf(item.getSku()),item.getSku() +"-"+item.getItem_name());
+                        } catch (Exception ioException) {
+
+                        }finally {
+                            resetItem();
+                        }
+                    }else{
+                        Prompt.failed("Item was not saved!");
+                    }
+                }catch (DataIntegrityViolationException dataIntegrityViolationException){
+                    Prompt.failed("Item existed already!");
                 }
+
             }else{
                 Prompt.failed("Please fill in all fields!");
             }
         });
 
     }
+
+    private Qrcode setQrCodeData(Item savedItem) {
+        Qrcode qrcode = new Qrcode();
+        qrcode.setQr_code_path(QrCodeUtil.filePath + "\\" +savedItem.getSku()+"-"+ savedItem.getItem_name() + ".jpg");
+        qrcode.setSku(savedItem.getSku());
+        qrcode.setDate_created(AppTime.now());
+        return qrcode;
+    }
+
 
     private void cancelOnAction() {
         cancel.setOnAction(e->{
@@ -121,23 +152,27 @@ public class AddItemController implements Initializable {
 
     private void resetOnAction() {
         reset.setOnAction(e->{
-            name.setText("");
-            quantity.setText("0");
-            sku.setText("0");
-            purchaseCost.setText("0");
-            totalAmount.setText("0");
-            lowStock.setText("0");
-
-            item.setItem_name("");
-            item.setItem_category("");
-            item.setLow_stock(0);
-            item.setTag(null);
-            item.setQuantity(0);
-            item.setCost(0);
-            item.setIn_stock(0);
-            item.setUnit("");
-            item.setSku(0);
+            resetItem();
         });
+    }
+
+    private void resetItem(){
+        name.setText("");
+        quantity.setText("0");
+        sku.setText("0");
+        purchaseCost.setText("0");
+        totalAmount.setText("0");
+        lowStock.setText("0");
+
+        item.setItem_name("");
+        item.setItem_category("");
+        item.setLow_stock(0);
+        item.setTag(null);
+        item.setQuantity(0);
+        item.setCost(0);
+        item.setIn_stock(0);
+        item.setUnit("");
+        item.setSku(0);
     }
 
     private void viewInventoryHistoryOnAction() {

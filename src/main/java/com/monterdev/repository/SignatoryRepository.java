@@ -7,6 +7,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface SignatoryRepository extends CrudRepository<Signatory, Integer> {
 
-    @Query(value = "SELECT * FROM signatory WHERE role=:role", nativeQuery = true)
-    Signatory findSignatoryByRole(@Param("role") String role);
+    @Query(value = "SELECT * FROM signatory WHERE role=:role AND reportid=:reportid", nativeQuery = true)
+    Signatory findSignatoryByRole(@Param("role") String role,@Param("reportid") int reportid);
 }

@@ -204,7 +204,7 @@ public class InventoryListController implements Initializable {
                 cellData.clear();
                 cellData.add(inventoryListTableView.getSelectionModel().getSelectedItem());
                 selectedItem = applicationContext.getBean(Item.class);
-                selectedItem.setTag(cellData.get(0).getTag());
+                selectedItem.setTag(String.valueOf(1));
                 selectedItem.setCost(cellData.get(0).getCost());
                 selectedItem.setItem_name(cellData.get(0).getItem_name());
                 selectedItem.setLow_stock(cellData.get(0).getLow_stock());

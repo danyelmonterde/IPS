@@ -102,15 +102,16 @@ public class ReportsMapper {
                 mappedReport.put("TOTAL_SALES", String.valueOf(totalSales));
                 mappedReport.put("TOTAL_COST", String.valueOf(totalCost));
                 mappedReport.put("TOTAL_INCOME", String.valueOf(totalIncome));
-                mappedReport.put("PREPARED_BY" , signatoryRepository.findSignatoryByRole("preparedBy").getSignatory());
-                mappedReport.put("NOTEDBY" , signatoryRepository.findSignatoryByRole("notedBy").getSignatory());
-                mappedReport.put("CHECKED_BY" , signatoryRepository.findSignatoryByRole("checkedBy").getSignatory());
-                mappedReport.put("CHECKED_BY_POSITION" , signatoryRepository.findSignatoryByRole("checkedBy").getPosition());
-                mappedReport.put("PREPARED_BY_POSITION" , signatoryRepository.findSignatoryByRole("preparedBy").getPosition());
-                mappedReport.put("NOTED_BY_POSITION" , signatoryRepository.findSignatoryByRole("notedBy").getPosition());
+                mappedReport.put("PREPARED_BY" , signatoryRepository.findSignatoryByRole("preparedBy",reportUtil.getReportId()).getSignatory());
+                mappedReport.put("NOTEDBY" , signatoryRepository.findSignatoryByRole("notedBy",reportUtil.getReportId()).getSignatory());
+                mappedReport.put("CHECKED_BY" , signatoryRepository.findSignatoryByRole("checkedBy",reportUtil.getReportId()).getSignatory());
+                mappedReport.put("CHECKED_BY_POSITION" , signatoryRepository.findSignatoryByRole("checkedBy",reportUtil.getReportId()).getPosition());
+                mappedReport.put("PREPARED_BY_POSITION" , signatoryRepository.findSignatoryByRole("preparedBy",reportUtil.getReportId()).getPosition());
+                mappedReport.put("NOTED_BY_POSITION" , signatoryRepository.findSignatoryByRole("notedBy",reportUtil.getReportId()).getPosition());
             }
 
             mappedReportsList.add(mappedReport);
+
         });
         return mappedReportsList;
     }

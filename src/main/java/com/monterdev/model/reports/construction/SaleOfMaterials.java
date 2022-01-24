@@ -11,17 +11,16 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SaleOfMaterials {
 
-    private String date;
+    private String PREPARED_BY;
 
-    private String name;
+    private String NOTED_BY;
 
-    private String orNumber;
+    private String CHECKED_BY;
 
-    private double sales;
+    private String CHECKED_BY_POSITION;
 
-    private String referenceNumber;
+    private String PREPARED_BY_POSITION;
 
-    private double cost;
+    private String NOTED_BY_POSITION;
 
-    private double income;
 }

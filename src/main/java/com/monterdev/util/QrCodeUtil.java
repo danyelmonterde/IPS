@@ -20,11 +20,11 @@ public class QrCodeUtil {
 
     public static String filePath = getConfigValue(generatedQrCodeDirectory);
 
-    public static void saveQrCode(String itemName) throws Exception {
+    public static void saveQrCode(String sku,String fileName) throws Exception {
         String charset = "UTF-8";
         Map<EncodeHintType, ErrorCorrectionLevel> hashMap = new HashMap<EncodeHintType, ErrorCorrectionLevel>();
         hashMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
-        generateQRcode(itemName, filePath+"\\"+itemName+".jpg", charset, hashMap, 200, 200);
+        generateQRcode(sku, filePath+"\\"+fileName+".jpg", charset, hashMap, 200, 200);
 
     }
 

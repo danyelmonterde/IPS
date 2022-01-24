@@ -309,6 +309,7 @@ public class MainDashboardController implements Initializable {
                 currentItem.setSku(s.getSku());
                 currentItem.setQuantity(0);
                 currentItem.setItem_name(s.getItem_name());
+                currentItem.setItem_category(s.getItem_category());
                 currentItem.setUnit(s.getUnit());
             }
         });
@@ -472,10 +473,9 @@ public class MainDashboardController implements Initializable {
         });
 
 
-        JFXButton getReport = new JFXButton("Generate Single Report");
+        JFXButton getReport = new JFXButton("Generate");
         getReport.setOnAction(e -> {
             try {
-                //new StageLoader().load(MainReportController.class, applicationContext);
                 reportUtil.generateReport();
             } catch (Exception exception){
                 System.out.println(exception.getLocalizedMessage());
@@ -502,7 +502,10 @@ public class MainDashboardController implements Initializable {
         resetSelectedItem();
         editItemController.create();
         currentLocationBanner.setText("Inventory Overview");
+    }
 
+    public void getAddItemModule(){
+        new StageLoader().load(AddItemController.class, applicationContext);
     }
 
     private void resetSelectedItem() {
@@ -722,6 +725,7 @@ public class MainDashboardController implements Initializable {
                 history.setDate(AppTime.now());
                 history.setItem_name(item.getItem_name());
                 history.setAdjustment(item.getQuantity()*-1);
+                history.setItem_category(item.getItem_category());
                 history.setReason("RELEASE ITEM");
                 history.setItem_category(item.getItem_category());
 
@@ -743,9 +747,6 @@ public class MainDashboardController implements Initializable {
                 history.setStock_after(inStock);
                 historyRepository.save(history);
 
-
-
-
             });
             if (!ObjectUtils.isEmpty(itemsRepository.saveAll(itemCart))) {
                 resetSelectedItem();
@@ -759,6 +760,7 @@ public class MainDashboardController implements Initializable {
                 }
 
                 if (!ObjectUtils.isEmpty(requisitionIssueSlip)) {
+                    requisitionIssueSlip.setId(0);
                     if (!ObjectUtils.isEmpty(risRepository.save(requisitionIssueSlip))) {
                         if(!ObjectUtils.isEmpty(risTypeFieldsList)){
                             risTypeFieldsList.stream().forEach(data ->{
@@ -775,9 +777,9 @@ public class MainDashboardController implements Initializable {
 
                     Sales sales = new Sales();
                     sales.setControl_number(requisitionIssueSlip.getControl_number());
-                    sales.setTotal_sales(totalSales);
+                    sales.setTotal_sales((double)Math.round(totalSales * 100d)/100d);
                     sales.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern("dd-MMM-YYYY")));
-                    sales.setIncome(totalIncome);
+                    sales.setIncome((double)Math.round(totalIncome * 100d)/100d);
                     sales.setTotal_cost(totalCost);
 
                     salesRepository.save(sales);

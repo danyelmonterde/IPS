@@ -294,7 +294,9 @@ public class EditItemController {
                 }
 
             } else if (ObjectUtils.isEmpty(newvalue)) {
-                searchGroupMainContainer.getChildren().remove(2);
+                if(searchGroupMainContainer.getChildren().size()>2){
+                    searchGroupMainContainer.getChildren().remove(2);
+                }
                 resetFields();
                 responseList.clear();
             }
@@ -325,6 +327,7 @@ public class EditItemController {
             sku.setText(Integer.toString(item.get().getSku()));
             averageCost.setText(Double.toString(item.get().getCost()));
             itemCategoryCombo.setValue(item.get().getItem_category());
+            comboUnit.setValue(item.get().getUnit());
         }
     }
 
@@ -371,6 +374,8 @@ public class EditItemController {
                             .build();
                     if (!ObjectUtils.isEmpty(deletedItemsRepository.save(deletedItems))) {
                         itemsRepository.delete(selectedItem);
+                        History history = setHistory(selectedItem,"DELETED ITEM",false);
+                        historyRepository.save(history);
                         cancel(new ActionEvent());
                     }
                 }
@@ -394,7 +399,8 @@ public class EditItemController {
         supplierGroup.setText("");
         receiptNumber.setText("");
         purchaseOrderNumber.setText("");
-
+        comboUnit.setValue("PCS");
+        itemCategoryCombo.setValue("CONSTRUCTION MATERIALS");
     }
 
     private void resetSelectedItem() {
@@ -406,6 +412,7 @@ public class EditItemController {
         selectedItem.setCost(0.0);
         selectedItem.setIn_stock(0);
         selectedItem.setItem_category("");
+        selectedItem.setUnit("");
     }
 
     public void cancel(ActionEvent actionEvent) {
@@ -431,37 +438,43 @@ public class EditItemController {
                 double currentTotalAmount = currentQuantity * currentItemCostPerUnit;
 
                 double finalAverageCost = (previousTotalAmount + currentTotalAmount) / (previousQuantity + currentQuantity);
+                if(Double.isNaN(finalAverageCost)){
+                    finalAverageCost = 0;
+                }
                 selectedItem.setCost(DataUtil.formatToDouble(finalAverageCost));
                 selectedItem.setIn_stock(currentQuantity + previousQuantity);
+                selectedItem.setSku(Integer.parseInt(sku.getText()));
+                selectedItem.setUnit((String)comboUnit.getSelectionModel().getSelectedItem());
                 if(selectedItem.getQuantity()==0){
                     selectedItem.setQuantity(selectedItem.getIn_stock());
                 }
             }
             Item savedItem = itemsRepository.save(selectedItem);
-            if (!ObjectUtils.isEmpty(savedItem)) {
+            if (!ObjectUtils.isEmpty(savedItem) && (Integer.parseInt(quantity.getText())!=0 ) && (Integer.parseInt(purchaseCost.getText())!=0)) {
 
                 PurchaseOrder purchaseOrder = setPurchaseOrder(savedItem);
                 purchaseOrderRepository.save(purchaseOrder);
                 SupplierGroup supplierGroup = setSupplierGroup(savedItem);
                 supplierRepository.save(supplierGroup);
-                Qrcode qrcode = setQrCodeData(savedItem);
-                qrcodeRepository.save(qrcode);
+//                Qrcode qrcode = setQrCodeData(savedItem);
+//                qrcodeRepository.save(qrcode);
                 History history = setHistory(savedItem);
                 historyRepository.save(history);
 
                 try {
-                    QrCodeUtil.saveQrCode(Integer.toString(savedItem.getSku()));
+                    QrCodeUtil.saveQrCode(String.valueOf(savedItem.getSku()),savedItem.getSku() +"-"+savedItem.getItem_name());
                 } catch (Exception ioException) {
-
+                    Prompt.failed("Error in Saving QR Code!");
                 }
 
-
-                Prompt.success("Data saved!");
+                Prompt.success("Purchased Item was saved!");
                 resetSelectedItem();
                 Stage stage = (Stage) save.getScene().getWindow();
                 stage.close();
-            } else {
-                Prompt.failed("Data did NOT save successfully!");
+            } else if(!ObjectUtils.isEmpty(savedItem)) {
+                Prompt.success("Item updated successfully!");
+            }else{
+                Prompt.failed("Transaction Failed! Please Try again!");
             }
         }
 
@@ -479,13 +492,30 @@ public class EditItemController {
         return history;
     }
 
-    private Qrcode setQrCodeData(Item savedItem) {
-        Qrcode qrcode = new Qrcode();
-        qrcode.setQr_code_path(QrCodeUtil.filePath + "\\" + savedItem.getItem_name() + ".jpg");
-        qrcode.setSku(savedItem.getSku());
-        qrcode.setDate_created(AppTime.now());
-        return qrcode;
+    private History setHistory(Item savedItem,String reason, boolean isPositive) {
+        History history = new History();
+        history.setDate(AppTime.now());
+        history.setReason(reason);
+        if(isPositive){
+            history.setAdjustment(savedItem.getQuantity());
+            history.setStock_after(savedItem.getQuantity());
+        }else{
+            history.setStock_after(0);
+            history.setAdjustment(savedItem.getIn_stock() * -1);
+        }
+
+        history.setItem_category(savedItem.getItem_category());
+        history.setItem_name(savedItem.getItem_name());
+        return history;
     }
+
+//    private Qrcode setQrCodeData(Item savedItem) {
+//        Qrcode qrcode = new Qrcode();
+//        qrcode.setQr_code_path(QrCodeUtil.filePath + "\\" +savedItem.getSku()+"-"+ savedItem.getItem_name() + ".jpg");
+//        qrcode.setSku(savedItem.getSku());
+//        qrcode.setDate_created(AppTime.now());
+//        return qrcode;
+//    }
 
     private SupplierGroup setSupplierGroup(Item savedItem) {
         String controlNumber = generateControlNumber();

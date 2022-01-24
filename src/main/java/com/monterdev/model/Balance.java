@@ -8,21 +8,25 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "signatory")
-public class Signatory {
+@NoArgsConstructor
+@Table(name = "balance")
+public class Balance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
-    private String signatory;
+    private double beginbalance;
 
-    private String position;
+    private double endbalance;
 
-    private String role;
+    private String month;
 
-    private int reportid;
+    private String year;
+
+    private String category;
+
+    private double datecreated;
 }

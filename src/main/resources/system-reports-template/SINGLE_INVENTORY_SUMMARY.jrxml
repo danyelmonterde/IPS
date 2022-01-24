@@ -57,6 +57,14 @@
 			<![CDATA[]]>
 		</queryString>
 	</subDataset>
+	<parameter name="COMPANY_NAME" class="java.lang.String"/>
+	<parameter name="STREET_ADDRESS" class="java.lang.String"/>
+	<parameter name="REPORT_NAME" class="java.lang.String"/>
+	<parameter name="SELECTED_MONTH" class="java.lang.String"/>
+	<parameter name="SELECTED_YEAR" class="java.lang.String"/>
+	<parameter name="BEGINNING_BALANCE_INVENTORY" class="java.lang.String"/>
+	<parameter name="TOTAL_COST" class="java.lang.String"/>
+	<parameter name="TOTAL_ENDING_BALANCE" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -67,7 +75,6 @@
 	<field name="BEGINNING_BALANCE_INVENTORY" class="java.lang.String"/>
 	<field name="SALES_INVOICE_NUMBER" class="java.lang.String"/>
 	<field name="PURCHASED_AMOUNT" class="java.lang.String"/>
-	<field name="COMPANY_NAME" class="java.lang.String"/>
 	<field name="TOTAL_COST" class="java.lang.String"/>
 	<field name="RIS_TYPE_NAMES_LIST" class="java.lang.String"/>
 	<field name="TOTAL_COST_OF_RIS" class="java.lang.String"/>
@@ -80,7 +87,7 @@
 	<field name="CHECKED_BY_POSITION" class="java.lang.String"/>
 	<field name="NOTED_BY_POSITION" class="java.lang.String"/>
 	<title>
-		<band height="134" splitType="Stretch">
+		<band height="141" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="90" width="198" height="25" uuid="57aed2b1-4f4e-40a3-a6ad-54dae8dd4c5a">
 					<property name="local_mesure_unitheight" value="pixel"/>
@@ -98,59 +105,48 @@
 				</reportElement>
 			</line>
 			<staticText>
-				<reportElement x="350" y="89" width="42" height="25" uuid="139ebe8d-25b0-411e-986c-270015400874">
+				<reportElement x="356" y="93" width="42" height="25" uuid="139ebe8d-25b0-411e-986c-270015400874">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="16" isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[PHP]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="120" y="30" width="320" height="30" uuid="52754a8e-2e08-4535-8dc9-8626a635a92f"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{REPORT_NAME}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="230" y="55" width="60" height="20" uuid="7d17fd20-381f-4db7-b4a8-2a7f8657946e"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="6"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{SELECTED_MONTH}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="300" y="55" width="68" height="20" uuid="463b1d44-36b3-4162-8233-ea742925d7f1"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="6"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{SELECTED_YEAR}]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement x="180" y="56" width="50" height="17" uuid="42d572a1-a789-41df-adaf-18fca01b58b5"/>
+				<reportElement x="188" y="57" width="50" height="17" uuid="42d572a1-a789-41df-adaf-18fca01b58b5"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="6"/>
+					<font size="10"/>
 				</textElement>
 				<text><![CDATA[AS OF]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="392" y="87" width="162" height="30" uuid="9a57de0d-40a8-4184-8998-aa23cba975b8"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="130" y="-4" width="314" height="30" isRemoveLineWhenBlank="true" uuid="ca617a4a-1e93-4626-805e-197b979c9dd3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{COMPANY_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="130" y="26" width="314" height="30" isRemoveLineWhenBlank="true" uuid="2d087e19-8355-431c-bf50-2d8a5ad3c98f"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{BEGINNING_BALANCE_INVENTORY}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{REPORT_NAME}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="158" y="-1" width="240" height="30" uuid="576ad8d1-5932-4195-b712-c3394e5c7f96"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="14" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{COMPANY_NAME}]]></textFieldExpression>
+			<textField isBlankWhenNull="true">
+				<reportElement x="241" y="50" width="84" height="30" isRemoveLineWhenBlank="true" uuid="322fe74f-d166-4854-a206-153e25a650e9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{SELECTED_MONTH}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="220" y="20" width="100" height="16" uuid="cb236b05-d6d5-495a-bb24-a4001da3da32"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{STREET_ADDRESS}]]></textFieldExpression>
+			<textField isBlankWhenNull="true">
+				<reportElement x="325" y="50" width="70" height="30" isRemoveLineWhenBlank="true" uuid="580d59cf-0621-4288-a9f1-cac195eb9c10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{SELECTED_YEAR}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="398" y="90" width="154" height="30" isRemoveLineWhenBlank="true" uuid="9ae06785-df92-469e-9b45-7e9da85a7852"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{BEGINNING_BALANCE_INVENTORY}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -165,163 +161,171 @@
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="84">
-			<textField>
-				<reportElement x="0" y="0" width="200" height="30" uuid="ac920e2b-c4a4-4ef6-84cd-2e7f20f9a1eb">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="884d4d1e-95ce-4c37-a2c2-9a4ba66ccf35"/>
+		<band height="40">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="185" height="20" isRemoveLineWhenBlank="true" uuid="76beec1b-c82a-4bd1-849d-72a1405a0299">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="38ca49e7-6c04-45f7-9342-f19655b34142"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
-				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{PURCHASE_LIST}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="230" y="2" width="100" height="30" uuid="49c5a777-42d9-4f11-815e-8c2199b04989">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ed2e0d28-469b-47b6-a3eb-26c5895a5016"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="185" y="0" width="185" height="20" isRemoveLineWhenBlank="true" uuid="7b6d1429-0590-40d6-a59d-f98ff68ea8a3">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="dae12a08-870e-4533-9c9d-c72f0f90434d"/>
 				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA[$F{SALES_INVOICE_NUMBER}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="409" y="0" width="140" height="30" uuid="69672ce5-0a6e-4acd-b149-4c36e283c132">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="74718ed9-eadc-48e4-97da-b2d9db1acb22"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="370" y="0" width="185" height="20" isRemoveLineWhenBlank="true" uuid="6d5f997a-4f4f-4912-8428-8ef57dff62c8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="065e3618-5f12-43f7-84bb-8f567f88ff8f"/>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{PURCHASED_AMOUNT}]]></textFieldExpression>
 			</textField>
 		</band>
-	</detail>
-	<lastPageFooter>
-		<band height="260">
-			<staticText>
-				<reportElement positionType="Float" mode="Opaque" x="2" y="230" width="556" height="30" backcolor="#E6E8E9" uuid="36aa233d-4305-48e6-974a-1bbf89bb3c8f"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Serif" size="9" isItalic="true"/>
-				</textElement>
-				<text><![CDATA[THIS REPORT IS SYSTEM GENERATED]]></text>
-			</staticText>
+		<band height="150">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<line>
-				<reportElement x="-3" y="20" width="556" height="1" uuid="dfa7e8aa-a5cb-4424-8664-a0ca4a957967">
+				<reportElement x="-6" y="-10" width="556" height="1" uuid="dfa7e8aa-a5cb-4424-8664-a0ca4a957967">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 			</line>
 			<staticText>
-				<reportElement x="0" y="30" width="196" height="30" uuid="c071ceda-f2f3-4261-8811-53b0b07fc54a"/>
+				<reportElement x="4" y="0" width="196" height="20" uuid="c071ceda-f2f3-4261-8811-53b0b07fc54a"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Total materials Available for Use / Sale]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="444" y="30" width="100" height="30" uuid="297ec236-53ce-418c-bcc8-9c2dc0b540e2"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{TOTAL_COST}]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement x="356" y="35" width="42" height="25" uuid="46352d33-1d49-475e-b731-fa907ac32970">
+				<reportElement x="360" y="5" width="42" height="20" uuid="46352d33-1d49-475e-b731-fa907ac32970">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="16" isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[PHP]]></text>
 			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="399" y="0" width="153" height="30" isRemoveLineWhenBlank="true" uuid="8bcb9c28-ec3d-449e-921c-345b54ba2f3f"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{TOTAL_COST}]]></textFieldExpression>
+			</textField>
 			<staticText>
-				<reportElement x="2" y="60" width="196" height="30" uuid="e6466199-4197-4764-bb17-decad1e0bc8a"/>
+				<reportElement x="6" y="30" width="196" height="20" uuid="e6466199-4197-4764-bb17-decad1e0bc8a"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Less: Materials Issued:]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="2" y="90" width="188" height="30" uuid="b7b4028f-c6e6-4c48-abf3-64fbe1a494be"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="6" y="60" width="188" height="20" isRemoveLineWhenBlank="true" uuid="b7b4028f-c6e6-4c48-abf3-64fbe1a494be"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{RIS_TYPE_NAMES_LIST}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="227" y="90" width="122" height="30" uuid="fcdd7e1f-ea3f-4682-95cf-7bada9c15fcb"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="196" y="60" width="185" height="20" isRemoveLineWhenBlank="true" uuid="fcdd7e1f-ea3f-4682-95cf-7bada9c15fcb"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{TOTAL_COST_OF_RIS}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="1" y="160" width="196" height="30" uuid="26a80e5c-0126-48c0-92b9-4313d14356ca"/>
+				<reportElement x="5" y="95" width="196" height="20" uuid="26a80e5c-0126-48c0-92b9-4313d14356ca"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Ending Balance - Inventory]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="360" y="160" width="42" height="25" uuid="01e1b85b-1ff7-49ac-bb53-952adfcf250c">
+				<reportElement x="354" y="93" width="42" height="25" uuid="01e1b85b-1ff7-49ac-bb53-952adfcf250c">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="16" isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[PHP]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="429" y="160" width="124" height="30" uuid="d6b016ae-51ce-46d6-9d0f-87595f0773f5"/>
-				<textFieldExpression><![CDATA[$F{TOTAL_ENDING_BALANCE}]]></textFieldExpression>
+			<textField isBlankWhenNull="true">
+				<reportElement x="399" y="90" width="151" height="30" isRemoveLineWhenBlank="true" uuid="d4103fb2-9ddf-42e0-a6f3-2e9a7ec7b67a"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{TOTAL_ENDING_BALANCE}]]></textFieldExpression>
 			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="130">
+			<property name="com.jaspersoft.studio.layout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement x="5" y="190" width="100" height="20" uuid="a26e63c4-4afb-4ec0-843c-9548bd86817c"/>
+				<reportElement positionType="Float" mode="Opaque" x="5" y="110" width="556" height="20" backcolor="#E6E8E9" uuid="36aa233d-4305-48e6-974a-1bbf89bb3c8f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Serif" size="9" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[THIS REPORT IS SYSTEM GENERATED]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="5" y="20" width="100" height="20" uuid="a26e63c4-4afb-4ec0-843c-9548bd86817c"/>
 				<textElement verticalAlignment="Middle"/>
 				<text><![CDATA[Prepared by:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="230" y="190" width="100" height="20" uuid="232b9209-7941-4dc0-8547-f9410765a989"/>
+				<reportElement x="233" y="20" width="100" height="20" uuid="232b9209-7941-4dc0-8547-f9410765a989"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Checked by:]]></text>
 			</staticText>
 			<line>
-				<reportElement x="-4" y="190" width="556" height="1" uuid="5bc2199b-9805-4fc8-965a-deb7e5127602">
+				<reportElement x="-1" y="10" width="556" height="1" uuid="5bc2199b-9805-4fc8-965a-deb7e5127602">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 			</line>
 			<staticText>
-				<reportElement x="452" y="192" width="100" height="20" uuid="cbac8e08-bf27-415f-8ba0-824bf82a8427"/>
+				<reportElement x="410" y="20" width="144" height="20" uuid="cbac8e08-bf27-415f-8ba0-824bf82a8427"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<text><![CDATA[Noted by:]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="2" y="210" width="100" height="20" uuid="af2da06b-c8dc-4963-b880-6056f317e909"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="55" width="164" height="20" isRemoveLineWhenBlank="true" uuid="af2da06b-c8dc-4963-b880-6056f317e909"/>
 				<textElement textAlignment="Left">
-					<font size="8"/>
+					<font size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{PREPARED_BY}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="230" y="201" width="100" height="30" uuid="48a0605e-8d51-4457-ba88-3a44890e6efa"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="183" y="45" width="190" height="30" isRemoveLineWhenBlank="true" uuid="48a0605e-8d51-4457-ba88-3a44890e6efa"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{CHECKED_BY}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="450" y="201" width="100" height="30" uuid="ab5dceda-abe9-4c5e-8b41-45b1efa6fe8f">
+			<textField isBlankWhenNull="true">
+				<reportElement x="385" y="45" width="163" height="30" isRemoveLineWhenBlank="true" uuid="ab5dceda-abe9-4c5e-8b41-45b1efa6fe8f">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1ccf250f-9488-49c0-a596-076b0e0bf4da"/>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{NOTED_BY}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="5" y="201" width="100" height="30" uuid="6886cb1a-8ebb-4fd2-953e-15a00e3a1485"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="4" y="72" width="164" height="30" isRemoveLineWhenBlank="true" uuid="6886cb1a-8ebb-4fd2-953e-15a00e3a1485"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font size="6"/>
+					<font size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{PREPARED_BY_POSITION}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="230" y="200" width="100" height="30" uuid="efef078d-4351-49fc-ab4c-0cd6e69eb2d1"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="189" y="70" width="188" height="30" isRemoveLineWhenBlank="true" uuid="efef078d-4351-49fc-ab4c-0cd6e69eb2d1"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
-					<font size="6"/>
+					<font size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{CHECKED_BY_POSITION}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="450" y="203" width="100" height="30" uuid="1fb6e6ca-a64d-4133-b8b9-1b4055fdaab7"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="390" y="70" width="161" height="30" isRemoveLineWhenBlank="true" uuid="1fb6e6ca-a64d-4133-b8b9-1b4055fdaab7"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font size="6"/>
+					<font size="10"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{NOTED_BY_POSITION}]]></textFieldExpression>
 			</textField>
