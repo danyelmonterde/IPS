@@ -24,8 +24,15 @@ import java.util.Properties;
 @Configuration
 public class OnloadConfig {
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    @Bean(name = "mysqlDatasource")
+    public DataSource dataSource() {
+        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+        dataSourceBuilder.url("jdbc:mysql://localhost:3306/iqwddbv2?&serverTimezone=UTC");
+        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
+        dataSourceBuilder.username("root");
+        dataSourceBuilder.password("root");
+        return dataSourceBuilder.build();
+    }
 
     @Autowired
     private ItemsRepository itemsRepository;
@@ -56,11 +63,6 @@ public class OnloadConfig {
         return new Item().builder().item_name("").build();
     }
 
-    @Bean
-    public Iterable<ItemCategory> category() {
-        return categoryRepository.findAll();
-    }
-
 
     @Bean
     @Qualifier("itemLists")
@@ -71,15 +73,7 @@ public class OnloadConfig {
         return itemLists;
     }
 
-    @Bean(name = "mysqlDatasource")
-    public DataSource dataSource() {
-        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.url("jdbc:mysql://localhost:3306/iqwddbv2?&serverTimezone=UTC");
-        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
-        dataSourceBuilder.username("root");
-        dataSourceBuilder.password("root");
-        return dataSourceBuilder.build();
-    }
+
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {

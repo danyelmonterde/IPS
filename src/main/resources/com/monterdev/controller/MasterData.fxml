@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="masterDataAnchorpane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.MasterDataController">
+   <children>
+      <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <TabPane fx:id="tabPane" prefHeight="100.0" prefWidth="1206.0" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="Inventory Types">
+                     <content>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <JFXTextField fx:id="tab1TxtInventoryType" labelFloat="true" prefHeight="25.0" prefWidth="331.0" promptText="INVENTORY TYPE">
+                                 <font>
+                                    <Font size="18.0" />
+                                 </font>
+                              </JFXTextField>
+                              <JFXButton fx:id="tab1BtnSaveInventoryType" buttonType="RAISED" prefHeight="36.0" prefWidth="88.0" text="SAVE">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                              </JFXButton>
+                           </children>
+                           <padding>
+                              <Insets left="20.0" top="20.0" />
+                           </padding>
+                        </HBox>
+                     </content>
+                  </Tab>
+                <Tab text="Report Names">
+                     <content>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <padding>
+                              <Insets left="20.0" top="20.0" />
+                           </padding>
+                           <children>
+                              <JFXTextField fx:id="tab2TxtReportName" promptText="NAME" />
+                              <JFXComboBox fx:id="tab2ComboInventoryType" promptText="INVENTORY TYPE">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXComboBox>
+                              <JFXTextField fx:id="tab2TxtDescription" promptText="DESCRIPTION">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXButton fx:id="tab2BtnSave" buttonType="RAISED" text="SAVE" />
+                           </children>
+                        </HBox>
+                     </content>
+                  </Tab>
+                  <Tab text="RIS Fields">
+                     <content>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <JFXTextField fx:id="tab3RisField" promptText="RIS FIELD">
+                                 <HBox.margin>
+                                    <Insets left="20.0" top="20.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXButton fx:id="tab3BtnSave" buttonType="RAISED" ripplerFill="#413e3e" text="SAVE">
+                                 <HBox.margin>
+                                    <Insets left="20.0" top="20.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children>
+                        </HBox>
+                     </content>
+                  </Tab>
+                  <Tab text="Ris Type Names">
+                     <content>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <padding>
+                              <Insets left="20.0" top="20.0" />
+                           </padding>
+                           <children>
+                              <JFXTextField fx:id="tab4TxtRisTypeName" promptText="RIS TYPE NAME" />
+                              <JFXComboBox fx:id="tab4ComboInventoryType" promptText="INVENTORY TYPE">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXComboBox>
+                              <JFXTextField fx:id="tab4TxtRisName" promptText="RIS NAME">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXButton fx:id="tab4BtnSave" text="SAVE">
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                              </JFXButton>
+                           </children>
+                        </HBox>
+                     </content>
+                  </Tab>
+                  <Tab text="RIS Type">
+                     <content>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <JFXComboBox fx:id="tab5ComboInventoryType" promptText="INVENTORY TYPE" />
+                              <JFXComboBox fx:id="tab5ComboRisType" promptText="RIS TYPE">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXComboBox>
+                              <JFXComboBox fx:id="tab5ComboRisField" promptText="RIS FIELD">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXComboBox>
+                              <JFXComboBox fx:id="tab5ComboRisFieldType" promptText="RIS FIELD TYPE">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXComboBox>
+                              <JFXTextField fx:id="tab5TxtRisName" promptText="RIS NAME">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXButton fx:id="tab5BtnSave" buttonType="RAISED" text="SAVE">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                              </JFXButton>
+                           </children>
+                           <padding>
+                              <Insets left="20.0" top="20.0" />
+                           </padding>
+                        </HBox>
+                     </content>
+                  </Tab>
+                  <Tab text="Signatory">
+                     <content>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <JFXTextField fx:id="tab6TxtSignatoryName" promptText="SIGNATORY NAME" />
+                              <JFXTextField fx:id="tab6TxtPosition" promptText="POSITION">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXTextField>
+                              <JFXComboBox fx:id="tab6ComboRole" promptText="ROLE">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXComboBox>
+                              <JFXComboBox fx:id="tab6ComboReportName" promptText="REPORT NAME">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXComboBox>
+                              <JFXButton fx:id="tab6BtnSave" text="SAVE">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children>
+                           <padding>
+                              <Insets left="20.0" top="20.0" />
+                           </padding>
+                        </HBox>
+                     </content>
+                  </Tab>
+                  <Tab text="Unit">
+                     <content>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <JFXTextField fx:id="tab7TxtUnit" promptText="UNIT NAME" />
+                              <JFXButton fx:id="tab7BtnSave" text="SAVE">
+                                 <HBox.margin>
+                                    <Insets left="20.0" />
+                                 </HBox.margin>
+                              </JFXButton>
+                           </children>
+                           <padding>
+                              <Insets left="20.0" top="20.0" />
+                           </padding>
+                        </HBox>
+                     </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
+            <JFXButton fx:id="btnExit" prefHeight="187.0" prefWidth="52.0" text="EXIT" />
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

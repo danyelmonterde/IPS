@@ -7,6 +7,7 @@ import com.monterdev.model.Item;
 import com.monterdev.model.ItemCategory;
 import com.monterdev.model.Qrcode;
 import com.monterdev.model.Unit;
+import com.monterdev.repository.CategoryRepository;
 import com.monterdev.repository.ItemsRepository;
 import com.monterdev.repository.QrcodeRepository;
 import com.monterdev.util.AppTime;
@@ -67,7 +68,7 @@ public class AddItemController implements Initializable {
     @FXML
     private JFXButton reset;
 
-    @Autowired
+
     private Iterable<ItemCategory> itemCategories;
 
     @Autowired
@@ -78,6 +79,9 @@ public class AddItemController implements Initializable {
 
     @Autowired
     private QrcodeRepository qrcodeRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     private Item item;
 
@@ -240,6 +244,7 @@ public class AddItemController implements Initializable {
     }
 
     private void loadItemCategories() {
+        itemCategories = categoryRepository.findAll();
         itemCategories.forEach(category->{
             itemCategoryCombo.getItems().add(category.getCategory_name());
         });

@@ -28,5 +28,5 @@ public class Balance {
 
     private String category;
 
-    private double datecreated;
+    private String datecreated;
 }

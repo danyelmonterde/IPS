@@ -4,10 +4,8 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.monterdev.constants.GlobalConfiguration;
-import com.monterdev.model.InventoryType;
-import com.monterdev.model.RisType;
-import com.monterdev.model.RisTypeNames;
-import com.monterdev.model.SelectedRisTemplate;
+import com.monterdev.model.*;
+import com.monterdev.repository.RisFieldsRepository;
 import com.monterdev.repository.RisTypeRepository;
 import com.monterdev.util.Prompt;
 import javafx.event.ActionEvent;
@@ -55,6 +53,9 @@ public class CreateRequisitionTemplateController implements Initializable {
     private List<RisTypeNames> risTemplates;
 
     @Autowired
+    private RisFieldsRepository risFieldsRepository;
+
+    @Autowired
     private SelectedRisTemplate selectedRisTemplate;
 
     private List<RisType> risTypeList;
@@ -73,6 +74,7 @@ public class CreateRequisitionTemplateController implements Initializable {
 
 
     public void addTemplate(ActionEvent actionEvent) {
+
         RisType risTypeModel = new RisType();
 
         HBox hBox = new HBox();
@@ -103,17 +105,19 @@ public class CreateRequisitionTemplateController implements Initializable {
             }
         });
 
-        JFXTextField risField = new JFXTextField();
-        risField.setAccessibleText("RIS_FIELD_NAME");
-        risField.setPromptText("RIS FIELD NAME");
+
+        JFXComboBox risField = new JFXComboBox();
+        risField.setAccessibleText("RIS_FIELD");
+        risFieldsRepository.findAll().forEach(e->{
+            risField.getItems().add(e.getRis_field());
+        });
+        risField.setPromptText("SELECT RIS FIELD");
         risField.setId(String.valueOf(counter));
-        risField.setLabelFloat(true);
-        risField.textProperty().addListener((observable, oldValue, newValue) -> {
+        risField.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
-                risTypeModel.setRisfield(newValue);
+                risTypeModel.setRisfield((String) newValue);
             }
         });
-
 
         JFXComboBox risFieldTypesCombo = new JFXComboBox();
         risFieldTypesCombo.setAccessibleText("FIELD_TYPE");
@@ -128,11 +132,24 @@ public class CreateRequisitionTemplateController implements Initializable {
             }
         });
 
-        hBox.getChildren().addAll(inventoryTypesCombo, risTypesCombo, risField, risFieldTypesCombo);
+        JFXTextField jfxRisName = new JFXTextField();
+        jfxRisName.setAccessibleText("RIS_NAME");
+        jfxRisName.setPromptText("RIS NAME");
+        jfxRisName.setId(String.valueOf(counter));
+        jfxRisName.setLabelFloat(true);
+        jfxRisName.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                risTypeModel.setRisname(newValue);
+            }
+        });
+
+
+        hBox.getChildren().addAll(inventoryTypesCombo, risTypesCombo, risField, risFieldTypesCombo,jfxRisName);
         HBox.setMargin(inventoryTypesCombo, new Insets(20, 0, 20, 20));
         HBox.setMargin(risTypesCombo, new Insets(20, 0, 20, 20));
         HBox.setMargin(risField, new Insets(20, 0, 20, 20));
         HBox.setMargin(risFieldTypesCombo, new Insets(20, 0, 20, 20));
+        HBox.setMargin(jfxRisName, new Insets(20, 0, 20, 20));
 
         risTemplateContainer.getChildren().add(hBox);
         VBox.setMargin(hBox, new Insets(20, 0, 20, 20));

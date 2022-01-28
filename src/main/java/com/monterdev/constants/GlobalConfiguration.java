@@ -35,6 +35,8 @@ public class GlobalConfiguration {
     public static final String companyName;
     public static final String companyAddress;
     public static final String defaultItemCategory;
+    public static final String systemReportLocation;
+    public static final String signatoryRole;
 
     static {
         homePage = "HOME_PAGE";
@@ -53,10 +55,21 @@ public class GlobalConfiguration {
         companyName = "COMPANY_NAME";
         companyAddress = "COMPANY_ADDRESS";
         defaultItemCategory = "CONSTRUCTION MATERIALS";
+        systemReportLocation = "SYSTEM_REPORT_LOCATION";
+        signatoryRole = "REPORT_SIGNATORY_ROLES";
     }
 
 
     //Custom getters
+    public static String getSystemReportLocation(){ return getConfigValue(systemReportLocation);}
+
+    public static String getDefaultCategoryData() {
+        return getConfigValue(defaultCategoryData);
+    }
+
+    public static String getSignatoryRole() {
+        return getConfigValue(signatoryRole);
+    }
     public static String getHomePage() {
         return getConfigValue(homePage);
     }

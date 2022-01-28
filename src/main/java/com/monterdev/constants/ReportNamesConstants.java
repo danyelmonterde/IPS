@@ -8,4 +8,5 @@ public class ReportNamesConstants {
     public static final String OFFICE_SUPPLIES_SUMMARY_151 = "151 - Office Supplies Inventory";
     public static final String ACCOUNTABLE_FORMS_SUMMARY = "333 - Accountable Forms Inventory";
     public static final String NON_ACCOUNTABLE_FORMS_SUMMARY = "151 - Non-Accountable Forms";
+    public static final String TOTAL_INVENTORY_SUMMARY ="Total Inventory";
 }

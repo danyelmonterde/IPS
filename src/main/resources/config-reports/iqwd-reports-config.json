@@ -20,5 +20,14 @@
       "configId": "CM-SOM",
       "configValue": ""
     }
+  ,
+    {
+      "configId": "SYSTEM_REPORT_LOCATION",
+      "configValue": "C:\\Users\\Daniel\\Desktop\\GeneratedReports\\"
+    }  ,
+    {
+      "configId": "REPORT_SIGNATORY_ROLES",
+      "configValue": "preparedBy,checkedBy,notedBy"
+    }
   ]
 }

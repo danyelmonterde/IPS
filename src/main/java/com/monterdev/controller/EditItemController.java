@@ -1,6 +1,7 @@
 package com.monterdev.controller;
 
 import com.jfoenix.controls.*;
+import com.monterdev.constants.InventoryTypeConstants;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
 import com.monterdev.util.*;
@@ -119,7 +120,6 @@ public class EditItemController {
     @Autowired
     private ItemsRepository itemsRepository;
 
-    @Autowired
     private Iterable<ItemCategory> categoryPreLoaded;
 
     @Autowired
@@ -167,7 +167,7 @@ public class EditItemController {
 
         ItemCategory itemCategory = null;
         if(ObjectUtils.isEmpty(selectedItem.getItem_category())){
-            itemCategory = categoryRepository.findByCategory("CONSTRUCTION MATERIALS");
+            itemCategory = categoryRepository.findByCategory(InventoryTypeConstants.CONSTRUCTION_MATERIALS);
         }
 
         List<Unit> itemUnits = unitRepository.findAllItemUnits();
@@ -247,7 +247,7 @@ public class EditItemController {
 
     private void loadCategories(ItemCategory itemCategory, List<Unit> unitList) {
         clearComboBoxes();
-
+        categoryPreLoaded =categoryRepository.findAll();
         categoryPreLoaded.forEach(itemCategory1 -> {
             this.itemCategoryCombo.getItems().add(itemCategory1.getCategory_name());
         });
@@ -318,6 +318,7 @@ public class EditItemController {
     }
 
     private void setFields(String itemName) {
+        itemLists = itemsRepository.findAll();
         Optional<Item> item = itemLists.stream().filter(e -> e.getItem_name().equalsIgnoreCase(itemName))
                 .findFirst();
         if (item.isPresent()) {
@@ -400,7 +401,7 @@ public class EditItemController {
         receiptNumber.setText("");
         purchaseOrderNumber.setText("");
         comboUnit.setValue("PCS");
-        itemCategoryCombo.setValue("CONSTRUCTION MATERIALS");
+        itemCategoryCombo.setValue(InventoryTypeConstants.CONSTRUCTION_MATERIALS);
     }
 
     private void resetSelectedItem() {
@@ -456,8 +457,6 @@ public class EditItemController {
                 purchaseOrderRepository.save(purchaseOrder);
                 SupplierGroup supplierGroup = setSupplierGroup(savedItem);
                 supplierRepository.save(supplierGroup);
-//                Qrcode qrcode = setQrCodeData(savedItem);
-//                qrcodeRepository.save(qrcode);
                 History history = setHistory(savedItem);
                 historyRepository.save(history);
 
@@ -508,14 +507,6 @@ public class EditItemController {
         history.setItem_name(savedItem.getItem_name());
         return history;
     }
-
-//    private Qrcode setQrCodeData(Item savedItem) {
-//        Qrcode qrcode = new Qrcode();
-//        qrcode.setQr_code_path(QrCodeUtil.filePath + "\\" +savedItem.getSku()+"-"+ savedItem.getItem_name() + ".jpg");
-//        qrcode.setSku(savedItem.getSku());
-//        qrcode.setDate_created(AppTime.now());
-//        return qrcode;
-//    }
 
     private SupplierGroup setSupplierGroup(Item savedItem) {
         String controlNumber = generateControlNumber();

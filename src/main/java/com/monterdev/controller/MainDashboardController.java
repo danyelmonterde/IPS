@@ -27,11 +27,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -164,7 +164,7 @@ public class MainDashboardController implements Initializable {
     private TranslateTransition slide = new TranslateTransition();
     private TranslateTransition slideMainAnchorpane = new TranslateTransition();
     private TranslateTransition slideSearchPane = new TranslateTransition();
-    private double totalSales =0; //;total amount na may 20% na patong pag new
+    private double totalSales = 0; //;total amount na may 20% na patong pag new
     private double totalCost = 0; //lahat ng average cost
     private double totalIncome = 0; //totalSales - totalCost
 
@@ -270,8 +270,9 @@ public class MainDashboardController implements Initializable {
         searchItemOnDashboard();
     }
 
+
     private void addItemOnAction() {
-        addItemButton.setOnAction(add ->{
+        addItemButton.setOnAction(add -> {
             new StageLoader().load(AddItemController.class, applicationContext);
         });
     }
@@ -331,7 +332,7 @@ public class MainDashboardController implements Initializable {
 
         amount.setEditable(false);
         amount.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldValue != newValue && !ObjectUtils.isEmpty(newValue) ) {
+            if (oldValue != newValue && !ObjectUtils.isEmpty(newValue)) {
 
             }
         });
@@ -345,9 +346,9 @@ public class MainDashboardController implements Initializable {
                 itemCart.get(Integer.parseInt(cost.getId())).setCost(Double.parseDouble(newValue));
                 amount.setText(String.format("%.2f", currentItem.getQuantity() * Double.parseDouble(newValue)));
 
-                if(requisitionIssueSlip.getIs_customer_new()==1){
-                    amount.setText(String.format("%.2f", currentItem.getQuantity() * Double.parseDouble(newValue)+(Double.parseDouble(newValue)*.2)));
-                }else{
+                if (requisitionIssueSlip.getIs_customer_new() == 1) {
+                    amount.setText(String.format("%.2f", currentItem.getQuantity() * Double.parseDouble(newValue) + (Double.parseDouble(newValue) * .2)));
+                } else {
                     amount.setText(String.format("%.2f", currentItem.getQuantity() * Double.parseDouble(newValue)));
                 }
                 currentItem.setCost(Double.parseDouble(newValue));
@@ -361,9 +362,9 @@ public class MainDashboardController implements Initializable {
             if (oldValue != newValue) {
                 currentItem.setQuantity(Integer.parseInt(newValue));
                 itemCart.get(Integer.parseInt(quantity.getId())).setQuantity(Integer.parseInt(newValue));
-                if(requisitionIssueSlip.getIs_customer_new()==1){
-                    amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()+(currentItem.getCost()*.2)));
-                }else{
+                if (requisitionIssueSlip.getIs_customer_new() == 1) {
+                    amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost() + (currentItem.getCost() * .2)));
+                } else {
                     amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
                 }
 
@@ -374,12 +375,12 @@ public class MainDashboardController implements Initializable {
         unit.setPromptText("SELECT ITEM UNIT");
         unit.setId(String.valueOf(currentIndex));
         Iterable<Unit> units = unitRepository.findAll();
-        units.forEach(u ->{
+        units.forEach(u -> {
             unit.getItems().add(u);
         });
 
-        unit.valueProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
+        unit.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
                 currentItem.setUnit((String) newValue);
             }
         });
@@ -442,10 +443,10 @@ public class MainDashboardController implements Initializable {
         availableReports.setLabelFloat(true);
 
         List<ReportNames> reports = reportNamesRepository.findAllAvailableReports();
-        String [] months = getMonthsofCalender().split(",");
-        String [] years = getCalenderYears().split(",");
+        String[] months = getMonthsofCalender().split(",");
+        String[] years = getCalenderYears().split(",");
 
-        reports.stream().forEach(report ->{
+        reports.stream().forEach(report -> {
             availableReports.getItems().add(report.getName());
         });
 
@@ -453,21 +454,20 @@ public class MainDashboardController implements Initializable {
         yearList.getItems().addAll(Arrays.asList(years));
 
 
-
-        availableReports.valueProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
+        availableReports.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
                 reportUtil.setSelectedReport((String) newValue);
             }
         });
 
-        monthsList.valueProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
+        monthsList.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
                 reportUtil.setSelectedMonth((String) newValue);
             }
         });
 
-        yearList.valueProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
+        yearList.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
                 reportUtil.setSelectedYear((String) newValue);
             }
         });
@@ -477,17 +477,17 @@ public class MainDashboardController implements Initializable {
         getReport.setOnAction(e -> {
             try {
                 reportUtil.generateReport();
-            } catch (Exception exception){
+            } catch (Exception exception) {
                 System.out.println(exception.getLocalizedMessage());
             }
         });
 
 
-        topHbox.getChildren().addAll(availableReports,monthsList,yearList, getReport);
-        HBox.setMargin(availableReports, new Insets(20,0,20,20));
-        HBox.setMargin(monthsList, new Insets(20,0,20,20));
-        HBox.setMargin(yearList, new Insets(20,0,20,20));
-        HBox.setMargin(getReport, new Insets(20,0,20,20));
+        topHbox.getChildren().addAll(availableReports, monthsList, yearList, getReport);
+        HBox.setMargin(availableReports, new Insets(20, 0, 20, 20));
+        HBox.setMargin(monthsList, new Insets(20, 0, 20, 20));
+        HBox.setMargin(yearList, new Insets(20, 0, 20, 20));
+        HBox.setMargin(getReport, new Insets(20, 0, 20, 20));
     }
 
     private void resetHboxes() {
@@ -504,7 +504,7 @@ public class MainDashboardController implements Initializable {
         currentLocationBanner.setText("Inventory Overview");
     }
 
-    public void getAddItemModule(){
+    public void getAddItemModule() {
         new StageLoader().load(AddItemController.class, applicationContext);
     }
 
@@ -516,6 +516,7 @@ public class MainDashboardController implements Initializable {
         selectedItem.setQuantity(0);
         selectedItem.setSku(0);
         selectedItem.setCost(0.0);
+        selectedItem.setItem_category(getDefaultCategoryData());
         selectedItem.setIn_stock(0);
     }
 
@@ -537,7 +538,7 @@ public class MainDashboardController implements Initializable {
         jfxBtnReports.setGraphic(reports);
         jfxBtnPurchaseItem.setGraphic(purchaseItem);
 
-        jfxBtnPurchaseItem.setOnAction(e ->{
+        jfxBtnPurchaseItem.setOnAction(e -> {
             getPurchaseItemModule();
         });
 
@@ -561,7 +562,7 @@ public class MainDashboardController implements Initializable {
         companyCopyright.setFont(Font.font("Roboto", FontWeight.MEDIUM, 10.0));
 
 
-        topHbox.getChildren().addAll(jfxBtnAddItem,jfxBtnPurchaseItem, jfxBtnReleaseItem, jfxBtnReports);
+        topHbox.getChildren().addAll(jfxBtnAddItem, jfxBtnPurchaseItem, jfxBtnReleaseItem, jfxBtnReports);
         midHbox.getChildren().addAll(companyName);
         bottomHbox.getChildren().addAll(companyCopyright);
 
@@ -579,8 +580,7 @@ public class MainDashboardController implements Initializable {
     public void getInventoryModule(ActionEvent actionEvent) {
         resetHboxes();
         currentLocationBanner.setText("Inventory");
-    //    topHbox.getChildren().addAll(itemListController.createItemList());
-        new StageLoader().load(InventoryListController.class,applicationContext);
+        new StageLoader().load(InventoryListController.class, applicationContext);
     }
 
     public void getCustomersModule(ActionEvent actionEvent) {
@@ -590,10 +590,40 @@ public class MainDashboardController implements Initializable {
 
     public void getSettingsModule(ActionEvent actionEvent) {
         resetHboxes();
+        JFXButton createMasterData = new JFXButton("ADD MASTER DATA");
+        JFXButton updatePassword = new JFXButton("UPDATE PASSWORD");
+        JFXButton rolesAndPrivileges = new JFXButton("ADMIN ROLES & PRIVILEGES");
+        JFXButton balanceSettings = new JFXButton("BALANCE SETTINGS");
+
+        Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
+
+        createMasterData.setOnAction(e -> {
+            new StageLoader().load(MasterDataController.class, applicationContext);
+            currentStage.close();
+        });
+
+        updatePassword.setOnAction(e ->{
+            new StageLoader().load(BalanceSettingsController.class, applicationContext);
+            currentStage.close();
+        });
+
+        balanceSettings.setOnAction(e ->{
+            new StageLoader().load(BalanceSettingsController.class, applicationContext);
+            currentStage.close();
+        });
+
+        topHbox.getChildren().addAll(createMasterData, updatePassword, rolesAndPrivileges,balanceSettings);
+        topHbox.setAlignment(Pos.CENTER);
+        midHbox.setAlignment(Pos.CENTER);
+        bottomHbox.setAlignment(Pos.CENTER);
         currentLocationBanner.setText("Settings");
     }
 
     public void getLogoutModule(ActionEvent actionEvent) {
+        resetSelectedItem();
+        Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
+        currentStage.close();
+        new StageLoader().load(LoginController.class, applicationContext);
     }
 
     public void createRequisitionIssueSlip() {
@@ -724,18 +754,18 @@ public class MainDashboardController implements Initializable {
                 History history = new History();
                 history.setDate(AppTime.now());
                 history.setItem_name(item.getItem_name());
-                history.setAdjustment(item.getQuantity()*-1);
+                history.setAdjustment(item.getQuantity() * -1);
                 history.setItem_category(item.getItem_category());
                 history.setReason("RELEASE ITEM");
                 history.setItem_category(item.getItem_category());
 
-                if(requisitionIssueSlip.getIs_customer_new()==1){
-                    totalCost+=item.getCost() * item.getQuantity();
-                    totalSales+=(item.getCost()+(item.getCost()*.2)) * item.getQuantity();
+                if (requisitionIssueSlip.getIs_customer_new() == 1) {
+                    totalCost += item.getCost() * item.getQuantity();
+                    totalSales += (item.getCost() + (item.getCost() * .2)) * item.getQuantity();
                     totalIncome = totalSales - totalCost;
-                }else{
-                    totalCost+=item.getCost() * item.getQuantity();
-                    totalSales+= item.getCost() * item.getQuantity();
+                } else {
+                    totalCost += item.getCost() * item.getQuantity();
+                    totalSales += item.getCost() * item.getQuantity();
                     totalIncome = totalSales - totalCost;
                 }
 
@@ -762,24 +792,24 @@ public class MainDashboardController implements Initializable {
                 if (!ObjectUtils.isEmpty(requisitionIssueSlip)) {
                     requisitionIssueSlip.setId(0);
                     if (!ObjectUtils.isEmpty(risRepository.save(requisitionIssueSlip))) {
-                        if(!ObjectUtils.isEmpty(risTypeFieldsList)){
-                            risTypeFieldsList.stream().forEach(data ->{
+                        if (!ObjectUtils.isEmpty(risTypeFieldsList)) {
+                            risTypeFieldsList.stream().forEach(data -> {
                                 risTypeFieldsRepository.save(data);
                             });
                             Prompt.success("Item released!");
                             risTypeFieldsList.clear();
-                        }else{
+                        } else {
                             Prompt.failed("Item could not be released! Please check RIS details!");
                         }
-                    }else{
+                    } else {
                         Prompt.failed("Item could not be released! Please check RIS details!");
                     }
 
                     Sales sales = new Sales();
                     sales.setControl_number(requisitionIssueSlip.getControl_number());
-                    sales.setTotal_sales((double)Math.round(totalSales * 100d)/100d);
+                    sales.setTotal_sales((double) Math.round(totalSales * 100d) / 100d);
                     sales.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern("dd-MMM-YYYY")));
-                    sales.setIncome((double)Math.round(totalIncome * 100d)/100d);
+                    sales.setIncome((double) Math.round(totalIncome * 100d) / 100d);
                     sales.setTotal_cost(totalCost);
 
                     salesRepository.save(sales);
@@ -818,11 +848,11 @@ public class MainDashboardController implements Initializable {
                 }
             }
         });
-        dashboardSearchField.setOnKeyPressed(e->{
-            if(e.getCode() == KeyCode.BACK_SPACE){
+        dashboardSearchField.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.BACK_SPACE) {
                 dashboardSearchResult.setText("");
-            }else if(e.getCode() == KeyCode.ENTER){
-                System.out.println("ENTERED WORD IS: "+dashboardSearchResult.getText());
+            } else if (e.getCode() == KeyCode.ENTER) {
+                System.out.println("ENTERED WORD IS: " + dashboardSearchResult.getText());
             }
         });
 
@@ -846,7 +876,6 @@ public class MainDashboardController implements Initializable {
     private Specification<Item> hasSku(String sku) {
         return (item, cq, cb) -> cb.like(item.get("sku"), "%" + sku + "%");
     }
-
 
 
 }

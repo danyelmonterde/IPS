@@ -1,50 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="331.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.StockAdjustmentController">
    <children>
-      <Label layoutX="14.0" layoutY="21.0" text="Stock Adjustment">
-         <font>
-            <Font name="Roboto Black" size="20.0" />
-         </font>
-      </Label>
-      <JFXComboBox labelFloat="true" layoutX="14.0" layoutY="81.0" prefHeight="25.0" prefWidth="156.0" promptText="Reason" />
-      <JFXTextField labelFloat="true" layoutX="14.0" layoutY="131.0" prefHeight="25.0" prefWidth="1244.0" promptText="Notes" />
-      <JFXTextField alignment="CENTER" labelFloat="true" layoutX="261.0" layoutY="81.0" prefHeight="28.0" prefWidth="997.0" promptText="SEARCH FOR ITEM NAME">
-         <font>
-            <Font name="Roboto Light" size="20.0" />
-         </font>
-      </JFXTextField>
-      <JFXTextField labelFloat="true" layoutX="14.0" layoutY="248.0" prefHeight="25.0" prefWidth="251.0" promptText="Item Name" />
-      <JFXTextField labelFloat="true" layoutX="14.0" layoutY="312.0" promptText="SKU" />
-      <JFXTextField labelFloat="true" layoutX="344.0" layoutY="248.0" promptText="In Stock" />
-      <JFXTextField labelFloat="true" layoutX="344.0" layoutY="312.0" promptText="Remove Stock" />
-      <JFXTextField labelFloat="true" layoutX="760.0" layoutY="248.0" promptText="Stock After" />
-      <JFXTextField labelFloat="true" layoutX="760.0" layoutY="312.0" promptText="Add Stock" />
-      <JFXTextField labelFloat="true" layoutX="1112.0" layoutY="248.0" promptText="Cost" />
-      <JFXButton buttonType="RAISED" layoutX="602.0" layoutY="383.0" style="-fx-background-color: green;" text="Save" textFill="WHITE">
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
-         <font>
-            <Font size="16.0" />
-         </font>
-      </JFXButton>
-      <JFXButton buttonType="RAISED" layoutX="679.0" layoutY="383.0" style="-fx-background-color: red;" text="Cancel" textFill="WHITE">
-         <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-         </padding>
-         <font>
-            <Font size="16.0" />
-         </font>
-      </JFXButton>
+      <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Label text="Stock Adjustment">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets left="20.0" top="20.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <JFXTextField fx:id="txtSearchItem" labelFloat="true" prefHeight="25.0" prefWidth="400.0" promptText="SEACH ITEM HERE">
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Label text="UPDATE FIELDS BELOW" />
+               </children>
+               <padding>
+                  <Insets bottom="20.0" top="20.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <JFXTextField fx:id="txtItemName" promptText="ITEM_NAME">
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+                  <JFXTextField fx:id="txtQuantity" promptText="QUANTITY">
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+                  <JFXTextField fx:id="txtCost" promptText="COST">
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <JFXTextField fx:id="txtInStock" promptText="IN STOCK">
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+                  <JFXTextField fx:id="txtLowStock" promptText="LOW STOCK">
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXTextField>
+               </children>
+            </HBox>
+            <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <JFXButton fx:id="btnSave" style="-fx-background-color: GREEN;" text="SAVE" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets left="20.0" />
+                     </HBox.margin>
+                  </JFXButton>
+                  <JFXButton fx:id="btnCancel" style="-fx-background-color: RED;" text="CANCEL" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets left="20.0" />
+                     </HBox.margin>
+                  </JFXButton>
+               </children>
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
    </children>
 </AnchorPane>
