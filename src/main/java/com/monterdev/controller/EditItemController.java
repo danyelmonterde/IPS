@@ -5,6 +5,7 @@ import com.monterdev.constants.InventoryTypeConstants;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
 import com.monterdev.util.*;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,6 +32,9 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static com.monterdev.constants.ItemsUIConfiguration.*;
 import static com.monterdev.util.ComponentCreator.createSearchBox;
@@ -151,6 +155,7 @@ public class EditItemController {
 
     private List<String> responseList = new ArrayList<>();
 
+    private ScheduledExecutorService timer;
 
     public void initialize() {
 
@@ -187,6 +192,33 @@ public class EditItemController {
         comboUnitOnChange();
 
         trackStockHbox.setVisible(false);
+
+        checkItemIfUpdated();
+    }
+
+    private void checkItemIfUpdated() {
+        Optional<Item> optionalUpdatedItem = itemsRepository.findById(selectedItem.getSku());
+        if(optionalUpdatedItem.isPresent()){
+            Item updatedItem = optionalUpdatedItem.get();
+            if (!updatedItem.getItem_name().equalsIgnoreCase(selectedItem.getItem_name())||
+                    !Double.toString(updatedItem.getCost()).equalsIgnoreCase(String.valueOf(selectedItem.getCost()))||
+                    !Integer.toString(updatedItem.getIn_stock()).equalsIgnoreCase(String.valueOf(selectedItem.getIn_stock()))||
+                    !Integer.toString(updatedItem.getLow_stock()).equalsIgnoreCase(String.valueOf(selectedItem.getLow_stock()))||
+                    !updatedItem.getItem_category().equalsIgnoreCase(selectedItem.getItem_category())
+            ) {
+                Optional<ButtonType> optionalButtonType = Prompt.confirm("Item changed. Item will be updated before saving.");
+                if(optionalButtonType.isPresent()){
+                    if(optionalButtonType.get().getText().equalsIgnoreCase("OK")){
+                        name.setText(updatedItem.getItem_name());
+                        averageCost.setText(Double.toString(updatedItem.getCost()));
+                        inStock.setText(Integer.toString(updatedItem.getIn_stock()));
+                        lowStock.setText(Integer.toString(updatedItem.getLow_stock()));
+                        comboUnit.setValue(updatedItem.getUnit());
+                    }
+                }
+
+            }
+        }
     }
 
     private void comboUnitOnChange() {
@@ -425,6 +457,7 @@ public class EditItemController {
 
     public void save(ActionEvent actionEvent) {
         if (!ObjectUtils.isEmpty(name.getText())) {
+            checkItemIfUpdated();
             selectedItem.setTag(null);
             if (!sku.getText().equalsIgnoreCase("0")) {
                 //EXISTING ITEM
@@ -450,6 +483,7 @@ public class EditItemController {
                     selectedItem.setQuantity(selectedItem.getIn_stock());
                 }
             }
+
             Item savedItem = itemsRepository.save(selectedItem);
             if (!ObjectUtils.isEmpty(savedItem) && (Integer.parseInt(quantity.getText())!=0 ) && (Integer.parseInt(purchaseCost.getText())!=0)) {
 
@@ -472,6 +506,9 @@ public class EditItemController {
                 stage.close();
             } else if(!ObjectUtils.isEmpty(savedItem)) {
                 Prompt.success("Item updated successfully!");
+                resetSelectedItem();
+                Stage stage = (Stage) save.getScene().getWindow();
+                stage.close();
             }else{
                 Prompt.failed("Transaction Failed! Please Try again!");
             }

@@ -594,6 +594,7 @@ public class MainDashboardController implements Initializable {
         JFXButton updatePassword = new JFXButton("UPDATE PASSWORD");
         JFXButton rolesAndPrivileges = new JFXButton("ADMIN ROLES & PRIVILEGES");
         JFXButton balanceSettings = new JFXButton("BALANCE SETTINGS");
+        JFXButton stockAdjusment = new JFXButton("STOCK ADJUSTMENT");
 
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
 
@@ -603,7 +604,18 @@ public class MainDashboardController implements Initializable {
         });
 
         updatePassword.setOnAction(e ->{
-            new StageLoader().load(BalanceSettingsController.class, applicationContext);
+            new StageLoader().load(UpdatePasswordController.class, applicationContext);
+            currentStage.close();
+        });
+
+        rolesAndPrivileges.setOnAction(e ->{
+            new StageLoader().load(AdminRolesController.class, applicationContext);
+            currentStage.close();
+        });
+
+
+        stockAdjusment.setOnAction(e ->{
+            new StageLoader().load(StockAdjustmentController.class, applicationContext);
             currentStage.close();
         });
 
@@ -612,7 +624,7 @@ public class MainDashboardController implements Initializable {
             currentStage.close();
         });
 
-        topHbox.getChildren().addAll(createMasterData, updatePassword, rolesAndPrivileges,balanceSettings);
+        topHbox.getChildren().addAll(createMasterData, updatePassword, rolesAndPrivileges,balanceSettings,stockAdjusment);
         topHbox.setAlignment(Pos.CENTER);
         midHbox.setAlignment(Pos.CENTER);
         bottomHbox.setAlignment(Pos.CENTER);

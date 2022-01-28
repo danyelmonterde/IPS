@@ -9,6 +9,8 @@ import com.monterdev.model.ItemCategory;
 import com.monterdev.repository.CategoryRepository;
 import com.monterdev.repository.DeletedItemsRepository;
 import com.monterdev.repository.ItemsRepository;
+import com.monterdev.util.AppTime;
+import com.monterdev.util.OpenCvUtils;
 import com.monterdev.util.Prompt;
 import com.monterdev.util.StageLoader;
 import com.opencsv.CSVWriter;
@@ -17,6 +19,7 @@ import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -25,6 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.Getter;
@@ -32,6 +36,8 @@ import lombok.Setter;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.opencv.core.Mat;
+import org.opencv.objdetect.QRCodeDetector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.domain.Page;
@@ -42,8 +48,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static com.monterdev.constants.GlobalConfiguration.defaultItemCategory;
 import static org.springframework.data.jpa.domain.Specification.where;
@@ -127,8 +137,11 @@ public class InventoryListController implements Initializable {
     private static String CURRENT_SELECTED_STOCK_ALERT = "";
     private static final String ALL_CATEGORIES = "ALL CATEGORIES";
 
+    private ScheduledExecutorService timer;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        initializeDateLabel();
         loadAllInventoryItems();
         initializeNumberOfRowsPerPage();
         initializeItemCategories();
@@ -144,6 +157,32 @@ public class InventoryListController implements Initializable {
         currentPageOnChange();
         rowsPerPageOnChange();
         ofLabelOnChange();
+    }
+
+    private void initializeDateLabel() {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+        currentDateLabel.textProperty().addListener((obs,oldValue,newValue)->{
+            if(oldValue!=newValue){
+
+            }
+        });
+
+        Runnable frameGrabber = new Runnable() {
+
+            @Override
+            public void run() {
+                    Platform.runLater(() -> {
+                        currentDateLabel.setText(AppTime.now().format(formatter));
+                        loadAllInventoryItems();
+                        initializeItemCategories();
+                    });
+            }
+        };
+
+        this.timer = Executors.newSingleThreadScheduledExecutor();
+        this.timer.scheduleAtFixedRate(frameGrabber, 0, 60, TimeUnit.SECONDS);
+
     }
 
     private void initializeStockAlerts() {
