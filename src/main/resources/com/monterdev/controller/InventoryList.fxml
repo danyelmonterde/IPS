@@ -2,6 +2,7 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXProgressBar?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
@@ -12,8 +13,8 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
-
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.InventoryListController">
    <children>
@@ -23,7 +24,7 @@
                <children>
                   <AnchorPane prefHeight="100.0" prefWidth="1243.0">
                      <children>
-                        <JFXButton fx:id="addItemButton" buttonType="RAISED" defaultButton="true" layoutY="32.0" style="-fx-background-color: navy blue;" text="ADD ITEM" textFill="WHITE">
+                        <JFXButton fx:id="addItemButton" buttonType="RAISED" defaultButton="true" layoutY="32.0" style="-fx-background-color: green;" text="ADD ITEM" textFill="WHITE">
                            <font>
                               <Font name="System Bold" size="12.0" />
                            </font>
@@ -47,18 +48,37 @@
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </JFXButton>
-                        <JFXComboBox fx:id="itemCategoriesCombo" labelFloat="true" layoutX="605.0" layoutY="38.0" promptText="ITEM CATEGORIES" />
-                        <JFXComboBox fx:id="stockAlertsCombo" labelFloat="true" layoutX="917.0" layoutY="38.0" promptText="STOCK ALERTS" />
-                        <Label fx:id="currentDateLabel" alignment="CENTER" contentDisplay="RIGHT" layoutX="1080.0" layoutY="43.0" text="Nov. 25, 2021 12:27 PM" textFill="#a6a6a6">
-                           <font>
-                              <Font name="Arial Bold" size="12.0" />
-                           </font>
-                        </Label>
-                        <Label layoutX="484.0" layoutY="42.0" text="FILTER ITEMS BY:">
+                        <JFXComboBox fx:id="itemCategoriesCombo" labelFloat="true" layoutX="901.0" layoutY="37.0" promptText="ITEM CATEGORIES" />
+                        <JFXComboBox fx:id="stockAlertsCombo" labelFloat="true" layoutX="1108.0" layoutY="38.0" promptText="STOCK ALERTS" />
+                        <Label layoutX="777.0" layoutY="41.0" text="FILTER ITEMS BY:">
                            <font>
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </Label>
+                        <JFXButton fx:id="btnHistory" buttonType="RAISED" layoutX="406.0" layoutY="32.0" style="-fx-background-color: WHITE;" text="HISTORY">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </JFXButton>
+                        <JFXButton fx:id="btnStockAdjustment" buttonType="RAISED" layoutX="500.0" layoutY="33.0" style="-fx-background-color: WHITE;" text="STOCK ADJUSTMENT">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </JFXButton>
+                        <JFXButton fx:id="btnOverview" buttonType="RAISED" layoutX="667.0" layoutY="33.0" style="-fx-background-color: WHITE;" text="OVERVIEW">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </JFXButton>
                      </children>
                      <HBox.margin>
                         <Insets left="20.0" />
@@ -68,12 +88,61 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <JFXTextField fx:id="searchItemTextField" alignment="CENTER" focusColor="NAVY" labelFloat="true" minHeight="-Infinity" minWidth="-Infinity" prefHeight="48.0" prefWidth="584.0" promptText="Search for Item Name">
-                     <font>
-                        <Font name="System Bold" size="16.0" />
-                     </font>
-                  </JFXTextField>
+                  <AnchorPane prefHeight="98.0" prefWidth="1280.0">
+                     <children>
+                        <JFXTextField fx:id="searchItemTextField" alignment="CENTER" focusColor="NAVY" labelFloat="true" layoutX="348.0" layoutY="3.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="48.0" prefWidth="584.0" promptText="Search for Item Name">
+                           <font>
+                              <Font name="System Bold" size="16.0" />
+                           </font>
+                        </JFXTextField>
+                        <Circle fx:id="lowStockCircle" fill="RED" layoutX="1080.0" layoutY="19.0" radius="15.0" stroke="RED" strokeType="INSIDE" AnchorPane.rightAnchor="185.0" />
+                        <Label fx:id="lowStockLabel" layoutX="1114.0" layoutY="8.0" prefHeight="21.0" prefWidth="133.0" text="LOW STOCK ITEM">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Circle fx:id="outOfStockCircle" layoutX="1080.0" layoutY="58.0" radius="15.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Label fx:id="outOfStockLabel" layoutX="1114.0" layoutY="48.0" prefHeight="21.0" prefWidth="152.0" text="OUT OF STOCK ITEM">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="27.0" layoutY="1.0" text="HELLO,">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="labelUsername" layoutX="88.0" layoutY="1.0" prefHeight="21.0" prefWidth="231.0" text="ADMIN">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="currentDateLabel" alignment="CENTER" contentDisplay="RIGHT" layoutX="27.0" layoutY="53.0" style="-fx-background-color: gray; -fx-label-padding: 5;" text="Nov. 25, 2021 12:27 PM" textFill="WHITE" AnchorPane.rightAnchor="1078.0">
+                           <font>
+                              <Font name="Arial Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="27.0" layoutY="28.0" prefHeight="21.0" prefWidth="79.0" text="TODAY IS">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="lowStockIndicator" layoutX="1075.0" layoutY="8.0" text="1" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="outOfStockIndicator" layoutX="1076.0" layoutY="47.0" text="1" textFill="WHITE">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
                </children>
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
             </HBox>
             <HBox prefHeight="311.0" prefWidth="1280.0">
                <children>
@@ -86,7 +155,7 @@
                         <TableColumn fx:id="inStock" prefWidth="293.66668701171875" style="-fx-alignment: center; -fx-font-size: 14px;" text="In Stock" />
                     </columns>
                      <HBox.margin>
-                        <Insets left="20.0" />
+                        <Insets left="20.0" top="20.0" />
                      </HBox.margin>
                      <cursor>
                         <Cursor fx:constant="DEFAULT" />
@@ -102,7 +171,7 @@
             </HBox>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <AnchorPane prefHeight="100.0" prefWidth="1239.0">
+                  <AnchorPane prefHeight="138.0" prefWidth="1239.0">
                      <children>
                         <JFXButton fx:id="previousPageButton" buttonType="RAISED" layoutX="7.0" layoutY="30.0" style="-fx-background-color: BLACK;" text="PREVIOUS PAGE" textFill="WHITE">
                            <font>
@@ -127,12 +196,39 @@
                         </Label>
                         <JFXComboBox fx:id="rowsPerPageCombo" labelFloat="true" layoutX="1025.0" layoutY="31.0" promptText="NUMBER OF ROWS PER PAGE" />
                         <Label layoutX="649.0" layoutY="43.0" text="of" />
+                        <JFXProgressBar fx:id="progressBar" layoutX="8.0" prefHeight="25.0" prefWidth="217.0" visible="false" AnchorPane.topAnchor="70.0" />
                      </children>
                      <HBox.margin>
                         <Insets left="20.0" />
                      </HBox.margin>
                   </AnchorPane>
                </children>
+            </HBox>
+            <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <JFXButton fx:id="btnRefreshTable" alignment="CENTER" buttonType="RAISED" defaultButton="true" style="-fx-background-color: NAVY BLUE;" text="REFRESH" textAlignment="CENTER" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <HBox.margin>
+                        <Insets left="20.0" right="20.0" />
+                     </HBox.margin>
+                  </JFXButton>
+                  <JFXButton fx:id="btnClose" buttonType="RAISED" cancelButton="true" style="-fx-background-color: gray;" text="CLOSE" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="20.0" right="20.0" />
+                     </HBox.margin>
+                  </JFXButton>
+               </children>
+               <VBox.margin>
+                  <Insets right="20.0" />
+               </VBox.margin>
             </HBox>
          </children>
       </VBox>

@@ -49,8 +49,8 @@ public class AdminRolesController implements Initializable {
         btnCancel.setOnAction(e->{
             Stage currentStage = (Stage) btnCancel.getScene().getWindow();
 
-            new StageLoader().load(MainDashboardController.class, applicationContext);
-            currentStage.close();
+            new StageLoader().load(MainDashboardController.class, applicationContext,currentStage);
+
 
         });
     }

@@ -168,7 +168,8 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     }
 
     public void createRISTemplate(ActionEvent actionEvent) {
-        new StageLoader().load(CreateRequisitionTemplateController.class, applicationContext);
+        Stage stage = (Stage) firstName.getScene().getWindow();
+        new StageLoader().load(CreateRequisitionTemplateController.class, applicationContext,stage);
     }
 
     public void addRIS(ActionEvent actionEvent) {

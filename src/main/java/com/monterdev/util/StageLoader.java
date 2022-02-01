@@ -1,56 +1,53 @@
 package com.monterdev.util;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.rgielen.fxweaver.core.FxWeaver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import static com.monterdev.constants.GlobalConfiguration.getWindowTitle;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class StageLoader {
 
-    private Stage primaryStage = null;
-    double x, y = 0;
+    double  screen_x, screen_y = 0;
 
-    public void load(Class<?> t, MouseEvent event, ConfigurableApplicationContext applicationContext) {
-        weave(t, applicationContext);
-        ((Node) (event.getSource())).getScene().getWindow().hide();
+    public void load(Class<?> t, MouseEvent event, ConfigurableApplicationContext applicationContext,Stage primaryStage) {
+        weave(t, applicationContext,primaryStage);
     }
 
-    public void load(Class<?> t, MouseEvent event, ConfigurableApplicationContext applicationContext, String s) {
-        weave(t, applicationContext);
+    public void load(Class<?> t, MouseEvent event, ConfigurableApplicationContext applicationContext, String s,Stage primaryStage) {
+        weave(t, applicationContext,primaryStage);
     }
 
-    public void load(Class<?> t, ConfigurableApplicationContext applicationContext) {
+    public void load(Class<?> t, ConfigurableApplicationContext applicationContext, Stage primaryStage) {
 
-        weave(t, applicationContext);
-    }
-
-    public void load(Class<?> t, Parent root) {
-        weave(t, root);
+        weave(t, applicationContext,primaryStage);
     }
 
     public void loadTest(Class<?> t, ConfigurableApplicationContext applicationContext, Stage primaryStage) {
-        if(primaryStage == null){
-            primaryStage = this.primaryStage;
-        }
-        this.primaryStage = primaryStage;
-        weaveTest(t, applicationContext, this.primaryStage);
+        weaveTest(t, applicationContext, primaryStage);
     }
 
-    private void weave(Class<?> t, Parent root) {
-        setStage(root);
-        System.gc();
-    }
-
-    private void weave(Class<?> t, ConfigurableApplicationContext applicationContext) {
+    private void weave(Class<?> t, ConfigurableApplicationContext applicationContext, Stage primaryStage) {
         FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
         Parent root = fxWeaver.loadView(t);
-        setStage(root);
+        setStage(root,primaryStage);
         System.gc();
     }
 
@@ -61,19 +58,26 @@ public class StageLoader {
         System.gc();
     }
 
-    public void weaveInitially(Class<?> t, ConfigurableApplicationContext applicationContext) {
-        FxWeaver fxWeaver = applicationContext.getBean(FxWeaver.class);
-        Parent root = fxWeaver.loadView(t);
-    }
 
-    private void setStage(Parent root) {
-        Scene scene = new Scene(root);
-        //    scene.getStylesheets().add(getClass().getResource("/fontstyle.css").toExternalForm());
-        Stage stage = new Stage();
-        // stage.setFullScreen(true);
+    private void setStage(Parent root,Stage stage) {
+        Scene scene = new Scene(root,1280,720);
+        stage.setFullScreen(true);
+        stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         stage.setTitle(getWindowTitle());
-        stage.setScene(scene);
        // stage.initStyle(StageStyle.UNDECORATED);
+
+        //Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        root.setOnMousePressed(event -> {
+            screen_x = event.getSceneX();
+            screen_y = event.getSceneY();
+        });
+        scene.setOnMouseDragged(event ->{
+            stage.setX(event.getScreenX() - screen_x);
+            stage.setY(event.getScreenY() - screen_y);
+        });
+
+        stage.setAlwaysOnTop(true);
+        stage.setScene(scene);
         stage.show();
 
         stage.setOnCloseRequest(windowEvent -> {
@@ -86,20 +90,24 @@ public class StageLoader {
 
     private void TestStage(Parent root, Stage primaryStage) {
 
-        primaryStage.initStyle(StageStyle.UNDECORATED);
-        primaryStage.setFullScreen(false);
+       // primaryStage.initStyle(StageStyle.UNDECORATED);
+        primaryStage.setFullScreen(true);
+        primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+
 
         root.setOnMousePressed(event -> {
-            x = event.getSceneX();
-            y = event.getSceneY();
+            screen_x = event.getSceneX();
+            screen_y = event.getSceneY();
         });
 
         root.setOnMouseDragged(event -> {
-            primaryStage.setX(event.getScreenX() - x);
-            primaryStage.setY(event.getScreenY() - y);
+            primaryStage.setX((screenBounds.getWidth() - primaryStage.getWidth()) / 2);
+            primaryStage.setY((screenBounds.getHeight() - primaryStage.getHeight()) / 2);
         });
 
-        primaryStage.setScene(new Scene(root, 700, 400));
+        primaryStage.setScene(new Scene(root, 1280, 720));
+        primaryStage.setAlwaysOnTop(true);
         primaryStage.show();
         primaryStage.setOnCloseRequest(windowEvent -> {
             System.out.println("Windows closing");

@@ -268,8 +268,8 @@ public class MasterDataController implements Initializable {
 
         btnExit.setOnAction(e->{
             Stage currentStage = (Stage) btnExit.getScene().getWindow();
-            new StageLoader().load(MainDashboardController.class,applicationContext);
-            currentStage.close();
+            new StageLoader().load(MainDashboardController.class,applicationContext,currentStage);
+            
         });
     }
 }

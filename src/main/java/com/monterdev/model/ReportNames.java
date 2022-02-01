@@ -23,4 +23,8 @@ public class ReportNames {
     private String inventorytype;
 
     private String description;
+
+    private String risTypeName;
+
+    private String jrxmlReportFileName;
 }

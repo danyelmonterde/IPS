@@ -3,6 +3,7 @@ package com.monterdev.controller;
 import com.jfoenix.controls.JFXButton;
 import com.monterdev.model.Item;
 import com.monterdev.util.OpenCvUtils;
+import com.monterdev.util.StageLoader;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,6 +17,7 @@ import org.opencv.core.Mat;
 import org.opencv.objdetect.QRCodeDetector;
 import org.opencv.videoio.VideoCapture;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -27,6 +29,9 @@ import java.util.concurrent.TimeUnit;
 @FxmlView("CaptureQrCode.fxml")
 @Getter
 public class CaptureQrCodeController {
+
+    @FXML
+    private ConfigurableApplicationContext applicationContext;
 
     @FXML
     private JFXButton openCamera;
@@ -64,7 +69,7 @@ public class CaptureQrCodeController {
     public void cancelCapture(ActionEvent actionEvent) {
         stopAcquisition();
         Stage stage = (Stage) cancelButton.getScene().getWindow();
-        stage.close();
+        new StageLoader().load(EditItemController.class, applicationContext,stage);
     }
 
     public void startCamera(ActionEvent actionEvent) {
@@ -107,7 +112,7 @@ public class CaptureQrCodeController {
                                 item.setItem_name(sku);
                                 System.gc();
                                 Stage stage = (Stage) openCamera.getScene().getWindow();
-                                stage.close();
+                                new StageLoader().load(MainDashboardController.class, applicationContext,stage);
 
                             });
 

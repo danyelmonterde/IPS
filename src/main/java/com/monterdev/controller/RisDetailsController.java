@@ -11,6 +11,7 @@ import com.monterdev.repository.RisTypeRepository;
 import com.monterdev.util.AppTime;
 import com.monterdev.util.ControlNumberGenerator;
 import com.monterdev.util.Prompt;
+import com.monterdev.util.StageLoader;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,6 +24,7 @@ import javafx.stage.Stage;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -38,6 +40,9 @@ import static com.monterdev.constants.DataTypeConstants.*;
 @FxmlView("RisTemplate.fxml")
 @Getter
 public class RisDetailsController implements Initializable {
+
+    @Autowired
+    private ConfigurableApplicationContext applicationContext;
 
     @FXML
     private Label risTemplateLabel;

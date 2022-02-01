@@ -1,6 +1,9 @@
 package com.monterdev.mapper.reports.construction;
 
-import com.monterdev.model.*;
+import com.monterdev.model.RequisitionIssueSlip;
+import com.monterdev.model.RisType;
+import com.monterdev.model.RisTypeFields;
+import com.monterdev.model.Sales;
 import com.monterdev.repository.*;
 import com.monterdev.util.ReportUtil;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -11,6 +14,7 @@ import org.springframework.util.ObjectUtils;
 import java.util.*;
 
 import static com.monterdev.constants.GlobalConfiguration.*;
+import static com.monterdev.constants.InventoryTypeConstants.SUMMARY;
 
 @Component
 public class ReportsMapper {
@@ -44,25 +48,24 @@ public class ReportsMapper {
 
     public List<Map> map() {
         totalSales = 0.0;
-        totalCost=0.0;
-        totalIncome=0.0;
+        totalCost = 0.0;
+        totalIncome = 0.0;
         List<Map> mappedReportsList = new ArrayList<>();
         String selectedMonth = reportUtil.getSelectedMonth();
         String selectedYear = reportUtil.getSelectedYear();
         String randomDate = "01";
         String selectedDate = randomDate + "-" + selectedMonth + "-" + selectedYear + "  01:01:01";
         List<RequisitionIssueSlip> requisitionIssueSlipListForTheSpecifiedMonth = new ArrayList<>();
-        try{
-            if(reportUtil.getSelectedReportRisTypeCode()!="SUMMARY"){
-                requisitionIssueSlipListForTheSpecifiedMonth=risRepository.findAllRequisitionSlipByCurrentMonthOfTheSpecifiedDate(selectedDate,reportUtil.getSelectedReportRisTypeCode());
-            }else{
+        try {
+            if (reportUtil.getSelectedReportRisTypeCode() != SUMMARY) {
+                requisitionIssueSlipListForTheSpecifiedMonth = risRepository.findAllRequisitionSlipByCurrentMonthOfTheSpecifiedDate(selectedDate, reportUtil.getSelectedReportRisTypeCode());
+            } else {
 
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
-
 
 
         requisitionIssueSlipListForTheSpecifiedMonth.stream().forEach(s -> {
@@ -86,12 +89,12 @@ public class ReportsMapper {
             Sales sales = optionalSales.isPresent() ? optionalSales.get() : null;
             if (!ObjectUtils.isEmpty(sales)) {
                 totalSales += sales.getTotal_sales();
-                totalCost  += sales.getTotal_cost();
+                totalCost += sales.getTotal_cost();
                 totalIncome += sales.getIncome();
                 //FIXED COLUMNS
                 mappedReport.put("COMPANY_NAME", getConfigValue(companyName));
                 mappedReport.put("ADDRESS", getConfigValue(companyAddress));
-                mappedReport.put("MONTH", selectedMonth+" "+selectedYear);
+                mappedReport.put("MONTH", selectedMonth + " " + selectedYear);
                 mappedReport.put("DOCUMENT_TRACKING_NUMBER", RandomStringUtils.randomAlphanumeric(5));
                 mappedReport.put("REPORT_NAME", reportUtil.getSelectedReport());
                 mappedReport.put("REPORT_DESCRIPTION", getReportDescription(reportUtil.getSelectedReport()));
@@ -102,12 +105,12 @@ public class ReportsMapper {
                 mappedReport.put("TOTAL_SALES", String.valueOf(totalSales));
                 mappedReport.put("TOTAL_COST", String.valueOf(totalCost));
                 mappedReport.put("TOTAL_INCOME", String.valueOf(totalIncome));
-                mappedReport.put("PREPARED_BY" , signatoryRepository.findSignatoryByRole("preparedBy",reportUtil.getReportId()).getSignatory());
-                mappedReport.put("NOTEDBY" , signatoryRepository.findSignatoryByRole("notedBy",reportUtil.getReportId()).getSignatory());
-                mappedReport.put("CHECKED_BY" , signatoryRepository.findSignatoryByRole("checkedBy",reportUtil.getReportId()).getSignatory());
-                mappedReport.put("CHECKED_BY_POSITION" , signatoryRepository.findSignatoryByRole("checkedBy",reportUtil.getReportId()).getPosition());
-                mappedReport.put("PREPARED_BY_POSITION" , signatoryRepository.findSignatoryByRole("preparedBy",reportUtil.getReportId()).getPosition());
-                mappedReport.put("NOTED_BY_POSITION" , signatoryRepository.findSignatoryByRole("notedBy",reportUtil.getReportId()).getPosition());
+                mappedReport.put("PREPARED_BY", signatoryRepository.findSignatoryByRole("preparedBy", reportUtil.getReportId()).getSignatory());
+                mappedReport.put("NOTEDBY", signatoryRepository.findSignatoryByRole("notedBy", reportUtil.getReportId()).getSignatory());
+                mappedReport.put("CHECKED_BY", signatoryRepository.findSignatoryByRole("checkedBy", reportUtil.getReportId()).getSignatory());
+                mappedReport.put("CHECKED_BY_POSITION", signatoryRepository.findSignatoryByRole("checkedBy", reportUtil.getReportId()).getPosition());
+                mappedReport.put("PREPARED_BY_POSITION", signatoryRepository.findSignatoryByRole("preparedBy", reportUtil.getReportId()).getPosition());
+                mappedReport.put("NOTED_BY_POSITION", signatoryRepository.findSignatoryByRole("notedBy", reportUtil.getReportId()).getPosition());
             }
 
             mappedReportsList.add(mappedReport);

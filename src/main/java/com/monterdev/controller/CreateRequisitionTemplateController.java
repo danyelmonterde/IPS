@@ -4,20 +4,26 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.monterdev.constants.GlobalConfiguration;
-import com.monterdev.model.*;
+import com.monterdev.model.InventoryType;
+import com.monterdev.model.RisType;
+import com.monterdev.model.RisTypeNames;
+import com.monterdev.model.SelectedRisTemplate;
 import com.monterdev.repository.RisFieldsRepository;
 import com.monterdev.repository.RisTypeRepository;
 import com.monterdev.util.Prompt;
+import com.monterdev.util.StageLoader;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -57,6 +63,9 @@ public class CreateRequisitionTemplateController implements Initializable {
 
     @Autowired
     private SelectedRisTemplate selectedRisTemplate;
+
+    @Autowired
+    private ConfigurableApplicationContext applicationContext;
 
     private List<RisType> risTypeList;
 
@@ -108,7 +117,7 @@ public class CreateRequisitionTemplateController implements Initializable {
 
         JFXComboBox risField = new JFXComboBox();
         risField.setAccessibleText("RIS_FIELD");
-        risFieldsRepository.findAll().forEach(e->{
+        risFieldsRepository.findAll().forEach(e -> {
             risField.getItems().add(e.getRis_field());
         });
         risField.setPromptText("SELECT RIS FIELD");
@@ -137,6 +146,7 @@ public class CreateRequisitionTemplateController implements Initializable {
         jfxRisName.setPromptText("RIS NAME");
         jfxRisName.setId(String.valueOf(counter));
         jfxRisName.setLabelFloat(true);
+        jfxRisName.prefWidth(Region.USE_COMPUTED_SIZE);
         jfxRisName.textProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
                 risTypeModel.setRisname(newValue);
@@ -144,7 +154,7 @@ public class CreateRequisitionTemplateController implements Initializable {
         });
 
 
-        hBox.getChildren().addAll(inventoryTypesCombo, risTypesCombo, risField, risFieldTypesCombo,jfxRisName);
+        hBox.getChildren().addAll(inventoryTypesCombo, risTypesCombo, risField, risFieldTypesCombo, jfxRisName);
         HBox.setMargin(inventoryTypesCombo, new Insets(20, 0, 20, 20));
         HBox.setMargin(risTypesCombo, new Insets(20, 0, 20, 20));
         HBox.setMargin(risField, new Insets(20, 0, 20, 20));
@@ -172,8 +182,12 @@ public class CreateRequisitionTemplateController implements Initializable {
                 if (ctr == risTypeList.size() - 1) {
                     risTypeRepository.save(risTypeList.get(ctr));
                     Prompt.success("Newly Created Template was saved!");
+                    Stage stage = (Stage) risTemplateContainer.getScene().getWindow();
+                    new StageLoader().load(CustomizeRequisitionIssueSlipController.class, applicationContext,stage);
                 } else {
                     risTypeRepository.save(risTypeList.get(ctr));
+                    Stage stage = (Stage) risTemplateContainer.getScene().getWindow();
+                    new StageLoader().load(CustomizeRequisitionIssueSlipController.class, applicationContext,stage);
                 }
             } else {
                 Prompt.failed("Pls fill in all details!");

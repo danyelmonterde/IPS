@@ -9,6 +9,7 @@ import com.monterdev.model.*;
 import com.monterdev.repository.*;
 import com.monterdev.util.*;
 import javafx.animation.TranslateTransition;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -29,6 +30,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -39,6 +41,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
@@ -47,6 +50,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.monterdev.constants.GlobalConfiguration.*;
+import static com.monterdev.constants.InventoryTypeConstants.SUMMARY;
 import static com.monterdev.util.ComponentCreator.createButtonWithoutText;
 import static com.monterdev.util.ComponentCreator.createTextField;
 import static com.monterdev.util.QrCodeUtil.readQrCodeImage;
@@ -113,9 +117,8 @@ public class MainDashboardController implements Initializable {
     @FXML
     private TextField dashboardSearchResult;
     @FXML
-    private JFXListView dashboardLowStock;
-    @FXML
-    private JFXListView dashboardOutofStock;
+    private JFXButton purchaseExistingItemButton;
+
 
     @Autowired
     private EditItemController editItemController;
@@ -154,6 +157,8 @@ public class MainDashboardController implements Initializable {
     private ReportNamesRepository reportNamesRepository;
     @Autowired
     private SearchEngineController searchEngineController;
+    @Autowired
+    private SelectedRisTemplate selectedRisTemplate;
 
     private List<String> responseList = new ArrayList<>();
     private static int rowIndex = 0;
@@ -268,12 +273,21 @@ public class MainDashboardController implements Initializable {
         refreshReleaseItemsOnMouseHover();
         addItemOnAction();
         searchItemOnDashboard();
+        purchaseExistingItemButtonOnAction();
+    }
+
+    private void purchaseExistingItemButtonOnAction() {
+        purchaseExistingItemButton.setOnAction(add -> {
+            Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
+            new StageLoader().load(InventoryListController.class, applicationContext,currentStage);
+        });
     }
 
 
     private void addItemOnAction() {
         addItemButton.setOnAction(add -> {
-            new StageLoader().load(AddItemController.class, applicationContext);
+            Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
+            new StageLoader().load(AddItemController.class, applicationContext,currentStage);
         });
     }
 
@@ -430,7 +444,7 @@ public class MainDashboardController implements Initializable {
         resetHboxes();
         currentLocationBanner.setText("Reports Module");
 
-        JFXComboBox availableReports = new JFXComboBox();
+        JFXComboBox<ReportNames> availableReports = new JFXComboBox();
         JFXComboBox monthsList = new JFXComboBox();
         JFXComboBox yearList = new JFXComboBox();
 
@@ -442,21 +456,43 @@ public class MainDashboardController implements Initializable {
         monthsList.setLabelFloat(true);
         availableReports.setLabelFloat(true);
 
+        ObservableList<ReportNames> reportLists = FXCollections.observableArrayList();
         List<ReportNames> reports = reportNamesRepository.findAllAvailableReports();
         String[] months = getMonthsofCalender().split(",");
         String[] years = getCalenderYears().split(",");
 
+
         reports.stream().forEach(report -> {
-            availableReports.getItems().add(report.getName());
+            reportLists.add(report);
         });
 
         monthsList.getItems().addAll(Arrays.asList(months));
         yearList.getItems().addAll(Arrays.asList(years));
 
+        availableReports.setItems(reportLists);
+        availableReports.setConverter(new StringConverter<ReportNames>() {
+            @Override
+            public String toString(ReportNames object) {
+                return object.getName();
+            }
+
+            @Override
+            public ReportNames fromString(String string) {
+                return availableReports.getItems().stream().filter(ap ->
+                        ap.getName().equals(string)).findFirst().orElse(null);
+            }
+        });
 
         availableReports.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
-                reportUtil.setSelectedReport((String) newValue);
+                reportUtil.setSelectedReport(newValue.getName());
+                reportUtil.setReportId(newValue.getId());
+                reportUtil.setSelectedReportRisTypeCode(newValue.getRisTypeName());//ex.CM-NEW CONNECTION
+                reportUtil.setFILE_UPPER_PART(new File(getReportJrxmlLocation()+newValue.getJrxmlReportFileName()+".jrxml"));
+                reportUtil.setInventoryType(newValue.getInventorytype());
+                if(newValue.getRisTypeName().equalsIgnoreCase(SUMMARY)  ){
+                    reportUtil.setFILE_LOWER_PART(new File(getReportJrxmlLocation()+"SINGLE_INVENTORY_SUMMARY_LOWER_PART.jrxml"));
+                }
             }
         });
 
@@ -497,15 +533,10 @@ public class MainDashboardController implements Initializable {
         bottomHbox.getChildren().clear();
     }
 
-    public void getPurchaseItemModule() {
-        resetHboxes();
-        resetSelectedItem();
-        editItemController.create();
-        currentLocationBanner.setText("Inventory Overview");
-    }
 
     public void getAddItemModule() {
-        new StageLoader().load(AddItemController.class, applicationContext);
+        Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
+        new StageLoader().load(AddItemController.class, applicationContext,currentStage);
     }
 
     private void resetSelectedItem() {
@@ -539,11 +570,14 @@ public class MainDashboardController implements Initializable {
         jfxBtnPurchaseItem.setGraphic(purchaseItem);
 
         jfxBtnPurchaseItem.setOnAction(e -> {
-            getPurchaseItemModule();
+
+            Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
+            new StageLoader().load(EditItemController.class, applicationContext,currentStage);
         });
 
         jfxBtnAddItem.setOnAction(e -> {
-            new StageLoader().load(AddItemController.class, applicationContext);
+            Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
+            new StageLoader().load(AddItemController.class, applicationContext,currentStage);
         });
 
         jfxBtnReleaseItem.setOnAction(f -> {
@@ -574,13 +608,15 @@ public class MainDashboardController implements Initializable {
     }
 
     private void getCustomizeRIS() {
-        new StageLoader().load(CustomizeRequisitionIssueSlipController.class, applicationContext);
+        Stage stage = new Stage();
+        new StageLoader().load(CustomizeRequisitionIssueSlipController.class, applicationContext,stage);
     }
 
     public void getInventoryModule(ActionEvent actionEvent) {
         resetHboxes();
-        currentLocationBanner.setText("Inventory");
-        new StageLoader().load(InventoryListController.class, applicationContext);
+        Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
+        new StageLoader().load(InventoryListController.class, applicationContext,currentStage);
+        
     }
 
     public void getCustomersModule(ActionEvent actionEvent) {
@@ -599,29 +635,29 @@ public class MainDashboardController implements Initializable {
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
 
         createMasterData.setOnAction(e -> {
-            new StageLoader().load(MasterDataController.class, applicationContext);
-            currentStage.close();
+            new StageLoader().load(MasterDataController.class, applicationContext,currentStage);
+            
         });
 
         updatePassword.setOnAction(e ->{
-            new StageLoader().load(UpdatePasswordController.class, applicationContext);
-            currentStage.close();
+            new StageLoader().load(UpdatePasswordController.class, applicationContext,currentStage);
+            
         });
 
         rolesAndPrivileges.setOnAction(e ->{
-            new StageLoader().load(AdminRolesController.class, applicationContext);
-            currentStage.close();
+            new StageLoader().load(AdminRolesController.class, applicationContext,currentStage);
+            
         });
 
 
         stockAdjusment.setOnAction(e ->{
-            new StageLoader().load(StockAdjustmentController.class, applicationContext);
-            currentStage.close();
+            new StageLoader().load(StockAdjustmentController.class, applicationContext,currentStage);
+            
         });
 
         balanceSettings.setOnAction(e ->{
-            new StageLoader().load(BalanceSettingsController.class, applicationContext);
-            currentStage.close();
+            new StageLoader().load(BalanceSettingsController.class, applicationContext,currentStage);
+            
         });
 
         topHbox.getChildren().addAll(createMasterData, updatePassword, rolesAndPrivileges,balanceSettings,stockAdjusment);
@@ -634,8 +670,8 @@ public class MainDashboardController implements Initializable {
     public void getLogoutModule(ActionEvent actionEvent) {
         resetSelectedItem();
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
-        currentStage.close();
-        new StageLoader().load(LoginController.class, applicationContext);
+        
+        new StageLoader().load(LoginController.class, applicationContext,currentStage);
     }
 
     public void createRequisitionIssueSlip() {
@@ -713,13 +749,30 @@ public class MainDashboardController implements Initializable {
         JFXButton openCamera = new JFXButton("Open Camera");
         JFXButton viewRisDetails = new JFXButton("RIS Details");
 
-
+        Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
         openCamera.setOnAction(e -> {
-            new StageLoader().load(CaptureQrCodeController.class, applicationContext);
+            if(ObjectUtils.isEmpty(selectedRisTemplate.getSelectedRisTemplate())){
+                Prompt.failed("Please set RIS Type first!");
+                Stage stage = new Stage();
+                currentStage.close();
+                new StageLoader().load(MainDashboardController.class, applicationContext,stage);
+            }else{
+                new StageLoader().load(CaptureQrCodeController.class, applicationContext,currentStage);
+            }
+
         });
 
         viewRisDetails.setOnAction(e -> {
-            new StageLoader().load(RisDetailsController.class, applicationContext);
+            if(ObjectUtils.isEmpty(selectedRisTemplate.getSelectedRisTemplate())){
+                Prompt.failed("Please set RIS Type first!");
+                Stage stage = new Stage();
+                currentStage.close();
+                new StageLoader().load(MainDashboardController.class, applicationContext,stage);
+            }else{
+                Stage stage = new Stage();
+                new StageLoader().load(RisDetailsController.class, applicationContext,stage);
+            }
+
         });
 
         topHbox.getChildren().addAll(itemName, openCamera, viewRisDetails);
@@ -864,7 +917,7 @@ public class MainDashboardController implements Initializable {
             if (e.getCode() == KeyCode.BACK_SPACE) {
                 dashboardSearchResult.setText("");
             } else if (e.getCode() == KeyCode.ENTER) {
-                System.out.println("ENTERED WORD IS: " + dashboardSearchResult.getText());
+
             }
         });
 

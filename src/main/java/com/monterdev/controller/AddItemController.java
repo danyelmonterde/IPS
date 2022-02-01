@@ -13,12 +13,14 @@ import com.monterdev.repository.QrcodeRepository;
 import com.monterdev.util.AppTime;
 import com.monterdev.util.Prompt;
 import com.monterdev.util.QrCodeUtil;
+import com.monterdev.util.StageLoader;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.stage.Stage;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -72,6 +74,9 @@ public class AddItemController implements Initializable {
     private Iterable<ItemCategory> itemCategories;
 
     @Autowired
+    private ConfigurableApplicationContext applicationContext;
+
+    @Autowired
     private List<Unit> unitList;
 
     @Autowired
@@ -115,7 +120,7 @@ public class AddItemController implements Initializable {
                         qrcodeRepository.save(qrcode);
                         Prompt.success("Item was successfully added!");
                         Stage stage = (Stage) name.getScene().getWindow();
-                        stage.close();
+                        new StageLoader().load(MainDashboardController.class, applicationContext,stage);
                         try {
                             QrCodeUtil.saveQrCode(String.valueOf(item.getSku()),item.getSku() +"-"+item.getItem_name());
                         } catch (Exception ioException) {
@@ -150,7 +155,7 @@ public class AddItemController implements Initializable {
         cancel.setOnAction(e->{
             resetOnAction();
             Stage stage = (Stage) name.getScene().getWindow();
-            stage.close();
+            new StageLoader().load(MainDashboardController.class, applicationContext,stage);
         });
     }
 

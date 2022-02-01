@@ -37,6 +37,7 @@ public class GlobalConfiguration {
     public static final String defaultItemCategory;
     public static final String systemReportLocation;
     public static final String signatoryRole;
+    public static final String reportJrxmlLocation;
 
     static {
         homePage = "HOME_PAGE";
@@ -57,10 +58,15 @@ public class GlobalConfiguration {
         defaultItemCategory = "CONSTRUCTION MATERIALS";
         systemReportLocation = "SYSTEM_REPORT_LOCATION";
         signatoryRole = "REPORT_SIGNATORY_ROLES";
+        reportJrxmlLocation = "REPORT_JRXML_LOCATION";
     }
 
 
     //Custom getters
+
+    public static String getReportJrxmlLocation() {
+        return getConfigValue(reportJrxmlLocation);
+    }
     public static String getSystemReportLocation(){ return getConfigValue(systemReportLocation);}
 
     public static String getDefaultCategoryData() {

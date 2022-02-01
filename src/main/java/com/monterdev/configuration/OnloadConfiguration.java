@@ -2,6 +2,8 @@ package com.monterdev.configuration;
 
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
+import com.monterdev.util.StageLoader;
+import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -22,7 +24,13 @@ import java.util.List;
 import java.util.Properties;
 
 @Configuration
-public class OnloadConfig {
+public class OnloadConfiguration {
+
+    @Bean
+    public StageLoader stageLoader() {
+        return new StageLoader();
+    }
+
 
     @Bean(name = "mysqlDatasource")
     public DataSource dataSource() {
@@ -72,7 +80,6 @@ public class OnloadConfig {
         initialItemList.forEach(itemLists::add);
         return itemLists;
     }
-
 
 
     @Bean
@@ -149,12 +156,12 @@ public class OnloadConfig {
 
 
     @Bean
-    public List<Unit> unitList(){
+    public List<Unit> unitList() {
         return unitRepository.findAllItemUnits();
     }
 
     @Bean
-    public PasswordEncoder encoder(){
+    public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
 

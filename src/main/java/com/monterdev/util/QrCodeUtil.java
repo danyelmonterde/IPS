@@ -29,7 +29,7 @@ public class QrCodeUtil {
     }
 
     public static void generateQRcode(String data, String path, String charset, Map map, int h, int w) throws WriterException, IOException {
-        BitMatrix matrix = new MultiFormatWriter().encode(new String(data.getBytes(charset), charset), BarcodeFormat.QR_CODE, w, h);
+        BitMatrix matrix = new MultiFormatWriter().encode(new String(data.getBytes(charset), charset), BarcodeFormat.CODE_128, w, h);
         MatrixToImageWriter.writeToFile(matrix, path.substring(path.lastIndexOf('.') + 1), new File(path));
     }
 

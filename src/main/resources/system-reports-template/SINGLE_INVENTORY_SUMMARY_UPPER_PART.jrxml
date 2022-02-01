@@ -197,16 +197,4 @@
 			</textField>
 		</band>
 	</detail>
-	<pageFooter>
-		<band height="50">
-			<staticText>
-				<reportElement x="0" y="17" width="556" height="30" uuid="1409e520-2e3f-4c39-8215-45ffcf309ca6"/>
-				<box padding="0">
-					<pen lineWidth="1.75"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[THIS REPORT IS SYSTEM GENERATED]]></text>
-			</staticText>
-		</band>
-	</pageFooter>
 </jasperReport>

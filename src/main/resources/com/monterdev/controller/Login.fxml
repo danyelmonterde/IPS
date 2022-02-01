@@ -3,36 +3,113 @@
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXPasswordField?>
 <?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="367.0" prefWidth="600.0" style="-fx-background-image: url(file:/C:/Users/Daniel/Desktop/iqwd-app/src/main/resources/config-ui/IQWD-APP-RESOURCES/Login/bg-960x540px.png);" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.LoginController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.LoginController">
    <children>
-      <Label fx:id="lblWelcome" alignment="CENTER" contentDisplay="CENTER" layoutX="26.0" layoutY="2.0" prefHeight="109.0" prefWidth="549.0" text="IQWD INVENTORY" textAlignment="CENTER">
-         <font>
-            <Font size="35.0" />
-         </font>
-      </Label>
-      <Label fx:id="lblUsername" layoutX="95.0" layoutY="173.0" text="Username:">
-         <font>
-            <Font size="19.0" />
-         </font></Label>
-      <Label fx:id="lblPassword" layoutX="97.0" layoutY="222.0" text="Password:">
-         <font>
-            <Font size="19.0" />
-         </font></Label>
-      <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" visible="false">
-         <image>
-            <Image url="@../../../config-ui/IQWD-APP-RESOURCES/Login/bg-960x540px.png" />
-         </image>
-      </ImageView>
-      <JFXButton fx:id="btnLogin" buttonType="RAISED" layoutX="258.0" layoutY="289.0" style="-fx-background-color: WHITE;" text="LOGIN" />
-      <JFXTextField fx:id="txtUsername" layoutX="209.0" layoutY="169.0" prefHeight="25.0" prefWidth="299.0" />
-      <JFXButton fx:id="btnExit" buttonType="RAISED" layoutX="421.0" layoutY="289.0" style="-fx-background-color: WHITE;" text="EXIT" />
-      <JFXPasswordField fx:id="txtPassword" layoutX="209.0" layoutY="224.0" prefHeight="25.0" prefWidth="299.0" />
-      <Label fx:id="lblVersion" layoutX="26.0" layoutY="328.0" text="version 1.0" />
+      <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <top>
+            <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="lblWelcome" alignment="CENTER" contentDisplay="CENTER" prefHeight="100.0" prefWidth="980.0" text="INFANTA QUEZON WATER DISTRICT INVENTORY SYSTEM" textAlignment="CENTER">
+                           <font>
+                              <Font name="Calibri" size="35.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </top>
+         <center>
+            <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="lblUsername" text="USERNAME: ">
+                           <font>
+                              <Font size="19.0" />
+                           </font>
+                        </Label>
+                        <JFXTextField fx:id="txtUsername" prefHeight="25.0" prefWidth="299.0">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </JFXTextField>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="lblPassword" text="PASSWORD: ">
+                           <font>
+                              <Font size="19.0" />
+                           </font>
+                        </Label>
+                        <JFXPasswordField fx:id="txtPassword" prefHeight="25.0" prefWidth="299.0">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </JFXPasswordField>
+                     </children>
+                     <VBox.margin>
+                        <Insets top="20.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
+         </center>
+         <bottom>
+            <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <JFXButton fx:id="btnLogin" buttonType="RAISED" style="-fx-background-color: GREEN;" text="LOGIN" textFill="WHITE">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </JFXButton>
+                        <JFXButton fx:id="btnExit" buttonType="RAISED" style="-fx-background-color: RED;" text="EXIT" textFill="WHITE">
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </JFXButton>
+                     </children>
+                  </HBox>
+                  <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label fx:id="lblVersion" text="version 1.0.1">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                           <font>
+                              <Font size="19.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </bottom>
+      </BorderPane>
    </children>
 </AnchorPane>

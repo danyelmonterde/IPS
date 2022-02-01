@@ -1,17 +1,14 @@
 package com.monterdev.repository;
 
-import com.monterdev.model.InventoryType;
 import com.monterdev.model.Item;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface ItemsRepository extends JpaRepository<Item, Integer>, JpaSpecificationExecutor<Item> {
@@ -21,5 +18,8 @@ public interface ItemsRepository extends JpaRepository<Item, Integer>, JpaSpecif
     @Query(value = "SELECT * FROM item WHERE tag is NULL AND sku:=sku", nativeQuery = true)
     Item updateItem(@Param("sku") int sku);
 
+    @Modifying
+    @Query(value = "TRUNCATE TABLE item",nativeQuery = true)
+    void truncateItems();
 
 }

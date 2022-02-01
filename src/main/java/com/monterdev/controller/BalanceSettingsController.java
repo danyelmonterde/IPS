@@ -75,8 +75,8 @@ public class BalanceSettingsController implements Initializable {
     private void btnCancelOnAction() {
         btnCancel.setOnAction(e->{
             Stage currentStage = (Stage) btnCancel.getScene().getWindow();
-            new StageLoader().load(MainDashboardController.class, applicationContext);
-            currentStage.close();
+            new StageLoader().load(MainDashboardController.class, applicationContext,currentStage);
+
         });
 
     }

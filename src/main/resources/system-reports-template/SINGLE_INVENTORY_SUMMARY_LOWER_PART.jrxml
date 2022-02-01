@@ -88,56 +88,6 @@
 	<field name="CHECKED_BY_POSITION" class="java.lang.String"/>
 	<field name="NOTED_BY_POSITION" class="java.lang.String"/>
 	<field name="RIS_TYPE_NAMES" class="java.lang.String"/>
-	<title>
-		<band height="100" splitType="Stretch">
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<line>
-				<reportElement x="0" y="80" width="556" height="1" uuid="806ce5df-1219-4876-ae0c-ca7405b1f246">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-			</line>
-			<staticText>
-				<reportElement x="188" y="57" width="50" height="17" uuid="42d572a1-a789-41df-adaf-18fca01b58b5"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10"/>
-				</textElement>
-				<text><![CDATA[AS OF]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="130" y="-4" width="314" height="30" isRemoveLineWhenBlank="true" uuid="ca617a4a-1e93-4626-805e-197b979c9dd3"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{COMPANY_NAME}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="130" y="26" width="314" height="30" isRemoveLineWhenBlank="true" uuid="2d087e19-8355-431c-bf50-2d8a5ad3c98f"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$P{REPORT_NAME}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="241" y="50" width="84" height="30" isRemoveLineWhenBlank="true" uuid="322fe74f-d166-4854-a206-153e25a650e9"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$P{SELECTED_MONTH}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="325" y="50" width="70" height="30" isRemoveLineWhenBlank="true" uuid="580d59cf-0621-4288-a9f1-cac195eb9c10"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$P{SELECTED_YEAR}]]></textFieldExpression>
-			</textField>
-		</band>
-	</title>
-	<columnHeader>
-		<band height="50">
-			<staticText>
-				<reportElement x="-1" y="20" width="110" height="20" uuid="5dd79ec0-adc2-4d8c-b032-a4e001aa1c52">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="884d4d1e-95ce-4c37-a2c2-9a4ba66ccf35"/>
-				</reportElement>
-				<text><![CDATA[Less Materials: Used]]></text>
-			</staticText>
-		</band>
-	</columnHeader>
 	<detail>
 		<band height="40">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>

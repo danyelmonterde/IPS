@@ -11,31 +11,35 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="362.0" prefWidth="617.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.CustomizeRequisitionIssueSlipController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.CustomizeRequisitionIssueSlipController">
    <children>
       <VBox prefHeight="333.0" prefWidth="569.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="17.0">
          <children>
-            <HBox prefHeight="100.0" prefWidth="200.0">
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Label text="Customize Requisition Issue Slip">
+                  <VBox alignment="BOTTOM_CENTER" prefHeight="55.0" prefWidth="384.0">
+                     <children>
+                        <Label text="Customize Requisition Issue Slip">
+                           <font>
+                              <Font name="Roboto Black" size="17.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="currentDate" alignment="CENTER" contentDisplay="CENTER" text="Friday, Oct. 29, 2021 9:00:00 AM">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="20.0" left="20.0" />
+                           </VBox.margin>
+                        </Label>
+                     </children>
                      <HBox.margin>
-                        <Insets left="20.0" top="20.0" />
+                        <Insets top="20.0" />
                      </HBox.margin>
-                     <font>
-                        <Font name="Roboto Black" size="17.0" />
-                     </font>
-                  </Label>
+                  </VBox>
                </children>
             </HBox>
-            <Label fx:id="currentDate" text="Friday, Oct. 29, 2021 9:00:00 AM">
-               <font>
-                  <Font size="10.0" />
-               </font>
-               <VBox.margin>
-                  <Insets bottom="20.0" left="20.0" />
-               </VBox.margin>
-            </Label>
-            <Line endX="492.626220703125" endY="-1.7290987968444824" opacity="0.31" startX="-100.0" startY="-2.729098081588745" />
+            <Line endX="1162.2928466796875" endY="-2.729097366333008" opacity="0.31" startX="-100.0" startY="-2.729098081588745" />
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
                <children>
                   <JFXTextField fx:id="firstName" labelFloat="true" promptText="FIRST NAME">
@@ -55,12 +59,7 @@
                   </JFXTextField>
                </children>
             </HBox>
-            <Line endX="489.29290771484375" endY="1.7928931713104248" opacity="0.31" startX="-100.0">
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin>
-            </Line>
-            <HBox prefHeight="100.0" prefWidth="200.0">
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
                   <JFXTextField fx:id="requestedBy" labelFloat="true" promptText="REQUESTED BY">
                      <HBox.margin>
@@ -84,11 +83,6 @@
                   </JFXTextField>
                </children>
             </HBox>
-            <Line endX="489.29290771484375" endY="1.7928931713104248" layoutX="111.0" layoutY="154.0" opacity="0.31" startX="-100.0">
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin>
-            </Line>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
                   <JFXComboBox fx:id="customerType" labelFloat="true" onAction="#selectCustomerType" promptText="CUSTOMER TYPE:">
@@ -103,11 +97,6 @@
                   </JFXComboBox>
                </children>
             </HBox>
-            <Line endX="489.29290771484375" endY="1.7928931713104248" layoutX="111.0" layoutY="157.0" opacity="0.31" startX="-100.0">
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin>
-            </Line>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
                <children>
                   <JFXButton fx:id="btnRisTemplate" buttonType="RAISED" onAction="#createRISTemplate" style="-fx-background-color: gray;" text="RIS Template" textFill="WHITE">
