@@ -48,13 +48,8 @@
                               <Font name="System Bold" size="12.0" />
                            </font>
                         </JFXButton>
-                        <JFXComboBox fx:id="itemCategoriesCombo" labelFloat="true" layoutX="901.0" layoutY="37.0" promptText="ITEM CATEGORIES" />
+                        <JFXComboBox fx:id="itemCategoriesCombo" labelFloat="true" layoutX="774.0" layoutY="38.0" prefHeight="25.0" prefWidth="279.0" promptText="ITEM CATEGORIES" />
                         <JFXComboBox fx:id="stockAlertsCombo" labelFloat="true" layoutX="1108.0" layoutY="38.0" promptText="STOCK ALERTS" />
-                        <Label layoutX="777.0" layoutY="41.0" text="FILTER ITEMS BY:">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
                         <JFXButton fx:id="btnHistory" buttonType="RAISED" layoutX="406.0" layoutY="32.0" style="-fx-background-color: WHITE;" text="HISTORY">
                            <padding>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -117,7 +112,7 @@
                               <Font name="System Bold" size="15.0" />
                            </font>
                         </Label>
-                        <Label fx:id="currentDateLabel" alignment="CENTER" contentDisplay="RIGHT" layoutX="27.0" layoutY="53.0" style="-fx-background-color: gray; -fx-label-padding: 5;" text="Nov. 25, 2021 12:27 PM" textFill="WHITE" AnchorPane.rightAnchor="1078.0">
+                        <Label fx:id="currentDateLabel" alignment="CENTER" layoutX="27.0" layoutY="53.0" style="-fx-background-color: gray; -fx-label-padding: 5;" text="Nov. 25, 2021 12:27 PM" textFill="WHITE">
                            <font>
                               <Font name="Arial Bold" size="15.0" />
                            </font>

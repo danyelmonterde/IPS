@@ -27,6 +27,11 @@ import java.util.Properties;
 public class OnloadConfiguration {
 
     @Bean
+    public User user(){
+        return new User();
+    }
+
+    @Bean
     public StageLoader stageLoader() {
         return new StageLoader();
     }

@@ -18,6 +18,12 @@ public interface ItemsRepository extends JpaRepository<Item, Integer>, JpaSpecif
     @Query(value = "SELECT * FROM item WHERE tag is NULL AND sku:=sku", nativeQuery = true)
     Item updateItem(@Param("sku") int sku);
 
+    @Query(value = "SELECT count(*) FROM item WHERE in_stock=0 OR low_stock=0",nativeQuery = true)
+    int getOutOfStockItems();
+
+    @Query(value = "SELECT count(*) FROM item WHERE in_stock=low_stock",nativeQuery = true)
+    int getLowStockItems();
+
     @Modifying
     @Query(value = "TRUNCATE TABLE item",nativeQuery = true)
     void truncateItems();

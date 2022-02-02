@@ -3,15 +3,14 @@ package com.monterdev.controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
+import com.monterdev.model.User;
 import com.monterdev.util.LoginUtil;
 import com.monterdev.util.Prompt;
 import com.monterdev.util.StageLoader;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -48,6 +47,9 @@ public class LoginController implements Initializable {
     @Autowired
     private StageLoader stageLoader;
 
+    @Autowired
+    private User user;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         txtUsernameOnEnter();
@@ -58,7 +60,7 @@ public class LoginController implements Initializable {
 
     private void txtUsernameOnEnter() {
         txtUsername.setOnKeyPressed(event -> {
-            if(event.getCode().equals(KeyCode.ENTER)){
+            if (event.getCode().equals(KeyCode.ENTER)) {
                 login();
             }
         });
@@ -66,31 +68,33 @@ public class LoginController implements Initializable {
 
     private void txtPasswordOnEnter() {
         txtPassword.setOnKeyPressed(event -> {
-            if(event.getCode().equals(KeyCode.ENTER)){
+            if (event.getCode().equals(KeyCode.ENTER)) {
                 login();
             }
         });
     }
 
     private void buttonExitOnClick() {
-        btnExit.setOnAction(e->{
+        btnExit.setOnAction(e -> {
             System.exit(-176);
         });
     }
 
     private void buttonLoginOnClick() {
-        btnLogin.setOnAction(e->{
+        btnLogin.setOnAction(e -> {
             login();
         });
     }
 
     private void login() {
-        boolean isUserAuthenticated = new LoginUtil().isAuthenticated(txtUsername.getText(),txtPassword.getText(),applicationContext);
-        if(isUserAuthenticated){
+        boolean isUserAuthenticated = new LoginUtil().isAuthenticated(txtUsername.getText(), txtPassword.getText(),applicationContext);
+        if (isUserAuthenticated) {
+            System.out.println(user.getUsername());
             Prompt.success("Welcome to IQWD Inventory System!");
-            Stage primaryStage = (Stage)btnLogin.getScene().getWindow();
-            stageLoader.load(MainDashboardController.class,applicationContext,primaryStage);
-        }else{
+            Stage primaryStage = (Stage) btnLogin.getScene().getWindow();
+            stageLoader.load(MainDashboardController.class, applicationContext, primaryStage);
+        } else {
+            System.out.println(user.getUsername());
             Prompt.failed("Invalid Username or Password! Please try again!");
         }
     }

@@ -7,6 +7,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends CrudRepository<User,Integer> {
 
-    @Query(value = "SELECT password FROM user WHERE username=:username", nativeQuery = true)
-    String findPasswordByUsername(@Param("username") String username);
+    @Query(value = "SELECT * FROM user WHERE username=:username", nativeQuery = true)
+    User findByUsername(@Param("username") String username);
 }

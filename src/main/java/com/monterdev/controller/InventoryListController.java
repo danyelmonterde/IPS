@@ -27,6 +27,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -46,8 +47,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
@@ -124,6 +125,10 @@ public class InventoryListController implements Initializable {
     private JFXButton btnStockAdjustment;
     @FXML
     private JFXButton btnOverview;
+    @FXML
+    private Circle lowStockCircle;
+    @FXML
+    private Circle outOfStockCircle;
 
     ////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////
@@ -164,7 +169,8 @@ public class InventoryListController implements Initializable {
     private static String CURRENT_SELECTED_STOCK_ALERT = "";
 
 
-    private ScheduledExecutorService timer;
+    private ScheduledExecutorService currentTimeUpdater;
+    private ScheduledExecutorService lowStockAndOutOfStockNotifier;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -196,7 +202,28 @@ public class InventoryListController implements Initializable {
     }
 
     private void indicatorsOnLoad() {
+        lowStockCircle.visibleProperty().addListener((observable,oldValue,newValue)->{
 
+        });
+        outOfStockCircle.visibleProperty().addListener((observable,oldValue,newValue)->{
+
+        });
+        lowStockLabel.visibleProperty().addListener((observable,oldValue,newValue)->{
+
+        });
+        outOfStockLabel.visibleProperty().addListener((observable,oldValue,newValue)->{
+
+        });
+        lowStockIndicator.visibleProperty().addListener((observable,oldValue,newValue)->{
+
+        });
+        outOfStockIndicator.visibleProperty().addListener((observable,oldValue,newValue)->{
+
+        });
+        lowStockCircle.setVisible(false);
+        outOfStockCircle.setVisible(false);
+        lowStockLabel.setVisible(false);
+        outOfStockLabel.setVisible(false);
     }
 
     private void progressBarOnLoad() {
@@ -254,26 +281,53 @@ public class InventoryListController implements Initializable {
 
     private void initializeDateLabel() {
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-DD-YYYY HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMM-yyy");
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("hh:mm a");
         currentDateLabel.textProperty().addListener((obs, oldValue, newValue) -> {
             if (oldValue != newValue) {
 
             }
         });
 
-        Runnable frameGrabber = new Runnable() {
+        Runnable timeUpdater = () -> Platform.runLater(() -> {
+            LocalDateTime localDateTime = AppTime.now();
+            currentDateLabel.setText(localDateTime.format(formatter) +" "+localDateTime.format(formatter1));
+            loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
+        });
 
-            @Override
-            public void run() {
-                Platform.runLater(() -> {
-                    currentDateLabel.setText(AppTime.now().format(formatter));
-                    loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
-                });
+        Runnable stockNotifier = () -> Platform.runLater(() -> {
+            int numberOfLowStocks=itemsRepository.getLowStockItems();
+            int numberOfOutOfStock=itemsRepository.getOutOfStockItems();
+            if(numberOfLowStocks>0){
+                lowStockIndicator.setText(String.valueOf(numberOfLowStocks));
+                lowStockIndicator.setVisible(true);
+                lowStockLabel.setVisible(true);
+                lowStockCircle.setVisible(true);
+            }else{
+                lowStockIndicator.setText("0");
+                lowStockIndicator.setVisible(false);
+                lowStockLabel.setVisible(false);
+                lowStockCircle.setVisible(false);
             }
-        };
 
-        this.timer = Executors.newSingleThreadScheduledExecutor();
-        this.timer.scheduleAtFixedRate(frameGrabber, 0, 60, TimeUnit.SECONDS);
+            if(numberOfOutOfStock>0){
+                outOfStockIndicator.setText(String.valueOf(numberOfOutOfStock));
+                outOfStockLabel.setVisible(true);
+                outOfStockIndicator.setVisible(true);
+                outOfStockCircle.setVisible(true);
+            }else{
+                outOfStockIndicator.setText("0");
+                outOfStockLabel.setVisible(false);
+                outOfStockIndicator.setVisible(false);
+                outOfStockCircle.setVisible(false);
+            }
+        });
+
+        this.currentTimeUpdater = Executors.newSingleThreadScheduledExecutor();
+        this.currentTimeUpdater.scheduleAtFixedRate(timeUpdater, 0, 60, TimeUnit.SECONDS);
+
+        this.lowStockAndOutOfStockNotifier = Executors.newSingleThreadScheduledExecutor();
+        this.lowStockAndOutOfStockNotifier.scheduleAtFixedRate(stockNotifier, 0, 1, TimeUnit.SECONDS);
 
     }
 

@@ -159,6 +159,8 @@ public class MainDashboardController implements Initializable {
     private SearchEngineController searchEngineController;
     @Autowired
     private SelectedRisTemplate selectedRisTemplate;
+    @Autowired
+    private User user;
 
     private List<String> responseList = new ArrayList<>();
     private static int rowIndex = 0;
@@ -669,8 +671,12 @@ public class MainDashboardController implements Initializable {
 
     public void getLogoutModule(ActionEvent actionEvent) {
         resetSelectedItem();
+        user.setUsername(null);
+        user.setIsAdmin(null);
+        user.setIsSuperAdmin(null);
+        user.setPassword(null);
+        user.setId(0);
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
-        
         new StageLoader().load(LoginController.class, applicationContext,currentStage);
     }
 
