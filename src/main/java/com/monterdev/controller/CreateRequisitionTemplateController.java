@@ -3,7 +3,7 @@ package com.monterdev.controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import com.monterdev.constants.GlobalConfiguration;
+import com.monterdev.configuration.GlobalConfiguration;
 import com.monterdev.model.InventoryType;
 import com.monterdev.model.RisType;
 import com.monterdev.model.RisTypeNames;

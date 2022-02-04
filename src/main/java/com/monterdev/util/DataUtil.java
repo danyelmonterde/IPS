@@ -9,6 +9,8 @@ public class DataUtil {
             return Double.parseDouble(String.format("%.2f", Double.parseDouble(text)));
         }catch (IllegalFormatException exception){
             return 0.0;
+        }catch (Exception e){
+            return 0.0;
         }
 
     }
@@ -18,6 +20,6 @@ public class DataUtil {
     }
 
     public static Double formatToDouble(Double text){
-        return Double.parseDouble(String.format("%.2f", text));
+        return DataUtil.formatDouble(String.format("%.2f", text));
     }
 }

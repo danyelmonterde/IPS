@@ -76,6 +76,13 @@ public class OnloadConfiguration {
         return new Item().builder().item_name("").build();
     }
 
+    @Bean
+    public CapturedItem capturedItem(){
+        CapturedItem capturedItem = new CapturedItem();
+        capturedItem.setSku(0);
+        return capturedItem;
+    }
+
 
     @Bean
     @Qualifier("itemLists")

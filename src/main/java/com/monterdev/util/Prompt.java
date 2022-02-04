@@ -15,7 +15,7 @@ public class Prompt {
     public static void success(String message){
         Alert alert = new Alert(Alert.AlertType.INFORMATION, message);
         alert.show();
-        Timeline idlestage = new Timeline( new KeyFrame( Duration.seconds(1 ), new EventHandler<ActionEvent>()
+        Timeline idlestage = new Timeline( new KeyFrame( Duration.seconds(3 ), new EventHandler<ActionEvent>()
         {
 
             @Override
@@ -32,6 +32,17 @@ public class Prompt {
     public static void failed(String message){
         Alert alert = new Alert(Alert.AlertType.ERROR, message);
         alert.show();
+        Timeline idlestage = new Timeline( new KeyFrame( Duration.seconds(5), new EventHandler<ActionEvent>()
+        {
+
+            @Override
+            public void handle( ActionEvent event )
+            {
+                alert.hide();
+            }
+        } ) );
+        idlestage.setCycleCount( 1 );
+        idlestage.play();
     }
 
     public static Optional<ButtonType> confirm(String message){

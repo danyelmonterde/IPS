@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static com.monterdev.constants.GlobalConfiguration.*;
+import static com.monterdev.configuration.GlobalConfiguration.*;
 
 @Component
 @FxmlView("CustomizeRis.fxml")

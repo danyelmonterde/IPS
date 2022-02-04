@@ -82,7 +82,11 @@
     },
     {
       "configId": "ITEMS_STOCK_ALERTS",
-      "configValue": "All Items, Low Stock, Out of Stock"
+      "configValue": "All STOCKS,LOW STOCK,OUT OF STOCK"
+    },
+    {
+      "configId": "ITEMS_STOCK_ADJUSTMENT_REASON",
+      "configValue": "RECEIVE ITEMS,INVENTORY COUNT,LOSS,DAMAGE,ITEM UPDATE"
     },
     {
       "configId": "ITEMS_SETTINGS_CONTEXT_MENU",

@@ -79,6 +79,16 @@
                                           <Font size="10.0" />
                                        </font>
                                     </JFXTextField>
+                                    <JFXComboBox fx:id="tab2ComboRisTypeName" labelFloat="true" promptText="RIS TYPE NAME">
+                                       <HBox.margin>
+                                          <Insets left="20.0" />
+                                       </HBox.margin>
+                                    </JFXComboBox>
+                                    <JFXTextField fx:id="tab2JrxmlReportFileName" promptText="JRXML REPORT FILE NAME">
+                                       <HBox.margin>
+                                          <Insets left="20.0" />
+                                       </HBox.margin>
+                                    </JFXTextField>
                                     <JFXButton fx:id="tab2BtnSave" buttonType="RAISED" style="-fx-background-color: green;" text="SAVE" textFill="WHITE">
                                        <font>
                                           <Font name="System Bold" size="10.0" />

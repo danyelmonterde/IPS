@@ -1,5 +1,7 @@
 package com.monterdev.constants;
 
+import com.monterdev.configuration.GlobalConfiguration;
+
 public class ErrorConstants {
 
     private static final String APP_ERROR_MESSAGE = "APP_ERROR_MESSAGE";

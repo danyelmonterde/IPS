@@ -10,21 +10,17 @@ import lombok.Setter;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.sql.Date;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.monterdev.constants.DateConstants.*;
-import static com.monterdev.constants.GlobalConfiguration.*;
+import static com.monterdev.configuration.GlobalConfiguration.*;
 import static com.monterdev.constants.InventoryTypeConstants.*;
 import static com.monterdev.constants.ReportFieldsConstant.*;
 
@@ -148,7 +144,7 @@ public class ReportUtil {
             Map<String, Object> objectMap = new HashMap<>();
             objectMap.put("PURCHASE_LIST", po.getItem_name());
             objectMap.put("SALES_INVOICE_NUMBER", purchaseOrderNumber);
-            objectMap.put("PURCHASED_AMOUNT", String.valueOf(po.getAmount()));
+            objectMap.put("PURCHASED_AMOUNT", String.format("%d",(long)po.getAmount()));
 
             mapList.add(objectMap);
             purchaseAmount += po.getAmount();
@@ -210,7 +206,7 @@ public class ReportUtil {
             double totalCostPerRisType = salesRepository.computeTotalCostPerRISType(ris, randomDate);
             Map<String, Object> objectMap = new HashMap<>();
             objectMap.put("RIS_TYPE_NAMES_LIST", risTypeNamesRepository.findRisNameByType(ris).getRisname());
-            objectMap.put("TOTAL_COST_OF_RIS", String.valueOf(totalCostPerRisType));
+            objectMap.put("TOTAL_COST_OF_RIS",String.format("%d",(long)totalCostPerRisType));
             mapList.add(objectMap);
             totalMaterialsIssued += totalCostPerRisType;
         });
@@ -268,7 +264,7 @@ public class ReportUtil {
             result = balanceRepository.getTotalBeginningBalanceForThisMonth( previousMonth, year);
         }
 
-        return String.valueOf(result);
+        return String.format("%d",(long)result);
     }
 
     private void createTotalInventoryReport() throws JRException{
@@ -278,23 +274,21 @@ public class ReportUtil {
         totalBalanceListForThisMonth.stream().forEach(e->{
             Map<String,Object> map = new HashMap<>();
             map.put("INVENTORY_NAME",e.getCategory());
-            map.put("INVENTORY_END_BALANCE",String.valueOf(e.getEndbalance()));
+            map.put("INVENTORY_END_BALANCE",String.format("%d",(long)e.getEndbalance()));
             inventoryListAndEndingBalances.add(map);
         });
         JRBeanCollectionDataSource totalInventoryDatasource = new JRBeanCollectionDataSource(inventoryListAndEndingBalances);
 
         Map<String, Object> titleParams = new HashMap<>();
-        String beginningBalance = computeBeginningBalanceInventory();
         titleParams.put(COMPANY_NAME_FIELD, getConfigValue(companyName));
         titleParams.put(STREET_ADDRESS_FIELD, getConfigValue(companyAddress));
         titleParams.put(REPORT_NAME_FIELD, selectedReport);
         titleParams.put(SELECTED_MONTH_FIELD, selectedMonth);
         titleParams.put(SELECTED_YEAR_FIELD, selectedYear);
-        titleParams.put(BEGINNING_BALANCE_INVENTORY_FIELD, beginningBalance);
 
 
         double totalEndingBalance = totalBalanceListForThisMonth.stream().mapToDouble(Balance::getEndbalance).sum();
-        titleParams.put(TOTAL_COST_FIELD, String.valueOf(totalEndingBalance));
+        titleParams.put(TOTAL_COST_FIELD,String.format("%d",(long)totalEndingBalance));
 
 
         this.setReportPreparedBy(signatoryRepository.findSignatoryByRole(PREPARED_BY_ROLE_FIELD, reportId).getSignatory());
@@ -337,7 +331,7 @@ public class ReportUtil {
         titleParams.put(REPORT_NAME_FIELD, selectedReport);
         titleParams.put(SELECTED_MONTH_FIELD, selectedMonth);
         titleParams.put(SELECTED_YEAR_FIELD, selectedYear);
-        totalMaterialsForUse = purchaseAmount + Double.parseDouble(beginningBalance);
+        totalMaterialsForUse = purchaseAmount + DataUtil.formatDouble(beginningBalance);
         titleParams.put(BEGINNING_BALANCE_INVENTORY_FIELD, beginningBalance);
         titleParams.put(TOTAL_COST_FIELD, String.valueOf(totalMaterialsForUse));
         double totalEndingBalance = totalMaterialsForUse - totalMaterialsIssued;

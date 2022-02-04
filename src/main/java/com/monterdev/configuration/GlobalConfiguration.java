@@ -1,10 +1,11 @@
-package com.monterdev.constants;
+package com.monterdev.configuration;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.monterdev.configuration.JsonFileConfiguration;
+import com.monterdev.constants.ErrorConstants;
 import com.monterdev.exception.IqwdException;
 import com.monterdev.model.CustomConfig;
 import org.springframework.context.annotation.Configuration;

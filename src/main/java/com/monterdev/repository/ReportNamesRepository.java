@@ -14,4 +14,7 @@ public interface ReportNamesRepository extends CrudRepository<ReportNames, Integ
 
     @Query(value = "SELECT description FROM reportnames where name=:name", nativeQuery = true)
     String findReportDescription(@Param("name") String name);
+
+    @Query(value = "SELECT * FROM reportnames where id=:id", nativeQuery = true)
+    ReportNames findReportNameById(@Param("id") int id);
 }

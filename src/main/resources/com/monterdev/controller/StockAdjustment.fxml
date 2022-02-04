@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="331.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.StockAdjustmentController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.monterdev.controller.StockAdjustmentController">
    <children>
-      <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
@@ -31,10 +33,13 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <JFXTextField fx:id="txtSearchItem" labelFloat="true" prefHeight="25.0" prefWidth="400.0" promptText="SEACH ITEM HERE">
+                  <JFXTextField fx:id="txtSearchItem" alignment="CENTER" labelFloat="true" prefHeight="25.0" prefWidth="400.0" promptText="SEACH ITEM HERE">
                      <HBox.margin>
                         <Insets left="20.0" top="20.0" />
                      </HBox.margin>
+                     <font>
+                        <Font size="15.0" />
+                     </font>
                   </JFXTextField>
                </children>
             </HBox>
@@ -48,17 +53,12 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <JFXTextField fx:id="txtItemName" promptText="ITEM_NAME">
+                  <JFXTextField fx:id="txtItemName" labelFloat="true" promptText="ITEM_NAME">
                      <HBox.margin>
                         <Insets left="20.0" top="20.0" />
                      </HBox.margin>
                   </JFXTextField>
-                  <JFXTextField fx:id="txtQuantity" promptText="QUANTITY">
-                     <HBox.margin>
-                        <Insets left="20.0" top="20.0" />
-                     </HBox.margin>
-                  </JFXTextField>
-                  <JFXTextField fx:id="txtCost" promptText="COST">
+                  <JFXTextField fx:id="txtCost" labelFloat="true" promptText="COST">
                      <HBox.margin>
                         <Insets left="20.0" top="20.0" />
                      </HBox.margin>
@@ -67,16 +67,22 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <JFXTextField fx:id="txtInStock" promptText="IN STOCK">
+                  <JFXTextField fx:id="txtInStock" labelFloat="true" promptText="IN STOCK">
                      <HBox.margin>
                         <Insets left="20.0" top="20.0" />
                      </HBox.margin>
                   </JFXTextField>
-                  <JFXTextField fx:id="txtLowStock" promptText="LOW STOCK">
+                  <JFXTextField fx:id="txtLowStock" labelFloat="true" promptText="LOW STOCK">
                      <HBox.margin>
                         <Insets left="20.0" top="20.0" />
                      </HBox.margin>
                   </JFXTextField>
+                  <JFXComboBox fx:id="comboReason" labelFloat="true" promptText="REASON">
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXComboBox>
+                  <Label fx:id="hiddenSku" text="sku" visible="false" />
                </children>
             </HBox>
             <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0">
@@ -91,6 +97,29 @@
                         <Insets left="20.0" />
                      </HBox.margin>
                   </JFXButton>
+               </children>
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox prefHeight="720.0" prefWidth="1280.0">
+               <children>
+                  <TableView fx:id="tableResult" prefHeight="135.0" prefWidth="1240.0" HBox.hgrow="ALWAYS">
+                    <columns>
+                      <TableColumn fx:id="columnSku" editable="false" prefWidth="75.0" style="-fx-alignment: center; -fx-font-size: 14px;" text="SKU" />
+                      <TableColumn fx:id="columnName" editable="false" prefWidth="75.0" style="-fx-alignment: center; -fx-font-size: 14px;" text="Item Name" />
+                        <TableColumn fx:id="columnCategory" editable="false" prefWidth="75.0" style="-fx-alignment: center; -fx-font-size: 14px;" text="Item Category" />
+                        <TableColumn fx:id="columnCost" editable="false" prefWidth="75.0" style="-fx-alignment: center; -fx-font-size: 14px;" text="Cost" />
+                        <TableColumn fx:id="columnInStock" editable="false" prefWidth="75.0" style="-fx-alignment: center; -fx-font-size: 14px;" text="In Stock" />
+                        <TableColumn fx:id="columnLowStock" editable="false" prefWidth="75.0" style="-fx-alignment: center; -fx-font-size: 14px;" text="Low Stock" />
+                    </columns>
+                     <HBox.margin>
+                        <Insets bottom="20.0" left="20.0" right="20.0" />
+                     </HBox.margin>
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                  </TableView>
                </children>
                <VBox.margin>
                   <Insets top="20.0" />

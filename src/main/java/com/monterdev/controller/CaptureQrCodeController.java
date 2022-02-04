@@ -1,6 +1,7 @@
 package com.monterdev.controller;
 
 import com.jfoenix.controls.JFXButton;
+import com.monterdev.model.CapturedItem;
 import com.monterdev.model.Item;
 import com.monterdev.util.OpenCvUtils;
 import com.monterdev.util.StageLoader;
@@ -45,6 +46,9 @@ public class CaptureQrCodeController {
     @Autowired
     private Item item;
 
+    @Autowired
+    private CapturedItem capturedItem;
+
     @FXML
     private Label labelStatus = new Label();
 
@@ -69,7 +73,7 @@ public class CaptureQrCodeController {
     public void cancelCapture(ActionEvent actionEvent) {
         stopAcquisition();
         Stage stage = (Stage) cancelButton.getScene().getWindow();
-        new StageLoader().load(EditItemController.class, applicationContext,stage);
+        new StageLoader().load(MainDashboardController.class, applicationContext,stage);
     }
 
     public void startCamera(ActionEvent actionEvent) {
@@ -97,9 +101,10 @@ public class CaptureQrCodeController {
                         Mat points = new Mat();
                         Image imageToShow = null;
                         String sku = decoder.detectAndDecode(frame, points).intern();
+                        imageToShow = OpenCvUtils.mat2Image(frame);
+                        updateImageView(currentFrame, imageToShow);
                         if (!ObjectUtils.isEmpty(sku)) {
-                            imageToShow = OpenCvUtils.mat2Image(frame);
-                            updateImageView(currentFrame, imageToShow);
+
                             stopAcquisition();
                             points = null;
                             decoder = null;
@@ -108,11 +113,11 @@ public class CaptureQrCodeController {
                             Platform.runLater(() -> {
 
                                 labelStatus.setText(sku);
-                                item.setSku(Integer.parseInt(sku));
-                                item.setItem_name(sku);
+                                capturedItem.setSku(Integer.parseInt(sku));
+                                capturedItem.setItem_name(sku);
                                 System.gc();
                                 Stage stage = (Stage) openCamera.getScene().getWindow();
-                                new StageLoader().load(MainDashboardController.class, applicationContext,stage);
+                                stage.close();
 
                             });
 
@@ -135,7 +140,7 @@ public class CaptureQrCodeController {
                 };
 
                 this.timer = Executors.newSingleThreadScheduledExecutor();
-                this.timer.scheduleAtFixedRate(frameGrabber, 0, 1, TimeUnit.SECONDS);
+                this.timer.scheduleAtFixedRate(frameGrabber, 0, 100, TimeUnit.MILLISECONDS);
 
                 // update the button content
                 // this.openCamera.setText("Stop Camera");

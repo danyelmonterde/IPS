@@ -9,6 +9,7 @@ import com.monterdev.model.*;
 import com.monterdev.repository.*;
 import com.monterdev.util.*;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -26,8 +27,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -44,12 +47,17 @@ import org.springframework.util.ObjectUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.monterdev.constants.GlobalConfiguration.*;
+import static com.monterdev.configuration.GlobalConfiguration.*;
+import static com.monterdev.constants.HistoryConstants.RELEASED_ITEM;
 import static com.monterdev.constants.InventoryTypeConstants.SUMMARY;
 import static com.monterdev.util.ComponentCreator.createButtonWithoutText;
 import static com.monterdev.util.ComponentCreator.createTextField;
@@ -127,6 +135,8 @@ public class MainDashboardController implements Initializable {
     @Autowired
     private Item selectedItem;
     @Autowired
+    private CapturedItem capturedItem;
+    @Autowired
     @Qualifier("itemLists")
     private List<Item> itemLists;
     @Autowired
@@ -174,10 +184,24 @@ public class MainDashboardController implements Initializable {
     private double totalSales = 0; //;total amount na may 20% na patong pag new
     private double totalCost = 0; //lahat ng average cost
     private double totalIncome = 0; //totalSales - totalCost
+    private boolean isFirstCharacter =true;
+    private boolean isItemOnCart;
+    private ScheduledExecutorService currentTimeUpdater;
 
     @SneakyThrows
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        Runnable timeUpdater = () -> Platform.runLater(() -> {
+            if(capturedItem.getSku()!=0){
+                selectedItem.setSku(capturedItem.getSku());
+                selectedItem.setItem_name(capturedItem.getItem_name());
+                sku.setText(String.valueOf(capturedItem.getSku()));
+            }
+        });
+
+        this.currentTimeUpdater = Executors.newSingleThreadScheduledExecutor();
+        this.currentTimeUpdater.scheduleAtFixedRate(timeUpdater, 0, 1, TimeUnit.SECONDS);
 
         Exit.setOnMouseClicked(event -> {
             System.exit(-176);
@@ -272,7 +296,7 @@ public class MainDashboardController implements Initializable {
 
         });
 
-        refreshReleaseItemsOnMouseHover();
+       // refreshReleaseItemsOnMouseHover();
         addItemOnAction();
         searchItemOnDashboard();
         purchaseExistingItemButtonOnAction();
@@ -281,7 +305,7 @@ public class MainDashboardController implements Initializable {
     private void purchaseExistingItemButtonOnAction() {
         purchaseExistingItemButton.setOnAction(add -> {
             Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
-            new StageLoader().load(InventoryListController.class, applicationContext,currentStage);
+            new StageLoader().load(InventoryListController.class, applicationContext, currentStage);
         });
     }
 
@@ -289,7 +313,7 @@ public class MainDashboardController implements Initializable {
     private void addItemOnAction() {
         addItemButton.setOnAction(add -> {
             Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
-            new StageLoader().load(AddItemController.class, applicationContext,currentStage);
+            new StageLoader().load(AddItemController.class, applicationContext, currentStage);
         });
     }
 
@@ -318,7 +342,7 @@ public class MainDashboardController implements Initializable {
 
         Item currentItem = new Item();
         itemLists.stream().forEach(s -> {
-            if (s.getSku() == item.getSku()) {
+            if (s.getSku() == item.getSku() && (!(item.getItem_name().equalsIgnoreCase(s.getItem_name())))) {
                 currentItem.setLow_stock(s.getLow_stock());
                 currentItem.setTag(null);
                 currentItem.setCost(s.getCost());
@@ -332,6 +356,7 @@ public class MainDashboardController implements Initializable {
         });
 
         itemCart.add(currentItem);
+
 
         JFXTextField name = createTextField("ITEM NAME", "LIGHT GRAY");
         name.setText(currentItem.getItem_name());
@@ -359,15 +384,15 @@ public class MainDashboardController implements Initializable {
         cost.setText(String.valueOf(currentItem.getCost()));
         cost.textProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
-                itemCart.get(Integer.parseInt(cost.getId())).setCost(Double.parseDouble(newValue));
-                amount.setText(String.format("%.2f", currentItem.getQuantity() * Double.parseDouble(newValue)));
+                itemCart.get(Integer.parseInt(cost.getId())).setCost(DataUtil.formatDouble(newValue));
+                amount.setText(String.format("%.2f", currentItem.getQuantity() * DataUtil.formatDouble(newValue)));
 
                 if (requisitionIssueSlip.getIs_customer_new() == 1) {
-                    amount.setText(String.format("%.2f", currentItem.getQuantity() * Double.parseDouble(newValue) + (Double.parseDouble(newValue) * .2)));
+                    amount.setText(String.format("%.2f", currentItem.getQuantity() * DataUtil.formatDouble(newValue) + (DataUtil.formatDouble(newValue) * .2)));
                 } else {
-                    amount.setText(String.format("%.2f", currentItem.getQuantity() * Double.parseDouble(newValue)));
+                    amount.setText(String.format("%.2f", currentItem.getQuantity() * DataUtil.formatDouble(newValue)));
                 }
-                currentItem.setCost(Double.parseDouble(newValue));
+                currentItem.setCost(DataUtil.formatDouble(newValue));
             }
         });
 
@@ -403,30 +428,31 @@ public class MainDashboardController implements Initializable {
 
         amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
 
-        JFXButton delete = createButtonWithoutText("DELETE");
-        delete.setId(Integer.toString(currentIndex));
-        delete.setOnAction(del -> {
-            try {
-                int indexOfItemToBeDeleted = itemCart.indexOf(currentItem);
-
-                if (vBox.getChildren().size() == 1) {
-                    rowIndex = 0;
-                    selectedItem.setSku(0);
-                    vBox.getChildren().clear();
-                    itemCart.clear();
-                    midHbox.getChildren().remove(1);
-                } else {
-                    itemCart.remove(Integer.parseInt(delete.getId()));
-                    vBox.getChildren().remove(indexOfItemToBeDeleted);
-                    midHbox.getChildren().remove(1);
-                }
-            } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
-                vBox.getChildren().clear();
-            } catch (Exception exception) {
-                vBox.getChildren().clear();
-            }
-
-        });
+//        JFXButton delete = createButtonWithoutText("DELETE");
+//        delete.setId(Integer.toString(currentIndex));
+//        delete.setOnAction(del -> {
+//            try {
+//                int indexOfItemToBeDeleted = itemCart.indexOf(currentItem);
+//
+//                if (vBox.getChildren().size() == 1) {
+//                    rowIndex = 0;
+//                    selectedItem.setSku(0);
+//                    vBox.getChildren().clear();
+//                    itemCart.clear();
+//                    midHbox.getChildren().remove(1);
+//                } else {
+//                    selectedItem.setSku(0);
+//                    itemCart.remove(Integer.parseInt(delete.getId()));
+//                    vBox.getChildren().remove(indexOfItemToBeDeleted);
+//                    midHbox.getChildren().remove(1);
+//                }
+//            } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+//                vBox.getChildren().clear();
+//            } catch (Exception exception) {
+//                vBox.getChildren().clear();
+//            }
+//
+//        });
 
 
         HBox hBox = new HBox();
@@ -434,8 +460,7 @@ public class MainDashboardController implements Initializable {
         HBox.setMargin(quantity, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(cost, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(amount, new Insets(50.0, 0.0, 0.0, 20.0));
-        HBox.setMargin(delete, new Insets(35.0, 0.0, 0.0, 20.0));
-        hBox.getChildren().addAll(name, quantity, cost, amount, delete);
+        hBox.getChildren().addAll(name, quantity, cost, amount);
 
         return hBox;
 
@@ -490,10 +515,10 @@ public class MainDashboardController implements Initializable {
                 reportUtil.setSelectedReport(newValue.getName());
                 reportUtil.setReportId(newValue.getId());
                 reportUtil.setSelectedReportRisTypeCode(newValue.getRisTypeName());//ex.CM-NEW CONNECTION
-                reportUtil.setFILE_UPPER_PART(new File(getReportJrxmlLocation()+newValue.getJrxmlReportFileName()+".jrxml"));
+                reportUtil.setFILE_UPPER_PART(new File(getReportJrxmlLocation() + newValue.getJrxmlReportFileName() + ".jrxml"));
                 reportUtil.setInventoryType(newValue.getInventorytype());
-                if(newValue.getRisTypeName().equalsIgnoreCase(SUMMARY)  ){
-                    reportUtil.setFILE_LOWER_PART(new File(getReportJrxmlLocation()+"SINGLE_INVENTORY_SUMMARY_LOWER_PART.jrxml"));
+                if (newValue.getRisTypeName().equalsIgnoreCase(SUMMARY)) {
+                    reportUtil.setFILE_LOWER_PART(new File(getReportJrxmlLocation() + "SINGLE_INVENTORY_SUMMARY_LOWER_PART.jrxml"));
                 }
             }
         });
@@ -538,10 +563,11 @@ public class MainDashboardController implements Initializable {
 
     public void getAddItemModule() {
         Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
-        new StageLoader().load(AddItemController.class, applicationContext,currentStage);
+        new StageLoader().load(AddItemController.class, applicationContext, currentStage);
     }
 
     private void resetSelectedItem() {
+        capturedItem = applicationContext.getBean(CapturedItem.class);
         selectedItem = applicationContext.getBean(Item.class);
         selectedItem.setTag(null);
         selectedItem.setItem_name("");
@@ -551,6 +577,8 @@ public class MainDashboardController implements Initializable {
         selectedItem.setCost(0.0);
         selectedItem.setItem_category(getDefaultCategoryData());
         selectedItem.setIn_stock(0);
+        capturedItem.setSku(0);
+        capturedItem.setItem_name("");
     }
 
     public void getDashboardModule(ActionEvent actionEvent) {
@@ -574,12 +602,12 @@ public class MainDashboardController implements Initializable {
         jfxBtnPurchaseItem.setOnAction(e -> {
 
             Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
-            new StageLoader().load(EditItemController.class, applicationContext,currentStage);
+            new StageLoader().load(EditItemController.class, applicationContext, currentStage);
         });
 
         jfxBtnAddItem.setOnAction(e -> {
             Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
-            new StageLoader().load(AddItemController.class, applicationContext,currentStage);
+            new StageLoader().load(AddItemController.class, applicationContext, currentStage);
         });
 
         jfxBtnReleaseItem.setOnAction(f -> {
@@ -611,14 +639,14 @@ public class MainDashboardController implements Initializable {
 
     private void getCustomizeRIS() {
         Stage stage = new Stage();
-        new StageLoader().load(CustomizeRequisitionIssueSlipController.class, applicationContext,stage);
+        new StageLoader().load(CustomizeRequisitionIssueSlipController.class, applicationContext, stage);
     }
 
     public void getInventoryModule(ActionEvent actionEvent) {
         resetHboxes();
         Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
-        new StageLoader().load(InventoryListController.class, applicationContext,currentStage);
-        
+        new StageLoader().load(InventoryListController.class, applicationContext, currentStage);
+
     }
 
     public void getCustomersModule(ActionEvent actionEvent) {
@@ -637,32 +665,32 @@ public class MainDashboardController implements Initializable {
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
 
         createMasterData.setOnAction(e -> {
-            new StageLoader().load(MasterDataController.class, applicationContext,currentStage);
-            
+            new StageLoader().load(MasterDataController.class, applicationContext, currentStage);
+
         });
 
-        updatePassword.setOnAction(e ->{
-            new StageLoader().load(UpdatePasswordController.class, applicationContext,currentStage);
-            
+        updatePassword.setOnAction(e -> {
+            new StageLoader().load(UpdatePasswordController.class, applicationContext, currentStage);
+
         });
 
-        rolesAndPrivileges.setOnAction(e ->{
-            new StageLoader().load(AdminRolesController.class, applicationContext,currentStage);
-            
+        rolesAndPrivileges.setOnAction(e -> {
+            new StageLoader().load(AdminRolesController.class, applicationContext, currentStage);
+
         });
 
 
-        stockAdjusment.setOnAction(e ->{
-            new StageLoader().load(StockAdjustmentController.class, applicationContext,currentStage);
-            
+        stockAdjusment.setOnAction(e -> {
+            new StageLoader().load(StockAdjustmentController.class, applicationContext, currentStage);
+
         });
 
-        balanceSettings.setOnAction(e ->{
-            new StageLoader().load(BalanceSettingsController.class, applicationContext,currentStage);
-            
+        balanceSettings.setOnAction(e -> {
+            new StageLoader().load(BalanceSettingsController.class, applicationContext, currentStage);
+
         });
 
-        topHbox.getChildren().addAll(createMasterData, updatePassword, rolesAndPrivileges,balanceSettings,stockAdjusment);
+        topHbox.getChildren().addAll(createMasterData, updatePassword, rolesAndPrivileges, balanceSettings, stockAdjusment);
         topHbox.setAlignment(Pos.CENTER);
         midHbox.setAlignment(Pos.CENTER);
         bottomHbox.setAlignment(Pos.CENTER);
@@ -677,7 +705,7 @@ public class MainDashboardController implements Initializable {
         user.setPassword(null);
         user.setId(0);
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
-        new StageLoader().load(LoginController.class, applicationContext,currentStage);
+        new StageLoader().load(LoginController.class, applicationContext, currentStage);
     }
 
     public void createRequisitionIssueSlip() {
@@ -701,28 +729,54 @@ public class MainDashboardController implements Initializable {
         AnchorPane.setBottomAnchor(vbox, 0.0);
 
         scrollPane.setContent(anchorPane);
-        HBox.setMargin(scrollPane, new Insets(0.0, 20.0, 0.0, 0.0));
+        HBox.setMargin(scrollPane, new Insets(0.0, 20.0, 20.0, 0.0));
 
         JFXTextField itemName = new JFXTextField();
+
         itemName.textProperty().addListener((observableValue, oldValue, newValue) -> {
             if (oldValue != newValue) {
-                searchUtil.searchItem(newValue, itemLists, responseList, "NAME");
+
+                if(isFirstCharacter && itemName.getText().length()==1){
+                    midHbox.getChildren().add(listView);
+                    isFirstCharacter = false;
+                }
+                searchUtil.searchItem(itemName.getText(), itemLists, responseList, "NAME");
                 if (responseList.size() > 0) {
 
-                    HBox.setMargin(listView, new Insets(20.0, 0.0, 20.0, 20.0));
+                    HBox.setMargin(listView, new Insets(20.0, 20.0, 20.0, 20.0));
+                    listView.getItems().clear();
                     responseList.stream().forEach(data -> {
-                        listView.getItems().clear();
+
                         listView.getItems().add(data);
-                        listView.setOnMouseClicked(e -> {
-                            if (e.getClickCount() == 2) {
-                                Optional<Item> optionalItem = itemLists.stream().filter(f -> f.getItem_name().equalsIgnoreCase(listView.getSelectionModel().getSelectedItem().toString())).findFirst();
+
+                    });
+                    listView.setOnMouseClicked(e -> {
+                        if (e.getClickCount() == 2) {
+                            Optional<Item> optionalItem = itemLists.stream().filter(f -> f.getItem_name().equalsIgnoreCase(listView.getSelectionModel().getSelectedItem().toString())).findFirst();
+                            isItemOnCart = false;
+                            itemCart.stream().forEach(x->{
+                                if(x.getItem_name().equalsIgnoreCase(optionalItem.get().getItem_name())){
+                                    Prompt.failed("Item already in cart!");
+                                    isItemOnCart = true;
+                                }
+                            });
+                            if(optionalItem.get().getIn_stock() == 0){
+                                Prompt.failed("Item is out of Stock");
+                            }else if((optionalItem.get().getIn_stock()==optionalItem.get().getLow_stock()) && (isItemOnCart == false)){
+                                Prompt.failed("Item is Low Stock!");
+                                selectedItem.setSku(optionalItem.isPresent() ? optionalItem.get().getSku() : 0);
+                                sku.setText(String.valueOf(optionalItem.isPresent() ? optionalItem.get().getSku() : 0));
+                            }else if(isItemOnCart == false){
                                 selectedItem.setSku(optionalItem.isPresent() ? optionalItem.get().getSku() : 0);
                                 sku.setText(String.valueOf(optionalItem.isPresent() ? optionalItem.get().getSku() : 0));
                             }
-                        });
+
+
+
+                        }
                     });
 
-                    midHbox.getChildren().add(listView);
+
                 }
 
                 if (ObjectUtils.isEmpty(newValue)) {
@@ -743,6 +797,7 @@ public class MainDashboardController implements Initializable {
         itemName.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.BACK_SPACE) {
                 try {
+                    isFirstCharacter = true;
                     responseList.clear();
                     selectedItem.setSku(0);
                     midHbox.getChildren().retainAll(scrollPane);
@@ -753,30 +808,42 @@ public class MainDashboardController implements Initializable {
         });
 
         JFXButton openCamera = new JFXButton("Open Camera");
+        openCamera.setButtonType(JFXButton.ButtonType.RAISED);
+        openCamera.setStyle("-fx-background-color: NAVY BLUE;");
+        openCamera.setTextAlignment(TextAlignment.CENTER);
+        openCamera.setTextFill(Paint.valueOf("WHITE"));
+        openCamera.setFont(Font.font("System Bold",14.0));
+
         JFXButton viewRisDetails = new JFXButton("RIS Details");
+        viewRisDetails.setButtonType(JFXButton.ButtonType.RAISED);
+        viewRisDetails.setStyle("-fx-background-color: NAVY BLUE;");
+        viewRisDetails.setTextAlignment(TextAlignment.CENTER);
+        viewRisDetails.setTextFill(Paint.valueOf("WHITE"));
+        viewRisDetails.setFont(Font.font("System Bold",14.0));
 
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
         openCamera.setOnAction(e -> {
-            if(ObjectUtils.isEmpty(selectedRisTemplate.getSelectedRisTemplate())){
+            if (ObjectUtils.isEmpty(selectedRisTemplate.getSelectedRisTemplate())) {
                 Prompt.failed("Please set RIS Type first!");
                 Stage stage = new Stage();
                 currentStage.close();
-                new StageLoader().load(MainDashboardController.class, applicationContext,stage);
-            }else{
-                new StageLoader().load(CaptureQrCodeController.class, applicationContext,currentStage);
+                new StageLoader().load(MainDashboardController.class, applicationContext, stage);
+            } else {
+                Stage stage = new Stage();
+                new StageLoader().load(CaptureQrCodeController.class, applicationContext, stage);
             }
 
         });
 
         viewRisDetails.setOnAction(e -> {
-            if(ObjectUtils.isEmpty(selectedRisTemplate.getSelectedRisTemplate())){
+            if (ObjectUtils.isEmpty(selectedRisTemplate.getSelectedRisTemplate())) {
                 Prompt.failed("Please set RIS Type first!");
                 Stage stage = new Stage();
                 currentStage.close();
-                new StageLoader().load(MainDashboardController.class, applicationContext,stage);
-            }else{
+                new StageLoader().load(MainDashboardController.class, applicationContext, stage);
+            } else {
                 Stage stage = new Stage();
-                new StageLoader().load(RisDetailsController.class, applicationContext,stage);
+                new StageLoader().load(RisDetailsController.class, applicationContext, stage);
             }
 
         });
@@ -784,9 +851,29 @@ public class MainDashboardController implements Initializable {
         topHbox.getChildren().addAll(itemName, openCamera, viewRisDetails);
         midHbox.getChildren().addAll(scrollPane);
         midHbox.setPrefHeight(500.0);
+        HBox.setMargin(openCamera,new Insets(20.0, 20.0, 20.0, 20.0));
+        HBox.setMargin(viewRisDetails,new Insets(20.0, 20.0, 20.0, 20.0));
 
         JFXButton releaseItem = new JFXButton("RELEASE ITEM");
+        releaseItem.setButtonType(JFXButton.ButtonType.RAISED);
+        releaseItem.setStyle("-fx-background-color: GREEN;");
+        releaseItem.setTextAlignment(TextAlignment.CENTER);
+        releaseItem.setTextFill(Paint.valueOf("WHITE"));
+        releaseItem.setFont(Font.font("System Bold",14.0));
+
         JFXButton cancelButton = new JFXButton("CANCEL");
+        cancelButton.setButtonType(JFXButton.ButtonType.RAISED);
+        cancelButton.setStyle("-fx-background-color: RED;");
+        cancelButton.setTextAlignment(TextAlignment.CENTER);
+        cancelButton.setTextFill(Paint.valueOf("WHITE"));
+        cancelButton.setFont(Font.font("System Bold",14.0));
+
+        JFXButton deleteAllButton = new JFXButton("DELETE ALL ITEMS ON CART");
+        deleteAllButton.setButtonType(JFXButton.ButtonType.RAISED);
+        deleteAllButton.setStyle("-fx-background-color: black;");
+        deleteAllButton.setTextAlignment(TextAlignment.CENTER);
+        deleteAllButton.setTextFill(Paint.valueOf("WHITE"));
+        deleteAllButton.setFont(Font.font("System Bold",14.0));
 
 
         releaseItem.setOnAction(x -> {
@@ -797,17 +884,36 @@ public class MainDashboardController implements Initializable {
             cancelTransaction();
         });
 
-        bottomHbox.getChildren().addAll(releaseItem, cancelButton);
+        deleteAllButton.setOnAction(e->{
+            selectedItem.setSku(0);
+            itemCart.clear();
+            sku.setText("0");
+            rowIndex = 0;
 
-        HBox.setMargin(scrollPane, new Insets(20.0, 0.0, 0.0, 20.0));
+            ObservableList<Node> nodeStream = midHbox.getChildren();
+            for (Node node : nodeStream) {
+                if (node instanceof ScrollPane) {
+                    Node node2 = ((ScrollPane) node).getContent();
+                    if (node2 instanceof AnchorPane) {
+                        for (Node node3 : ((AnchorPane) node2).getChildren()) {
+                            if (node3 instanceof VBox) {
+                                VBox vBox = (VBox) node3;
+                                vBox.getChildren().clear();
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
-        try {
-            currentLocationBanner.setText(readQrCodeImage());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-        }
+        bottomHbox.getChildren().addAll(releaseItem, cancelButton,deleteAllButton);
+
+        HBox.setMargin(scrollPane, new Insets(20.0, 0.0, 20.0, 20.0));
+        HBox.setMargin(cancelButton, new Insets(20.0, 0.0, 20.0, 20.0));
+        HBox.setMargin(deleteAllButton, new Insets(20.0, 0.0, 20.0, 20.0));
+        HBox.setMargin(releaseItem, new Insets(20.0, 0.0, 20.0, 20.0));
+
+        currentLocationBanner.setText("RELEASE ITEMS");
     }
 
 
@@ -819,7 +925,7 @@ public class MainDashboardController implements Initializable {
     }
 
     private void releaseItemsOnCart() {
-        if (!ObjectUtils.isEmpty(itemCart) || selectedItem.getSku() != 0) {
+        if (!ObjectUtils.isEmpty(itemCart) && selectedItem.getSku() != 0) {
             itemCart.stream().forEach(item -> {
 
                 History history = new History();
@@ -827,7 +933,7 @@ public class MainDashboardController implements Initializable {
                 history.setItem_name(item.getItem_name());
                 history.setAdjustment(item.getQuantity() * -1);
                 history.setItem_category(item.getItem_category());
-                history.setReason("RELEASE ITEM");
+                history.setReason(RELEASED_ITEM);
                 history.setItem_category(item.getItem_category());
 
                 if (requisitionIssueSlip.getIs_customer_new() == 1) {
@@ -868,6 +974,7 @@ public class MainDashboardController implements Initializable {
                                 risTypeFieldsRepository.save(data);
                             });
                             Prompt.success("Item released!");
+                            isFirstCharacter = true;
                             risTypeFieldsList.clear();
                         } else {
                             Prompt.failed("Item could not be released! Please check RIS details!");

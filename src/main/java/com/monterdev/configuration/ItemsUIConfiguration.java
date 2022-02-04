@@ -1,4 +1,4 @@
-package com.monterdev.constants;
+package com.monterdev.configuration;
 
 
 import javafx.geometry.Insets;
@@ -39,6 +39,7 @@ public class ItemsUIConfiguration extends GlobalConfiguration {
     public static final String ITEMS_ROWS_PER_PAGE;
     public static final String EDIT_BUTTON;
     public static final String DELETE_BUTTON;
+    public static final String ITEMS_STOCK_ADJUSTMENT_REASON;
 
 
     static {
@@ -66,11 +67,16 @@ public class ItemsUIConfiguration extends GlobalConfiguration {
         ITEMS_ROWS_PER_PAGE="ITEMS_ROWS_PER_PAGE";
         DELETE_BUTTON="DELETE_BUTTON";
         EDIT_BUTTON="EDIT_BUTTON";
+        ITEMS_STOCK_ADJUSTMENT_REASON="ITEMS_STOCK_ADJUSTMENT_REASON";
     }
 
     //Custom getters/////////////////////////////////////
+
     public static String getAddItemsButtonName() {
         return getConfigValue(ITEMS_ADD_ITEM_BUTTON_NAME);
+    }
+    public static String getItemsStockAdjustmentReason() {
+        return getConfigValue(ITEMS_STOCK_ADJUSTMENT_REASON);
     }
     public static String getExportButtonName() {
         return getConfigValue(ITEMS_EXPORT_BUTTON_NAME);
@@ -176,9 +182,14 @@ public class ItemsUIConfiguration extends GlobalConfiguration {
         else return function;
     }
 
-    public  static List<String> stockAlerts(){
+    public static List<String> stockAlerts(){
         List<String> stockAlerts = Arrays.asList(getItemsStockAlerts().split(","));
         return stockAlerts;
+    }
+
+    public static List<String> stockAdjustmentReasons(){
+        List<String> stockAdjustments = Arrays.asList(getItemsStockAdjustmentReason().split(","));
+        return stockAdjustments;
     }
 
     public static List<String> rowsPerPage(){

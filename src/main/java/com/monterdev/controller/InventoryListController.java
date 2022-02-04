@@ -3,14 +3,9 @@ package com.monterdev.controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import com.monterdev.model.DeletedItems;
-import com.monterdev.model.Item;
-import com.monterdev.model.ItemCategory;
-import com.monterdev.model.Qrcode;
-import com.monterdev.repository.CategoryRepository;
-import com.monterdev.repository.DeletedItemsRepository;
-import com.monterdev.repository.ItemsRepository;
-import com.monterdev.repository.QrcodeRepository;
+import com.monterdev.constants.InventoryTypeConstants;
+import com.monterdev.model.*;
+import com.monterdev.repository.*;
 import com.monterdev.util.*;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -49,14 +44,16 @@ import java.io.*;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.monterdev.constants.GlobalConfiguration.*;
+import static com.monterdev.configuration.GlobalConfiguration.*;
 import static com.monterdev.constants.InventoryTypeConstants.ALL_CATEGORIES;
+import static com.monterdev.configuration.ItemsUIConfiguration.stockAlerts;
 import static com.monterdev.util.QrCodeUtil.saveQrCode;
 import static org.springframework.data.jpa.domain.Specification.where;
 
@@ -150,6 +147,10 @@ public class InventoryListController implements Initializable {
     private QrcodeRepository qrcodeRepository;
     @Autowired
     private InventoryListUtil inventoryListUtil;
+    @Autowired
+    private User user;
+    @Autowired
+    private BalanceRepository balanceRepository;
     //END OF AUTOWIRED DEPENDENCIES
     ////////////////////////////////////////////////////
 
@@ -161,12 +162,10 @@ public class InventoryListController implements Initializable {
     private int numberOfRowsPerPage = 10; //Initial number of rows per page
     private int currentPage = 1;
     private int maximumPage = 1;
-    private static final String ALL_STOCKS = "All STOCKS";
-    private static final String LOW_STOCK_ALERT = "LOW STOCK";
-    private static final String OUT_OF_STOCK_ALERT = "OUT OF STOCK";
     private Item selectedItem;
     private static String CURRENT_SELECTED_CATEGORY = "";
     private static String CURRENT_SELECTED_STOCK_ALERT = "";
+    private List<String> stockAlertLists = new ArrayList<>();
 
 
     private ScheduledExecutorService currentTimeUpdater;
@@ -199,25 +198,33 @@ public class InventoryListController implements Initializable {
         btnOverviewOnClick();
         progressBarOnLoad();
         indicatorsOnLoad();
+        btnStockAdjustmentOnAction();
+    }
+
+    private void btnStockAdjustmentOnAction() {
+        btnStockAdjustment.setOnAction(e->{
+            Stage newStage = new Stage();
+            new StageLoader().load(StockAdjustmentController.class, applicationContext, newStage);
+        });
     }
 
     private void indicatorsOnLoad() {
-        lowStockCircle.visibleProperty().addListener((observable,oldValue,newValue)->{
+        lowStockCircle.visibleProperty().addListener((observable, oldValue, newValue) -> {
 
         });
-        outOfStockCircle.visibleProperty().addListener((observable,oldValue,newValue)->{
+        outOfStockCircle.visibleProperty().addListener((observable, oldValue, newValue) -> {
 
         });
-        lowStockLabel.visibleProperty().addListener((observable,oldValue,newValue)->{
+        lowStockLabel.visibleProperty().addListener((observable, oldValue, newValue) -> {
 
         });
-        outOfStockLabel.visibleProperty().addListener((observable,oldValue,newValue)->{
+        outOfStockLabel.visibleProperty().addListener((observable, oldValue, newValue) -> {
 
         });
-        lowStockIndicator.visibleProperty().addListener((observable,oldValue,newValue)->{
+        lowStockIndicator.visibleProperty().addListener((observable, oldValue, newValue) -> {
 
         });
-        outOfStockIndicator.visibleProperty().addListener((observable,oldValue,newValue)->{
+        outOfStockIndicator.visibleProperty().addListener((observable, oldValue, newValue) -> {
 
         });
         lowStockCircle.setVisible(false);
@@ -236,6 +243,12 @@ public class InventoryListController implements Initializable {
     }
 
     private void btnHistoryOnClick() {
+        btnHistory.setOnAction(e->{
+            Stage newStage = new Stage();
+            Stage stage2 = (Stage) btnHistory.getScene().getWindow();
+            new StageLoader().load(InventoryHistoryController.class, applicationContext, newStage);
+            stage2.close();
+        });
     }
 
     private void initializeUsername() {
@@ -246,7 +259,7 @@ public class InventoryListController implements Initializable {
 
             @Override
             public String toString(ItemCategory object) {
-                return !ObjectUtils.isEmpty(object.getCategory_name())? object.getCategory_name():null;
+                return !ObjectUtils.isEmpty(object.getCategory_name()) ? object.getCategory_name() : null;
             }
 
             @Override
@@ -258,7 +271,7 @@ public class InventoryListController implements Initializable {
 
     private void btnRefreshTableOnClick() {
         btnRefreshTable.setOnAction(e -> {
-            loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
+            loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
         });
     }
 
@@ -266,13 +279,13 @@ public class InventoryListController implements Initializable {
         btnClose.setOnAction(e -> {
             resetTable();
             Stage currentStage = (Stage) btnClose.getScene().getWindow();
-            new StageLoader().load(MainDashboardController.class, applicationContext,currentStage);
+            new StageLoader().load(MainDashboardController.class, applicationContext, currentStage);
         });
     }
 
     private void resetTable() {
-        stockAlertsCombo.setValue(ALL_STOCKS);
-        CURRENT_SELECTED_CATEGORY="";
+        stockAlertsCombo.setValue(stockAlertLists.get(0));
+        CURRENT_SELECTED_CATEGORY = "";
         numberOfRowsPerPage = 10;
         searchItemTextField.setText("");
         currentPage = 1;
@@ -291,31 +304,31 @@ public class InventoryListController implements Initializable {
 
         Runnable timeUpdater = () -> Platform.runLater(() -> {
             LocalDateTime localDateTime = AppTime.now();
-            currentDateLabel.setText(localDateTime.format(formatter) +" "+localDateTime.format(formatter1));
-            loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
+            currentDateLabel.setText(localDateTime.format(formatter) + " " + localDateTime.format(formatter1));
+            loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
         });
 
         Runnable stockNotifier = () -> Platform.runLater(() -> {
-            int numberOfLowStocks=itemsRepository.getLowStockItems();
-            int numberOfOutOfStock=itemsRepository.getOutOfStockItems();
-            if(numberOfLowStocks>0){
+            int numberOfLowStocks = itemsRepository.getLowStockItems();
+            int numberOfOutOfStock = itemsRepository.getOutOfStockItems();
+            if (numberOfLowStocks > 0) {
                 lowStockIndicator.setText(String.valueOf(numberOfLowStocks));
                 lowStockIndicator.setVisible(true);
                 lowStockLabel.setVisible(true);
                 lowStockCircle.setVisible(true);
-            }else{
+            } else {
                 lowStockIndicator.setText("0");
                 lowStockIndicator.setVisible(false);
                 lowStockLabel.setVisible(false);
                 lowStockCircle.setVisible(false);
             }
 
-            if(numberOfOutOfStock>0){
+            if (numberOfOutOfStock > 0) {
                 outOfStockIndicator.setText(String.valueOf(numberOfOutOfStock));
                 outOfStockLabel.setVisible(true);
                 outOfStockIndicator.setVisible(true);
                 outOfStockCircle.setVisible(true);
-            }else{
+            } else {
                 outOfStockIndicator.setText("0");
                 outOfStockLabel.setVisible(false);
                 outOfStockIndicator.setVisible(false);
@@ -332,11 +345,14 @@ public class InventoryListController implements Initializable {
     }
 
     private void initializeStockAlerts() {
-        stockAlertsCombo.getItems().add(ALL_STOCKS);
-        stockAlertsCombo.getItems().add(LOW_STOCK_ALERT);
-        stockAlertsCombo.getItems().add(OUT_OF_STOCK_ALERT);
-        stockAlertsCombo.setValue(ALL_STOCKS);
-        CURRENT_SELECTED_STOCK_ALERT = ALL_STOCKS;
+        labelUsername.setText(user.getUsername());
+        stockAlertLists = stockAlerts();
+        stockAlertLists.stream().forEach(e -> {
+            stockAlertsCombo.getItems().add(e);
+        });
+
+        stockAlertsCombo.setValue(stockAlertLists.get(0));
+        CURRENT_SELECTED_STOCK_ALERT = stockAlertLists.get(0);
     }
 
     private void initializeItemCategories() {
@@ -366,9 +382,9 @@ public class InventoryListController implements Initializable {
 
     private void loadAllInventoryItems() {
         //Initial Loading of All Inventory Items
-        currentPage = !ObjectUtils.isEmpty(currentPageTextField.getText()) ? Integer.parseInt(currentPageTextField.getText()):currentPage;
+        currentPage = !ObjectUtils.isEmpty(currentPageTextField.getText()) ? Integer.parseInt(currentPageTextField.getText()) : currentPage;
         setTableColumnNames();
-        loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
+        loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
         currentPageTextField.setText(String.valueOf(currentPage));
     }
 
@@ -437,7 +453,7 @@ public class InventoryListController implements Initializable {
         rowsPerPageCombo.valueProperty().addListener((ob, ov, nv) -> {
             if (ov != nv) {
                 numberOfRowsPerPage = (int) nv;
-                loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
+                loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
             }
         });
     }
@@ -448,7 +464,7 @@ public class InventoryListController implements Initializable {
                 if (StringUtils.isNumeric(nv)) {
                     currentPage = Integer.parseInt(nv);
                     if (currentPage <= maximumPage) {
-                        loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
+                        loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
                     }
                 }
             }
@@ -460,7 +476,7 @@ public class InventoryListController implements Initializable {
             if (!((currentPage + 1) > maximumPage)) {
                 currentPage++;
                 currentPageTextField.setText(String.valueOf(currentPage));
-                loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
+                loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
             }
         });
     }
@@ -470,7 +486,7 @@ public class InventoryListController implements Initializable {
             if (!((currentPage - 1) == 0)) {
                 currentPage--;
                 currentPageTextField.setText(String.valueOf(currentPage));
-                loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
+                loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
             }
         });
     }
@@ -478,7 +494,7 @@ public class InventoryListController implements Initializable {
     private void searchItemOnType() {
         searchItemTextField.textProperty().addListener((ob, ov, nv) -> {
             if (ov != nv) {
-                loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
+                loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
             }
         });
     }
@@ -487,17 +503,17 @@ public class InventoryListController implements Initializable {
         stockAlertsCombo.valueProperty().addListener((ob, ov, nv) -> {
             if (ov != nv) {
                 CURRENT_SELECTED_STOCK_ALERT = (String) nv;
-                loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
+                loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
             }
         });
     }
 
-    private void loadTableViewFilteredByStockAlertsAndCategoryAndItemName(String selectedStockAlert,String itemToSearch) {
-        if (selectedStockAlert.equalsIgnoreCase(ALL_STOCKS)) {
+    private void loadTableViewFilteredByStockAlertsAndCategoryAndItemName(String selectedStockAlert, String itemToSearch) {
+        if (selectedStockAlert.equalsIgnoreCase(stockAlertLists.get(0))) {
             loadTableViewWithPaginationAndItemName(currentPage - 1, numberOfRowsPerPage, where(hasItemNameLike(itemToSearch).and(hasCategoryLike(CURRENT_SELECTED_CATEGORY))));
-        } else if (selectedStockAlert.equalsIgnoreCase(LOW_STOCK_ALERT)) {
+        } else if (selectedStockAlert.equalsIgnoreCase(stockAlertLists.get(1))) {
             loadTableViewWithPaginationAndItemName(currentPage - 1, numberOfRowsPerPage, where(hasItemNameLike(itemToSearch).and(hasCategoryLike(CURRENT_SELECTED_CATEGORY)).and(lowStockEqualsToInStock())));
-        } else if (selectedStockAlert.equalsIgnoreCase(OUT_OF_STOCK_ALERT)) {
+        } else if (selectedStockAlert.equalsIgnoreCase(stockAlertLists.get(2))) {
             loadTableViewWithPaginationAndItemName(currentPage - 1, numberOfRowsPerPage, where(hasItemNameLike(itemToSearch).and(hasCategoryLike(CURRENT_SELECTED_CATEGORY)).and(outOfStockItems())));
         }
     }
@@ -506,13 +522,13 @@ public class InventoryListController implements Initializable {
         itemCategoriesCombo.valueProperty().addListener((ob, ov, nv) -> {
             if (ov != nv) {
                 ItemCategory category = (ItemCategory) nv;
-                if(!ObjectUtils.isEmpty(category)){
+                if (!ObjectUtils.isEmpty(category)) {
                     if (category.getCategory_name().equalsIgnoreCase(ALL_CATEGORIES)) {
                         CURRENT_SELECTED_CATEGORY = "";
-                        loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
+                        loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
                     } else {
                         CURRENT_SELECTED_CATEGORY = category.getCategory_name();
-                        loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT,searchItemTextField.getText());
+                        loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
                     }
                 }
 
@@ -568,7 +584,7 @@ public class InventoryListController implements Initializable {
                             .build().parse();
                     if (!ObjectUtils.isEmpty(importedItems)) {
                         if (Prompt.confirm("Are you sure you want to import this file? Existing items will be deleted.").get().getText().equalsIgnoreCase("OK")) {
-                            deletedItemsRepository.truncateDeletedItemsHistory();
+                            deletedItemsRepository.truncateDeletedItems();
                             List<Item> existingItems = itemsRepository.findAll();
                             existingItems.stream().forEach(existingItem -> {
                                 DeletedItems deletedItems = new DeletedItems();
@@ -585,19 +601,50 @@ public class InventoryListController implements Initializable {
                             });
                             itemsRepository.truncateItems();
                             List<Item> newlyAddedItemList = itemsRepository.saveAll(importedItems);
+
+                            Balance balance = new Balance();
+                            categoryObservableList.stream().forEach(e->{
+                                Balance bal = balanceRepository.getBalanceIdOfCurrentInventoryMonth(AppTime.getMonth(),String.valueOf(AppTime.getYear()),e.getCategory_name());
+                                if(!(e.getCategory_name().equalsIgnoreCase(ALL_CATEGORIES))){
+                                    if(!ObjectUtils.isEmpty(bal)){
+                                        balance.setYear(String.valueOf(AppTime.getYear()));
+                                        balance.setMonth(AppTime.getMonth());
+                                        balance.setDatecreated(String.valueOf(AppTime.now()));
+                                        balance.setId(bal.getId());
+                                        balance.setBeginbalance(bal.getBeginbalance());
+                                        balance.setCategory(bal.getCategory());
+                                        String x = itemsRepository.getEndBalanceByInventoryType(e.getCategory_name());
+                                        balance.setEndbalance(ObjectUtils.isEmpty(x)?0:DataUtil.formatDouble(x));
+                                        balanceRepository.save(balance);//lagay sa loop
+                                    }else{
+                                        balance.setYear(String.valueOf(AppTime.getYear()));
+                                        balance.setMonth(AppTime.getMonth());
+                                        balance.setDatecreated(String.valueOf(AppTime.now()));
+                                        balance.setId(0);
+                                        String b = itemsRepository.getEndBalanceByInventoryType(e.getCategory_name());
+                                        balance.setBeginbalance(ObjectUtils.isEmpty(b)?0: DataUtil.formatDouble(b));
+                                        balance.setCategory(e.getCategory_name());
+                                        balance.setEndbalance(ObjectUtils.isEmpty(b)?0: DataUtil.formatDouble(b));
+                                        balanceRepository.save(balance);//lagay sa loop
+                                    }
+                                }
+
+                            });
+
+
+
                             if (!ObjectUtils.isEmpty(newlyAddedItemList)) {
                                 qrcodeRepository.truncateQrCodes();
-                                newlyAddedItemList.stream().forEach(e->{
+                                newlyAddedItemList.stream().forEach(e -> {
                                     Qrcode qrcode = new Qrcode();
                                     qrcode.setSku(e.getSku());
-                                    qrcode.setQr_code_path(getConfigValue(generatedQrCodeDirectory)+"\\"+e.getSku()+"-"+e.getItem_name());
+                                    qrcode.setQr_code_path(getConfigValue(generatedQrCodeDirectory) + "\\" + e.getSku() + "-" + e.getItem_name());
                                     qrcode.setDate_created(AppTime.now());
                                     qrcodeRepository.save(qrcode);
                                     try {
-                                        saveQrCode(String.valueOf(e.getSku()),e.getSku()+"-"+e.getItem_name());
-                                        Prompt.success("Imported items were successfully added!");
+                                        saveQrCode(String.valueOf(e.getSku()), e.getSku() + "-" + e.getItem_name());
                                     } catch (Exception ex) {
-                                        Prompt.failed("Error Saving QrCode / Barcode!");
+
                                     }
                                 });
 
@@ -631,7 +678,7 @@ public class InventoryListController implements Initializable {
             selectedItem.setIn_stock(0);
             selectedItem.setItem_category(defaultItemCategory);
             Stage stage = (Stage) exportItemButton.getScene().getWindow();
-            new StageLoader().load(AddItemController.class, applicationContext,stage);
+            new StageLoader().load(AddItemController.class, applicationContext, stage);
         });
     }
 

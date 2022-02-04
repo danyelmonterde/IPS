@@ -3,11 +3,11 @@ package com.monterdev.controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import com.monterdev.constants.InventoryTypeConstants;
 import com.monterdev.model.Balance;
 import com.monterdev.repository.BalanceRepository;
 import com.monterdev.repository.CategoryRepository;
 import com.monterdev.util.AppTime;
+import com.monterdev.util.DataUtil;
 import com.monterdev.util.Prompt;
 import com.monterdev.util.StageLoader;
 import javafx.fxml.FXML;
@@ -23,11 +23,10 @@ import org.springframework.util.ObjectUtils;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
-import static com.monterdev.constants.GlobalConfiguration.getCalenderYears;
-import static com.monterdev.constants.GlobalConfiguration.getMonthsofCalender;
+import static com.monterdev.configuration.GlobalConfiguration.getCalenderYears;
+import static com.monterdev.configuration.GlobalConfiguration.getMonthsofCalender;
 
 @Component
 @FxmlView("BalanceSettings.fxml")
@@ -110,8 +109,8 @@ public class BalanceSettingsController implements Initializable {
 
     private Balance createBalanceObject() {
         Balance balance = new Balance();
-        balance.setBeginbalance(Double.parseDouble(txtBeginBalance.getText()));
-        balance.setEndbalance(Double.parseDouble(txtEndBalance.getText()));
+        balance.setBeginbalance(DataUtil.formatDouble(txtBeginBalance.getText()));
+        balance.setEndbalance(DataUtil.formatDouble(txtEndBalance.getText()));
         balance.setCategory((String) comboInventoryType.valueProperty().getValue());
         balance.setMonth(SELECTED_MONTH);
         balance.setYear(SELECTED_YEAR);

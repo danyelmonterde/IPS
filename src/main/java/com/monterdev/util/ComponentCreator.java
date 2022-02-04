@@ -1,7 +1,7 @@
 package com.monterdev.util;
 
 import com.jfoenix.controls.*;
-import com.monterdev.constants.ItemsUIConfiguration;
+import com.monterdev.configuration.ItemsUIConfiguration;
 import com.monterdev.model.Item;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,7 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import static com.monterdev.constants.ItemsUIConfiguration.ITEMS_VBOX_CLASSES;
+import static com.monterdev.configuration.ItemsUIConfiguration.ITEMS_VBOX_CLASSES;
 
 public class ComponentCreator {
 

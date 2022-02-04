@@ -13,7 +13,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.*;
 
-import static com.monterdev.constants.GlobalConfiguration.*;
+import static com.monterdev.configuration.GlobalConfiguration.*;
 import static com.monterdev.constants.InventoryTypeConstants.SUMMARY;
 
 @Component
@@ -102,9 +102,9 @@ public class ReportsMapper {
                 mappedReport.put("COST", sales.getTotal_cost());
                 mappedReport.put("INCOME", sales.getIncome());
                 mappedReport.put("DATE", sales.getDate_transacted());
-                mappedReport.put("TOTAL_SALES", String.valueOf(totalSales));
-                mappedReport.put("TOTAL_COST", String.valueOf(totalCost));
-                mappedReport.put("TOTAL_INCOME", String.valueOf(totalIncome));
+                mappedReport.put("TOTAL_SALES", String.format("%d",(long)totalSales));
+                mappedReport.put("TOTAL_COST", String.format("%d",(long)totalCost));
+                mappedReport.put("TOTAL_INCOME", String.format("%d",(long)totalIncome));
                 mappedReport.put("PREPARED_BY", signatoryRepository.findSignatoryByRole("preparedBy", reportUtil.getReportId()).getSignatory());
                 mappedReport.put("NOTEDBY", signatoryRepository.findSignatoryByRole("notedBy", reportUtil.getReportId()).getSignatory());
                 mappedReport.put("CHECKED_BY", signatoryRepository.findSignatoryByRole("checkedBy", reportUtil.getReportId()).getSignatory());

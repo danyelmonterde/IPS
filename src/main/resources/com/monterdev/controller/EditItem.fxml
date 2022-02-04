@@ -200,7 +200,7 @@
                               <Insets left="20.0" top="20.0" />
                            </VBox.margin>
                         </Label>
-                        <JFXTextField fx:id="lowStock" minWidth="-Infinity" text="0">
+                        <JFXTextField fx:id="lowStock" minWidth="-Infinity" text="1">
                            <VBox.margin>
                               <Insets bottom="10.0" left="20.0" />
                            </VBox.margin>

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -24,8 +25,9 @@ public interface ItemsRepository extends JpaRepository<Item, Integer>, JpaSpecif
     @Query(value = "SELECT count(*) FROM item WHERE in_stock=low_stock",nativeQuery = true)
     int getLowStockItems();
 
-    @Modifying
-    @Query(value = "TRUNCATE TABLE item",nativeQuery = true)
-    void truncateItems();
+    @Query(value = "select sum(cost * in_stock) as 'sum'  from item WHERE item_category=:itemCategory",nativeQuery = true)
+    String getEndBalanceByInventoryType(@Param("itemCategory") String itemCategory);
 
+    @Procedure
+    void truncateItems();
 }

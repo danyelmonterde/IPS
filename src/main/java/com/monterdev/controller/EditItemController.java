@@ -31,7 +31,8 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static com.monterdev.constants.ItemsUIConfiguration.getItemsTopHboxSpacing;
+import static com.monterdev.configuration.ItemsUIConfiguration.getItemsTopHboxSpacing;
+import static com.monterdev.constants.HistoryConstants.PURCHASED_ITEM;
 import static com.monterdev.util.ComponentCreator.createSearchBox;
 import static com.monterdev.util.ControlNumberGenerator.generateControlNumber;
 
@@ -199,6 +200,7 @@ public class EditItemController implements Initializable {
         trackStockHbox.setVisible(false);
 
         checkItemIfUpdated();
+
     }
 
     private void checkItemIfUpdated() {
@@ -267,18 +269,18 @@ public class EditItemController implements Initializable {
         //INITIAL HBOX CONFIGURATION
         HBox topHbox = new HBox();
         topHbox.setAlignment(Pos.TOP_CENTER);
-        topHbox.setSpacing(Double.parseDouble(getItemsTopHboxSpacing()));
+        topHbox.setSpacing(DataUtil.formatDouble(getItemsTopHboxSpacing()));
 
         HBox midHbox = new HBox();
         midHbox.setAlignment(Pos.TOP_LEFT);
-        midHbox.setSpacing(Double.parseDouble(getItemsTopHboxSpacing()));
+        midHbox.setSpacing(DataUtil.formatDouble(getItemsTopHboxSpacing()));
 
 
         HBox botHbox = new HBox();
         botHbox.setAlignment(Pos.TOP_LEFT);
-        botHbox.setSpacing(Double.parseDouble(getItemsTopHboxSpacing()));
+        botHbox.setSpacing(DataUtil.formatDouble(getItemsTopHboxSpacing()));
         Stage stage = (Stage) cancel.getScene().getWindow();
-        new StageLoader().load(EditItemController.class, applicationContext,stage);
+        new StageLoader().load(EditItemController.class, applicationContext, stage);
     }
 
 
@@ -385,13 +387,17 @@ public class EditItemController implements Initializable {
             if (old != newv && StringUtils.isNumeric(newv)) {
                 selectedItem.setLow_stock(Integer.parseInt(newv));
             } else {
-                lowStock.setText("0");
+                lowStock.setText("1");
             }
         });
     }
 
 
     public void viewHistory(ActionEvent actionEvent) {
+        Stage stage = new Stage();
+        Stage currentStage = (Stage) save.getScene().getWindow();
+        new StageLoader().load(InventoryHistoryController.class, applicationContext, stage);
+        currentStage.close();
     }
 
     public void delete(ActionEvent actionEvent) {
@@ -428,7 +434,7 @@ public class EditItemController implements Initializable {
     private void resetFields() {
         resetSelectedItem();
         name.setText("");
-        lowStock.setText("0");
+        lowStock.setText("1");
         quantity.setText("0");
         purchaseCost.setText("0");
         averageCost.setText("0");
@@ -456,7 +462,7 @@ public class EditItemController implements Initializable {
     private void resetSelectedItem() {
         selectedItem.setTag(null);
         selectedItem.setItem_name("");
-        selectedItem.setLow_stock(0);
+        selectedItem.setLow_stock(1);
         selectedItem.setQuantity(0);
         selectedItem.setSku(0);
         selectedItem.setCost(0.0);
@@ -469,66 +475,74 @@ public class EditItemController implements Initializable {
         selectedItem = applicationContext.getBean(Item.class);
         resetSelectedItem();
         Stage stage = (Stage) cancel.getScene().getWindow();
-        new StageLoader().load(InventoryListController.class, applicationContext,stage);
+        new StageLoader().load(InventoryListController.class, applicationContext, stage);
     }
 
     public void save(ActionEvent actionEvent) {
         if (!ObjectUtils.isEmpty(name.getText())) {
-            checkItemIfUpdated();
-            selectedItem.setTag(null);
-            if (!sku.getText().equalsIgnoreCase("0")) {
-                //EXISTING ITEM
-                //get previous quantity,cost and product of pv q and  pv cost
+            try {
+                checkItemIfUpdated();
+                selectedItem.setTag(null);
+                if (!sku.getText().equalsIgnoreCase("0")) {
+                    //EXISTING ITEM
+                    //get previous quantity,cost and product of pv q and  pv cost
+                    int previousQuantity = Integer.parseInt(inStock.getText());
+                    double previousItemCostPerUnit = DataUtil.formatDouble(averageCost.getText());
+                    double previousTotalAmount = previousQuantity * previousItemCostPerUnit;
 
-                int previousQuantity = Integer.parseInt(inStock.getText());
-                double previousItemCostPerUnit = Double.parseDouble(averageCost.getText());
-                double previousTotalAmount = previousQuantity * previousItemCostPerUnit;
+                    int currentQuantity = Integer.parseInt(quantity.getText());
+                    double currentItemCostPerUnit = DataUtil.formatDouble(purchaseCost.getText());
+                    double currentTotalAmount = currentQuantity * currentItemCostPerUnit;
 
-                int currentQuantity = Integer.parseInt(quantity.getText());
-                double currentItemCostPerUnit = Double.parseDouble(purchaseCost.getText());
-                double currentTotalAmount = currentQuantity * currentItemCostPerUnit;
-
-                double finalAverageCost = (previousTotalAmount + currentTotalAmount) / (previousQuantity + currentQuantity);
-                if (Double.isNaN(finalAverageCost)) {
-                    finalAverageCost = 0;
+                    double finalAverageCost = (previousTotalAmount + currentTotalAmount) / (previousQuantity + currentQuantity);
+                    if (Double.isNaN(finalAverageCost)) {
+                        finalAverageCost = 0;
+                    }
+                    selectedItem.setCost(DataUtil.formatToDouble(finalAverageCost));
+                    selectedItem.setIn_stock(currentQuantity + previousQuantity);
+                    selectedItem.setSku(Integer.parseInt(sku.getText()));
+                    selectedItem.setUnit((String) comboUnit.getSelectionModel().getSelectedItem());
+                    if (selectedItem.getQuantity() == 0) {
+                        selectedItem.setQuantity(selectedItem.getIn_stock());
+                    }
                 }
-                selectedItem.setCost(DataUtil.formatToDouble(finalAverageCost));
-                selectedItem.setIn_stock(currentQuantity + previousQuantity);
-                selectedItem.setSku(Integer.parseInt(sku.getText()));
-                selectedItem.setUnit((String) comboUnit.getSelectionModel().getSelectedItem());
-                if (selectedItem.getQuantity() == 0) {
-                    selectedItem.setQuantity(selectedItem.getIn_stock());
+
+                Item savedItem = itemsRepository.save(selectedItem);
+                if (!ObjectUtils.isEmpty(savedItem) && (Integer.parseInt(quantity.getText()) != 0) && (DataUtil.formatDouble(purchaseCost.getText()) > 0)) {
+
+                    PurchaseOrder purchaseOrder = setPurchaseOrder(savedItem);
+                    purchaseOrderRepository.save(purchaseOrder);
+                    SupplierGroup supplierGroup = setSupplierGroup(savedItem);
+                    supplierRepository.save(supplierGroup);
+                    History history = setHistory(savedItem);
+                    historyRepository.save(history);
+
+                    try {
+                        QrCodeUtil.saveQrCode(String.valueOf(savedItem.getSku()), savedItem.getSku() + "-" + savedItem.getItem_name());
+                    } catch (Exception ioException) {
+                        Prompt.failed("Error in Saving QR Code!");
+                    }
+
+                    Prompt.success("Purchased Item was saved!");
+                    resetSelectedItem();
+                    Stage stage = (Stage) save.getScene().getWindow();
+                    new StageLoader().load(MainDashboardController.class, applicationContext, stage);
+                } else if (!ObjectUtils.isEmpty(savedItem)) {
+                    Prompt.success("Item updated successfully!");
+                    resetSelectedItem();
+                    Stage stage = (Stage) save.getScene().getWindow();
+                    new StageLoader().load(MainDashboardController.class, applicationContext, stage);
+                } else {
+                    Prompt.failed("Transaction Failed! Please Try again!");
                 }
+            } catch (NumberFormatException e) {
+                Prompt.failed("Transaction Failed! Please Try again! Reason is: \n" + e.getMessage());
+            } catch (NullPointerException e) {
+                Prompt.failed("Transaction Failed! Please Try again! Reason is: \n" + e.getMessage());
+            } catch (Exception e) {
+                Prompt.failed("Transaction Failed! Please Try again! Reason is: \n" + e.getMessage());
             }
 
-            Item savedItem = itemsRepository.save(selectedItem);
-            if (!ObjectUtils.isEmpty(savedItem) && (Integer.parseInt(quantity.getText()) != 0) && (Integer.parseInt(purchaseCost.getText()) != 0)) {
-
-                PurchaseOrder purchaseOrder = setPurchaseOrder(savedItem);
-                purchaseOrderRepository.save(purchaseOrder);
-                SupplierGroup supplierGroup = setSupplierGroup(savedItem);
-                supplierRepository.save(supplierGroup);
-                History history = setHistory(savedItem);
-                historyRepository.save(history);
-
-                try {
-                    QrCodeUtil.saveQrCode(String.valueOf(savedItem.getSku()), savedItem.getSku() + "-" + savedItem.getItem_name());
-                } catch (Exception ioException) {
-                    Prompt.failed("Error in Saving QR Code!");
-                }
-
-                Prompt.success("Purchased Item was saved!");
-                resetSelectedItem();
-                Stage stage = (Stage) save.getScene().getWindow();
-                new StageLoader().load(MainDashboardController.class, applicationContext,stage);
-            } else if (!ObjectUtils.isEmpty(savedItem)) {
-                Prompt.success("Item updated successfully!");
-                resetSelectedItem();
-                Stage stage = (Stage) save.getScene().getWindow();
-                new StageLoader().load(MainDashboardController.class, applicationContext,stage);
-            } else {
-                Prompt.failed("Transaction Failed! Please Try again!");
-            }
         }
 
     }
@@ -537,7 +551,7 @@ public class EditItemController implements Initializable {
         History history = new History();
         history.setDate(AppTime.now());
         history.setStock_after(savedItem.getIn_stock());
-        history.setReason("PURCHASED ITEM");
+        history.setReason(PURCHASED_ITEM);
         history.setAdjustment(savedItem.getQuantity());
         history.setItem_category(savedItem.getItem_category());
         history.setItem_name(savedItem.getItem_name());
@@ -576,13 +590,13 @@ public class EditItemController implements Initializable {
     private PurchaseOrder setPurchaseOrder(Item item) {
         PurchaseOrder purchaseOrder = new PurchaseOrder();
         purchaseOrder.setDatecreated(AppTime.now());
-        purchaseOrder.setPurchase_cost(Double.parseDouble(purchaseCost.getText()));
+        purchaseOrder.setPurchase_cost(DataUtil.formatDouble(purchaseCost.getText()));
         purchaseOrder.setItem_name(name.getText());
         purchaseOrder.setQuantity(Integer.parseInt(quantity.getText()));
         purchaseOrder.setSku(item.getSku());
         purchaseOrder.setIn_stock(item.getIn_stock());
         purchaseOrder.setItem_category(selectedItem.getItem_category());
-        purchaseOrder.setAmount(Integer.parseInt(quantity.getText()) * Double.parseDouble(purchaseCost.getText()));
+        purchaseOrder.setAmount(Integer.parseInt(quantity.getText()) * DataUtil.formatDouble(purchaseCost.getText()));
         return purchaseOrder;
     }
 
@@ -593,7 +607,6 @@ public class EditItemController implements Initializable {
             trackStockHbox.setVisible(false);
         }
     }
-
 
 
 }

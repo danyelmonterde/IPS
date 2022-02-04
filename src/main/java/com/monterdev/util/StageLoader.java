@@ -1,23 +1,20 @@
 package com.monterdev.util;
 
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import net.rgielen.fxweaver.core.FxWeaver;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import static com.monterdev.constants.GlobalConfiguration.getWindowTitle;
+import static com.monterdev.configuration.GlobalConfiguration.getWindowTitle;
 
 @Getter
 @Setter

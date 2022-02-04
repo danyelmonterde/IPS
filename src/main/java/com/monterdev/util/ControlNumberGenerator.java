@@ -1,6 +1,6 @@
 package com.monterdev.util;
 
-import com.monterdev.constants.GlobalConfiguration;
+import com.monterdev.configuration.GlobalConfiguration;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 

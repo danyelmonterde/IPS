@@ -12,8 +12,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.monterdev.constants.GlobalConfiguration.generatedQrCodeDirectory;
-import static com.monterdev.constants.GlobalConfiguration.getConfigValue;
+import static com.monterdev.configuration.GlobalConfiguration.generatedQrCodeDirectory;
+import static com.monterdev.configuration.GlobalConfiguration.getConfigValue;
 
 public class QrCodeUtil {
 

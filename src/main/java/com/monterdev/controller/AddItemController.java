@@ -10,10 +10,7 @@ import com.monterdev.model.Unit;
 import com.monterdev.repository.CategoryRepository;
 import com.monterdev.repository.ItemsRepository;
 import com.monterdev.repository.QrcodeRepository;
-import com.monterdev.util.AppTime;
-import com.monterdev.util.Prompt;
-import com.monterdev.util.QrCodeUtil;
-import com.monterdev.util.StageLoader;
+import com.monterdev.util.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.stage.Stage;
@@ -171,11 +168,11 @@ public class AddItemController implements Initializable {
         sku.setText("0");
         purchaseCost.setText("0");
         totalAmount.setText("0");
-        lowStock.setText("0");
+        lowStock.setText("1");
 
         item.setItem_name("");
         item.setItem_category("");
-        item.setLow_stock(0);
+        item.setLow_stock(1);
         item.setTag(null);
         item.setQuantity(0);
         item.setCost(0);
@@ -190,7 +187,12 @@ public class AddItemController implements Initializable {
     private void lowStockOnChange() {
         lowStock.textProperty().addListener((observable,oldValue,newValue)->{
             if(oldValue!=newValue){
-                item.setLow_stock(Integer.parseInt(newValue));
+                try{
+                    item.setLow_stock(Integer.parseInt(newValue));
+                }catch (NumberFormatException e){
+                    item.setLow_stock(1);
+                }
+
             }
         });
     }
@@ -207,7 +209,7 @@ public class AddItemController implements Initializable {
         purchaseCost.textProperty().addListener((observable,oldValue,newValue)->{
             if(oldValue!=newValue){
                 try{
-                    double itemPurchaseCost = Double.parseDouble(newValue);
+                    double itemPurchaseCost = DataUtil.formatDouble(newValue);
                     double itemQuantity = Integer.parseInt(quantity.getText());
                     double itemTotalAmount = itemPurchaseCost * itemQuantity;
 
@@ -225,7 +227,7 @@ public class AddItemController implements Initializable {
         quantity.textProperty().addListener((observable,oldValue,newValue)->{
             if(oldValue!=newValue){
                 try{
-                    double itemPurchaseCost = Double.parseDouble(purchaseCost.getText());
+                    double itemPurchaseCost = DataUtil.formatDouble(purchaseCost.getText());
                     double itemQuantity = Integer.parseInt(newValue);
                     double itemTotalAmount = itemPurchaseCost * itemQuantity;
 
