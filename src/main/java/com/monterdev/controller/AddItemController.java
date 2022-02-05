@@ -3,10 +3,8 @@ package com.monterdev.controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import com.monterdev.model.Item;
-import com.monterdev.model.ItemCategory;
-import com.monterdev.model.Qrcode;
-import com.monterdev.model.Unit;
+import com.monterdev.model.*;
+import com.monterdev.repository.BalanceRepository;
 import com.monterdev.repository.CategoryRepository;
 import com.monterdev.repository.ItemsRepository;
 import com.monterdev.repository.QrcodeRepository;
@@ -25,6 +23,8 @@ import org.springframework.util.ObjectUtils;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import static com.monterdev.constants.InventoryTypeConstants.ALL_CATEGORIES;
 
 @Component
 @FxmlView("AddItem.fxml")
@@ -85,6 +85,9 @@ public class AddItemController implements Initializable {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private BalanceRepository balanceRepository;
+
     private Item item;
 
     @Override
@@ -113,6 +116,36 @@ public class AddItemController implements Initializable {
             if(!ObjectUtils.isEmpty(item.getItem_name()) && !ObjectUtils.isEmpty(item.getUnit())){
                 try{
                     if(!ObjectUtils.isEmpty(itemsRepository.save(item))){
+                        Balance balance = new Balance();
+                        categoryRepository.findAll().stream().forEach(z->{
+                            Balance bal = balanceRepository.getBalanceIdOfCurrentInventoryMonth(AppTime.getMonth(),String.valueOf(AppTime.getYear()),z.getCategory_name());
+                            if(!(z.getCategory_name().equalsIgnoreCase(ALL_CATEGORIES))){
+                                if(!org.apache.commons.lang3.ObjectUtils.isEmpty(bal)){
+                                    balance.setYear(String.valueOf(AppTime.getYear()));
+                                    balance.setMonth(AppTime.getMonth());
+                                    balance.setDatecreated(String.valueOf(AppTime.now()));
+                                    balance.setId(bal.getId());
+                                    balance.setBeginbalance(bal.getBeginbalance());
+                                    balance.setCategory(bal.getCategory());
+                                    String x = itemsRepository.getEndBalanceByInventoryType(z.getCategory_name());
+                                    balance.setEndbalance(ObjectUtils.isEmpty(x)?0:DataUtil.formatDouble(x));
+                                    balanceRepository.save(balance);//lagay sa loop
+                                }else{
+                                    balance.setYear(String.valueOf(AppTime.getYear()));
+                                    balance.setMonth(AppTime.getMonth());
+                                    balance.setDatecreated(String.valueOf(AppTime.now()));
+                                    balance.setId(0);
+                                    String b = itemsRepository.getEndBalanceByInventoryType(z.getCategory_name());
+                                    balance.setBeginbalance(ObjectUtils.isEmpty(b)?0: DataUtil.formatDouble(b));
+                                    balance.setCategory(z.getCategory_name());
+                                    balance.setEndbalance(ObjectUtils.isEmpty(b)?0: DataUtil.formatDouble(b));
+                                    balanceRepository.save(balance);//lagay sa loop
+                                }
+                            }
+
+                        });
+
+
                         Qrcode qrcode = setQrCodeData(item);
                         qrcodeRepository.save(qrcode);
                         Prompt.success("Item was successfully added!");
