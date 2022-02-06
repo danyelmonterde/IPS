@@ -600,8 +600,8 @@ public class InventoryListController implements Initializable {
                                 deletedItemsRepository.save(deletedItems);
                             });
                             itemsRepository.truncateItems();
-                            List<Item> newlyAddedItemList = itemsRepository.saveAll(importedItems);
-
+                          //  List<Item> newlyAddedItemList = itemsRepository.saveAll(importedItems);
+                              List<Item> newlyAddedItemList = itemsRepository.saveAll(DataUtil.convertIQWDInventoryToItemList());
                             Balance balance = new Balance();
                             categoryObservableList.stream().forEach(e->{
                                 Balance bal = balanceRepository.getBalanceIdOfCurrentInventoryMonth(AppTime.getMonth(),String.valueOf(AppTime.getYear()),e.getCategory_name());
@@ -638,11 +638,11 @@ public class InventoryListController implements Initializable {
                                 newlyAddedItemList.stream().forEach(e -> {
                                     Qrcode qrcode = new Qrcode();
                                     qrcode.setSku(e.getSku());
-                                    qrcode.setQr_code_path(getConfigValue(generatedQrCodeDirectory) + "\\" + e.getSku() + "-" + e.getItem_name());
+                                    qrcode.setQr_code_path(getConfigValue(generatedQrCodeDirectory) + "\\" + e.getSku());
                                     qrcode.setDate_created(AppTime.now());
                                     qrcodeRepository.save(qrcode);
                                     try {
-                                        saveQrCode(String.valueOf(e.getSku()), e.getSku() + "-" + e.getItem_name());
+                                        saveQrCode(String.valueOf(e.getSku()), String.valueOf(e.getSku()));
                                     } catch (Exception ex) {
 
                                     }

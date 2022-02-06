@@ -2,6 +2,7 @@ package com.monterdev.model;
 
 import com.opencsv.bean.CsvBindByName;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Objects;

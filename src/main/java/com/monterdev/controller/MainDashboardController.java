@@ -752,7 +752,7 @@ public class MainDashboardController implements Initializable {
                     });
                     listView.setOnMouseClicked(e -> {
                         if (e.getClickCount() == 2) {
-                            Optional<Item> optionalItem = itemLists.stream().filter(f -> f.getItem_name().equalsIgnoreCase(listView.getSelectionModel().getSelectedItem().toString())).findFirst();
+                            Optional<Item> optionalItem = itemLists.stream().filter(f -> String.valueOf(f.getSku()).equalsIgnoreCase(listView.getSelectionModel().getSelectedItem().toString())).findFirst();
                             isItemOnCart = false;
                             itemCart.stream().forEach(x->{
                                 if(x.getItem_name().equalsIgnoreCase(optionalItem.get().getItem_name())){
