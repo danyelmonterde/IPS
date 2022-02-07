@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+import java.time.LocalDate;
+
 @Component
 public class LoginUtil {
 
@@ -36,10 +38,13 @@ public class LoginUtil {
         user = applicationContext.getBean(User.class);
         encoder = applicationContext.getBean(PasswordEncoder.class);
         User userData = userRepository.findByUsername(username);
+        LocalDate currentDate = LocalDate.of(2022,2,8);
+        LocalDate expirationDate = currentDate.plusDays(15);
+        LocalDate todayDate = LocalDate.now();
         boolean isUserAuthenticated;
         if(!ObjectUtils.isEmpty(userData)){
             isUserAuthenticated = encoder.matches(password,userData.getPassword());
-            if(isUserAuthenticated){
+            if(isUserAuthenticated && todayDate.isBefore(expirationDate)){
                 user.setIsAdmin(userData.getIsAdmin());
                 user.setUsername(userData.getUsername());
                 user.setPassword(userData.getPassword());
