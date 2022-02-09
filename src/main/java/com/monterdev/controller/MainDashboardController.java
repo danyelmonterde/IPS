@@ -1,9 +1,6 @@
 package com.monterdev.controller;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
 import com.monterdev.util.*;
@@ -17,9 +14,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -36,6 +31,7 @@ import javafx.util.StringConverter;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -56,6 +52,8 @@ import java.util.stream.StreamSupport;
 import static com.monterdev.configuration.GlobalConfiguration.*;
 import static com.monterdev.constants.HistoryConstants.RELEASED_ITEM;
 import static com.monterdev.constants.InventoryTypeConstants.SUMMARY;
+import static com.monterdev.constants.TextFieldValidatorConstants.PLUS_DOLLAR_REGEX_EXCLUDE;
+import static com.monterdev.constants.TextFieldValidatorConstants.WHOLE_NUMBERS_REGEX_EXCLUDE;
 import static com.monterdev.util.ComponentCreator.createTextField;
 
 @Component
@@ -186,6 +184,10 @@ public class MainDashboardController implements Initializable {
     @SneakyThrows
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        if(!ObjectUtils.isEmpty(requisitionIssueSlip.getRequisition_and_issue_slip_number())){
+            createRequisitionIssueSlip();
+        }
 
         Runnable timeUpdater = () -> Platform.runLater(() -> {
             if (capturedItem.getSku() != 0) {
@@ -354,6 +356,7 @@ public class MainDashboardController implements Initializable {
 
 
         JFXTextField name = createTextField("ITEM NAME", "LIGHT GRAY");
+        name.setEditable(false);
         name.setText(currentItem.getItem_name());
         name.setId(String.valueOf(currentIndex));
         name.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -375,6 +378,7 @@ public class MainDashboardController implements Initializable {
 
 
         JFXTextField cost = createTextField("COST", "LIGHT GRAY");
+        cost.setEditable(true);
         cost.setId(String.valueOf(currentIndex));
         cost.setText(String.valueOf(currentItem.getCost()));
         cost.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -395,7 +399,8 @@ public class MainDashboardController implements Initializable {
         quantity.setText(String.valueOf(currentItem.getQuantity()));
         quantity.setId(String.valueOf(currentIndex));
         quantity.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldValue != newValue) {
+            if (NumberUtils.isParsable(quantity.getText()) && !ObjectUtils.isEmpty(quantity.getText())) {
+                //VALID TEXT FIELD
                 currentItem.setQuantity(Integer.parseInt(newValue));
                 itemCart.get(Integer.parseInt(quantity.getId())).setQuantity(Integer.parseInt(newValue));
                 if (requisitionIssueSlip.getIs_customer_new() == 1) {
@@ -403,8 +408,27 @@ public class MainDashboardController implements Initializable {
                 } else {
                     amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
                 }
-
+            } else if (ObjectUtils.isEmpty(quantity.getText())) {
+                //EMPTY TEXT FIELD
+                item.setLow_stock(0);
+                quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+            } else {
+                //INVALID TEXT FIELD
+                quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
             }
+
+
+//            if (oldValue != newValue) {
+//                currentItem.setQuantity(Integer.parseInt(newValue));
+//                itemCart.get(Integer.parseInt(quantity.getId())).setQuantity(Integer.parseInt(newValue));
+//                if (requisitionIssueSlip.getIs_customer_new() == 1) {
+//                    amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost() + (currentItem.getCost() * .2)));
+//                } else {
+//                    amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
+//                }
+//
+//            }
         });
 
         JFXComboBox unit = new JFXComboBox();
@@ -553,10 +577,32 @@ public class MainDashboardController implements Initializable {
     public void getDashboardModule(ActionEvent actionEvent) {
         resetHboxes();
 
-        ImageView addItem = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/AddItem-dashboard.jpg", true));
-        ImageView releaseItem = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Release-dashboard.jpg", true));
-        ImageView reports = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Reports-dashboard.jpg", true));
-        ImageView purchaseItem = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Purchase-dashboard.jpg", true));
+        ImageView addItem = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/AddItem-dashboard.png", true));
+        ImageView releaseItem = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Release-dashboard.png", true));
+        ImageView reports = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Reports-dashboard.png", true));
+        ImageView purchaseItem = new ImageView(new Image("config-ui/IQWD-APP-RESOURCES/Main/Purchase-dashboard.png", true));
+
+        addItem.setFitHeight(150.0);
+        addItem.setFitWidth(200.0);
+        addItem.setPickOnBounds(true);
+        addItem.setPreserveRatio(true);
+
+        releaseItem.setFitHeight(150.0);
+        releaseItem.setFitWidth(200.0);
+        releaseItem.setPickOnBounds(true);
+        releaseItem.setPreserveRatio(true);
+
+        reports.setFitHeight(150.0);
+        reports.setFitWidth(200.0);
+        reports.setPickOnBounds(true);
+        reports.setPreserveRatio(true);
+
+        purchaseItem.setFitHeight(150.0);
+        purchaseItem.setFitWidth(200.0);
+        purchaseItem.setPickOnBounds(true);
+        purchaseItem.setPreserveRatio(true);
+
+
 
         JFXButton jfxBtnAddItem = new JFXButton();
         JFXButton jfxBtnReleaseItem = new JFXButton();
@@ -581,7 +627,6 @@ public class MainDashboardController implements Initializable {
 
         jfxBtnReleaseItem.setOnAction(f -> {
             getCustomizeRIS();
-            createRequisitionIssueSlip();
         });
 
         jfxBtnReports.setOnAction(g -> {
@@ -607,7 +652,7 @@ public class MainDashboardController implements Initializable {
     }
 
     private void getCustomizeRIS() {
-        Stage stage = new Stage();
+        Stage stage = (Stage) sidebarAnchorpane.getScene().getWindow();
         new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext, stage);
     }
 
@@ -679,10 +724,10 @@ public class MainDashboardController implements Initializable {
 
     public void createRequisitionIssueSlip() {
         resetHboxes();
-
+        topHbox.setAlignment(Pos.BOTTOM_LEFT);
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setPrefHeight(500);
-        scrollPane.setPrefWidth(800);
+        scrollPane.setPrefWidth(600);
 
         AnchorPane anchorPane = new AnchorPane();
         anchorPane.setPrefWidth(800);
@@ -698,21 +743,43 @@ public class MainDashboardController implements Initializable {
         AnchorPane.setBottomAnchor(vbox, 0.0);
 
         scrollPane.setContent(anchorPane);
-        HBox.setMargin(scrollPane, new Insets(0.0, 20.0, 20.0, 0.0));
+
+        midHbox.setAlignment(Pos.CENTER_RIGHT);
+        HBox.setMargin(scrollPane, new Insets(0.0, 20.0, 20.0, 20.0));
 
         JFXTextField itemName = new JFXTextField();
+        itemName.setPrefWidth(200.0);
+        HBox.setMargin(itemName, new Insets(20.0, 20.0, 20.0, 20.0));
+
+        ToggleGroup searchGroup = new ToggleGroup();
+
+        searchGroup.selectedToggleProperty().addListener((observable,oldValue,newValue)->{
+            RadioButton rb = (RadioButton) searchGroup.getSelectedToggle();
+            if(rb != null){
+                System.out.println(rb.getText());
+            }
+        });
+
 
         itemName.textProperty().addListener((observableValue, oldValue, newValue) -> {
             if (oldValue != newValue) {
 
+                if(NumberUtils.isParsable(newValue)){
+                   Optional<Item> item = itemsRepository.findById(Integer.parseInt(newValue));
+                    if(item.isPresent()){
+                        itemName.setText(item.get().getItem_name());
+                    }
+                }
+
                 if (isFirstCharacter && itemName.getText().length() == 1) {
-                    midHbox.getChildren().add(listView);
+                   // midHbox.getChildren().add(0,listView);
                     isFirstCharacter = false;
                 }
                 searchUtil.searchItem(itemName.getText(), itemLists, responseList, "NAME");
                 if (responseList.size() > 0) {
 
-                    HBox.setMargin(listView, new Insets(20.0, 20.0, 20.0, 20.0));
+                    listView.setPrefWidth(200.0);
+                    HBox.setMargin(listView, new Insets(20.0, 0.0, 20.0, 0.0));
                     listView.getItems().clear();
                     responseList.stream().forEach(data -> {
 
@@ -721,7 +788,7 @@ public class MainDashboardController implements Initializable {
                     });
                     listView.setOnMouseClicked(e -> {
                         if (e.getClickCount() == 2) {
-                            Optional<Item> optionalItem = itemLists.stream().filter(f -> String.valueOf(f.getSku()).equalsIgnoreCase(listView.getSelectionModel().getSelectedItem().toString())).findFirst();
+                            Optional<Item> optionalItem = itemLists.stream().filter(f -> String.valueOf(f.getItem_name()).equalsIgnoreCase(listView.getSelectionModel().getSelectedItem().toString())).findFirst();
                             isItemOnCart = false;
                             itemCart.stream().forEach(x -> {
                                 if (x.getItem_name().equalsIgnoreCase(optionalItem.get().getItem_name())) {
@@ -753,7 +820,7 @@ public class MainDashboardController implements Initializable {
                     sku.setText("");
                     rowIndex = 0;
                     try {
-                        midHbox.getChildren().remove(1);
+                     //   midHbox.getChildren().remove(0);
                     } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
 
                     }
@@ -768,59 +835,63 @@ public class MainDashboardController implements Initializable {
                     isFirstCharacter = true;
                     responseList.clear();
                     selectedItem.setSku(0);
-                    midHbox.getChildren().retainAll(scrollPane);
+                //    midHbox.getChildren().retainAll(scrollPane);
                 } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
 
                 }
             }
         });
 
-        JFXButton openCamera = new JFXButton("Open Camera");
-        openCamera.setButtonType(JFXButton.ButtonType.RAISED);
-        openCamera.setStyle("-fx-background-color: NAVY BLUE;");
-        openCamera.setTextAlignment(TextAlignment.CENTER);
-        openCamera.setTextFill(Paint.valueOf("WHITE"));
-        openCamera.setFont(Font.font("System Bold", 14.0));
+//        JFXButton openCamera = new JFXButton("Open Camera");
+//        openCamera.setButtonType(JFXButton.ButtonType.RAISED);
+//        openCamera.setStyle("-fx-background-color: NAVY BLUE;");
+//        openCamera.setTextAlignment(TextAlignment.CENTER);
+//        openCamera.setTextFill(Paint.valueOf("WHITE"));
+//        openCamera.setFont(Font.font("System Bold", 14.0));
+//
+//        JFXButton viewRisDetails = new JFXButton("RIS Details");
+//        viewRisDetails.setButtonType(JFXButton.ButtonType.RAISED);
+//        viewRisDetails.setStyle("-fx-background-color: NAVY BLUE;");
+//        viewRisDetails.setTextAlignment(TextAlignment.CENTER);
+//        viewRisDetails.setTextFill(Paint.valueOf("WHITE"));
+//        viewRisDetails.setFont(Font.font("System Bold", 14.0));
 
-        JFXButton viewRisDetails = new JFXButton("RIS Details");
-        viewRisDetails.setButtonType(JFXButton.ButtonType.RAISED);
-        viewRisDetails.setStyle("-fx-background-color: NAVY BLUE;");
-        viewRisDetails.setTextAlignment(TextAlignment.CENTER);
-        viewRisDetails.setTextFill(Paint.valueOf("WHITE"));
-        viewRisDetails.setFont(Font.font("System Bold", 14.0));
+  //      Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
+//        openCamera.setOnAction(e -> {
+//            if (ObjectUtils.isEmpty(selectedRisTemplate.getSelectedRisTemplate())) {
+//                Prompt.failed("Please set RIS Type first!");
+//                Stage stage = new Stage();
+//                currentStage.close();
+//                new StageLoader().load(MainDashboardController.class, applicationContext, stage);
+//            } else {
+//                Stage stage = new Stage();
+//                new StageLoader().load(CaptureQrCodeController.class, applicationContext, stage);
+//            }
+//
+//        });
 
-        Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
-        openCamera.setOnAction(e -> {
-            if (ObjectUtils.isEmpty(selectedRisTemplate.getSelectedRisTemplate())) {
-                Prompt.failed("Please set RIS Type first!");
-                Stage stage = new Stage();
-                currentStage.close();
-                new StageLoader().load(MainDashboardController.class, applicationContext, stage);
-            } else {
-                Stage stage = new Stage();
-                new StageLoader().load(CaptureQrCodeController.class, applicationContext, stage);
-            }
+//        viewRisDetails.setOnAction(e -> {
+//            if (ObjectUtils.isEmpty(selectedRisTemplate.getSelectedRisTemplate())) {
+//                Prompt.failed("Please set RIS Type first!");
+//                Stage stage = new Stage();
+//                currentStage.close();
+//                new StageLoader().load(MainDashboardController.class, applicationContext, stage);
+//            } else {
+//                Stage stage = new Stage();
+//                new StageLoader().load(RisDetailsController.class, applicationContext, stage);
+//            }
+//
+//        });
 
-        });
-
-        viewRisDetails.setOnAction(e -> {
-            if (ObjectUtils.isEmpty(selectedRisTemplate.getSelectedRisTemplate())) {
-                Prompt.failed("Please set RIS Type first!");
-                Stage stage = new Stage();
-                currentStage.close();
-                new StageLoader().load(MainDashboardController.class, applicationContext, stage);
-            } else {
-                Stage stage = new Stage();
-                new StageLoader().load(RisDetailsController.class, applicationContext, stage);
-            }
-
-        });
-
-        topHbox.getChildren().addAll(itemName, openCamera, viewRisDetails);
-        midHbox.getChildren().addAll(scrollPane);
+        //topHbox.getChildren().addAll(itemName, openCamera, viewRisDetails);
+        topHbox.getChildren().addAll(itemName);
+        midHbox.getChildren().addAll(listView,scrollPane);
         midHbox.setPrefHeight(500.0);
-        HBox.setMargin(openCamera, new Insets(20.0, 20.0, 20.0, 20.0));
-        HBox.setMargin(viewRisDetails, new Insets(20.0, 20.0, 20.0, 20.0));
+
+         HBox.setMargin(listView, new Insets(20.0, 20.0, 20.0, 20.0));
+         HBox.setMargin(scrollPane, new Insets(20.0, 20.0, 20.0, 20.0));
+        //HBox.setMargin(viewRisDetails, new Insets(20.0, 20.0, 20.0, 20.0));
+
 
         JFXButton releaseItem = new JFXButton("RELEASE ITEM");
         releaseItem.setButtonType(JFXButton.ButtonType.RAISED);
@@ -928,7 +999,7 @@ public class MainDashboardController implements Initializable {
                 sku.setText("0");
                 itemCart.clear();
                 try {
-                    midHbox.getChildren().remove(1);
+                 //   midHbox.getChildren().remove(1);
                     cancelTransaction();
                 } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
 

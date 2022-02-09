@@ -24,6 +24,6 @@ public class ControlNumberGenerator {
     }
 
     public static String generateControlNumber(){
-        return RandomStringUtils.randomAlphanumeric(8);
+        return RandomStringUtils.randomAlphanumeric(5);
     }
 }

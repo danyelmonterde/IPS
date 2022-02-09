@@ -31,7 +31,11 @@ public class RequisitionIssueSlip {
 
     private String requested_by;
 
+    private String designation;
+
     private String division;
+
+    private String unit;
 
     private String office;
 

@@ -15,16 +15,10 @@ public class Prompt {
     public static void success(String message){
         Alert alert = new Alert(Alert.AlertType.INFORMATION, message);
         alert.show();
-        Timeline idlestage = new Timeline( new KeyFrame( Duration.seconds(3 ), new EventHandler<ActionEvent>()
-        {
-
-            @Override
-            public void handle( ActionEvent event )
-            {
-                //alert.setResult(ButtonType.CANCEL);
-                alert.hide();
-            }
-        } ) );
+        Timeline idlestage = new Timeline( new KeyFrame( Duration.seconds(3 ), event -> {
+            //alert.setResult(ButtonType.CANCEL);
+            alert.hide();
+        }) );
         idlestage.setCycleCount( 1 );
         idlestage.play();
     }
@@ -32,15 +26,7 @@ public class Prompt {
     public static void failed(String message){
         Alert alert = new Alert(Alert.AlertType.ERROR, message);
         alert.show();
-        Timeline idlestage = new Timeline( new KeyFrame( Duration.seconds(2), new EventHandler<ActionEvent>()
-        {
-
-            @Override
-            public void handle( ActionEvent event )
-            {
-                alert.hide();
-            }
-        } ) );
+        Timeline idlestage = new Timeline( new KeyFrame( Duration.seconds(2), event -> alert.hide()) );
         idlestage.setCycleCount( 1 );
         idlestage.play();
     }

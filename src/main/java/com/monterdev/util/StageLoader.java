@@ -65,7 +65,7 @@ public class StageLoader {
         // stage.setFullScreen(true);
         if(!stage.isShowing()){
             stage.initStyle(StageStyle.UNDECORATED);
-            stage.setAlwaysOnTop(true);
+          //  stage.setAlwaysOnTop(true);
         }
         stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         stage.setTitle(getWindowTitle());
@@ -101,10 +101,10 @@ public class StageLoader {
         Platform.setImplicitExit(false);
         if(!primaryStage.isShowing()){
             primaryStage.initStyle(StageStyle.UNDECORATED);
-            primaryStage.setAlwaysOnTop(true);
+       //     primaryStage.setAlwaysOnTop(true);
         }
 
-       // primaryStage.setFullScreen(true);
+       //primaryStage.setFullScreen(true);
 
         //primaryStage.initModality(Modality.APPLICATION_MODAL);
         primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);

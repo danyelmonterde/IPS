@@ -478,12 +478,14 @@ public class InventoryListController implements Initializable {
                 currentPage = Integer.parseInt(nv);
                 if (currentPage <= maximumPage) {
                     loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
+                }else if(currentPage > maximumPage){
+                    currentPageTextField.setText(String.valueOf(maximumPage));
                 }
 
             } else if (org.springframework.util.ObjectUtils.isEmpty(currentPageTextField.getText())) {
                 //EMPTY TEXT FIELD
-                currentPageTextField.setText(currentPageTextField.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
-                currentPage = 1;
+               // currentPageTextField.setText(currentPageTextField.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                currentPageTextField.setText("1");
             } else {
                 //INVALID TEXT FIELD
                 currentPageTextField.setText(currentPageTextField.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
@@ -515,6 +517,9 @@ public class InventoryListController implements Initializable {
     private void searchItemOnType() {
         searchItemTextField.textProperty().addListener((ob, ov, nv) -> {
             if (ov != nv) {
+                if(nv.length()==1){
+                    currentPageTextField.setText("1");
+                }
                 loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
             }
         });
@@ -523,6 +528,7 @@ public class InventoryListController implements Initializable {
     private void stockAlertsOnClick() {
         stockAlertsCombo.valueProperty().addListener((ob, ov, nv) -> {
             if (ov != nv) {
+                currentPageTextField.setText("1");
                 CURRENT_SELECTED_STOCK_ALERT = (String) nv;
                 loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
             }
@@ -545,9 +551,11 @@ public class InventoryListController implements Initializable {
                 ItemCategory category = (ItemCategory) nv;
                 if (!ObjectUtils.isEmpty(category)) {
                     if (category.getCategory_name().equalsIgnoreCase(ALL_CATEGORIES)) {
+                        currentPageTextField.setText("1");
                         CURRENT_SELECTED_CATEGORY = "";
                         loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
                     } else {
+                        currentPageTextField.setText("1");
                         CURRENT_SELECTED_CATEGORY = category.getCategory_name();
                         loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
                     }

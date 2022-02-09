@@ -16,7 +16,7 @@
       "configValue": "C:\\Users\\Daniel\\Desktop\\IPS\\src\\main\\resources\\config-ui\\IQWD-APP-RESOURCES\\Main\\trash.png"
     }, {
       "configId": "CUSTOMER_TYPES",
-      "configValue": "OLD,NEW"
+      "configValue": "EXISTING,NEW"
     },
     {
       "configId": "RIS_FIELD_TYPES",

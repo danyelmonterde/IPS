@@ -9,7 +9,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ToggleGroup;
@@ -20,7 +19,6 @@ import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,7 +30,6 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static com.monterdev.configuration.ItemsUIConfiguration.getItemsTopHboxSpacing;
 import static com.monterdev.constants.HistoryConstants.PURCHASED_ITEM;
 import static com.monterdev.constants.TextFieldValidatorConstants.*;
 import static com.monterdev.util.ComponentCreator.createSearchBox;
@@ -358,7 +355,7 @@ public class EditItemController implements Initializable {
                     if (!ObjectUtils.isEmpty(purchaseCost.getText())) {
                         //VALID TEXT FIELD
                         purchaseCost.setText(purchaseCost.getText().replaceAll(FLOAT_NUMBERS_REGEX_EXCLUDE, ""));
-                       // double itemPurchaseCost = Double.parseDouble(newValue);
+                        // double itemPurchaseCost = Double.parseDouble(newValue);
                         //double itemQuantity = Integer.parseInt(quantity.getText());
                         //double itemTotalAmount = itemPurchaseCost * itemQuantity;
 
@@ -368,7 +365,7 @@ public class EditItemController implements Initializable {
                     } else {
                         //EMPTY TEXT FIELD
                         selectedItem.setCost(0);
-                      //  totalAmount.setText("0");
+                        //  totalAmount.setText("0");
                     }
 
                 } catch (NumberFormatException exception) {
