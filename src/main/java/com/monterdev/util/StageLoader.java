@@ -64,7 +64,7 @@ public class StageLoader {
         Scene scene = new Scene(root, 1280, 720);
         // stage.setFullScreen(true);
         if(!stage.isShowing()){
-            stage.initStyle(StageStyle.UNDECORATED);
+         //   stage.initStyle(StageStyle.UNDECORATED);
           //  stage.setAlwaysOnTop(true);
         }
         stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
@@ -81,7 +81,7 @@ public class StageLoader {
             stage.setY(event.getScreenY() - screen_y);
         });
 
-        stage.setAlwaysOnTop(true);
+      //  stage.setAlwaysOnTop(true);
         stage.setScene(scene);
         stage.show();
 
@@ -100,7 +100,7 @@ public class StageLoader {
     private void TestStage(Parent root, Stage primaryStage) {
         Platform.setImplicitExit(false);
         if(!primaryStage.isShowing()){
-            primaryStage.initStyle(StageStyle.UNDECORATED);
+          //  primaryStage.initStyle(StageStyle.UNDECORATED);
        //     primaryStage.setAlwaysOnTop(true);
         }
 

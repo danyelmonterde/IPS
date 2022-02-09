@@ -567,12 +567,12 @@ public class EditItemController implements Initializable {
                     Prompt.success("Purchased Item was saved!");
                     resetSelectedItem();
                     Stage stage = (Stage) save.getScene().getWindow();
-                    new StageLoader().load(MainDashboardController.class, applicationContext, stage);
+                    new StageLoader().load(InventoryListController.class, applicationContext, stage);
                 } else if (!ObjectUtils.isEmpty(savedItem)) {
                     Prompt.success("Item updated successfully!");
                     resetSelectedItem();
                     Stage stage = (Stage) save.getScene().getWindow();
-                    new StageLoader().load(MainDashboardController.class, applicationContext, stage);
+                    new StageLoader().load(InventoryListController.class, applicationContext, stage);
                 } else {
                     Prompt.failed("Transaction Failed! Please Try again!");
                 }
