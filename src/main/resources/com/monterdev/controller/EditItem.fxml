@@ -26,7 +26,7 @@
                               <Insets left="20.0" top="20.0" />
                            </VBox.margin>
                         </Label>
-                        <JFXTextField fx:id="name" minWidth="-Infinity">
+                        <JFXTextField fx:id="name" minWidth="-Infinity" prefWidth="420.0">
                            <VBox.margin>
                               <Insets bottom="20.0" left="20.0" />
                            </VBox.margin>
@@ -91,7 +91,7 @@
                      <children>
                         <Label text="Purchase Cost" />
                         <JFXTextField fx:id="purchaseCost" minWidth="-Infinity" text="0" />
-                        <JFXToggleButton fx:id="trackStock" onAction="#showTrackStock" text="Track stock" textAlignment="JUSTIFY" toggleLineColor="#31b738">
+                        <JFXToggleButton fx:id="trackStock" onAction="#showTrackStock" text="Show Stock" textAlignment="JUSTIFY" toggleLineColor="#31b738">
                            <VBox.margin>
                               <Insets top="20.0" />
                            </VBox.margin>

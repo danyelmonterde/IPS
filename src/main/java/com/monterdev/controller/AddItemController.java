@@ -99,22 +99,22 @@ public class AddItemController implements Initializable {
     private void saveOnAction() {
         save.setOnAction(e -> {
             if (!ObjectUtils.isEmpty(item.getItem_name()) && !ObjectUtils.isEmpty(item.getUnit()) && !ObjectUtils.isEmpty(item.getItem_category())) {
-
+                //Item name, Item unit and category are  required
                 try {
                     Item savedItem = itemsRepository.save(item);
                     if (!ObjectUtils.isEmpty(savedItem)) {
                         Balance balance = new Balance();
-                        categoryRepository.findAll().stream().forEach(z -> {
-                            Balance bal = balanceRepository.getBalanceIdOfCurrentInventoryMonth(AppTime.getMonth(), String.valueOf(AppTime.getYear()), z.getCategory_name());
-                            if (!(z.getCategory_name().equalsIgnoreCase(ALL_CATEGORIES))) {
-                                if (!org.apache.commons.lang3.ObjectUtils.isEmpty(bal)) {
+                            //Balance is being adjusted every new item being added 
+                            Balance bal = balanceRepository.getBalanceOfCurrentInventoryMonth(AppTime.getMonth(), String.valueOf(AppTime.getYear()), savedItem.getItem_category());
+                            if (!(savedItem.getItem_category().equalsIgnoreCase(ALL_CATEGORIES))) {
+                                if (!ObjectUtils.isEmpty(bal)) {
                                     balance.setYear(String.valueOf(AppTime.getYear()));
                                     balance.setMonth(AppTime.getMonth());
                                     balance.setDatecreated(String.valueOf(AppTime.now()));
                                     balance.setId(bal.getId());
                                     balance.setBeginbalance(bal.getBeginbalance());
                                     balance.setCategory(bal.getCategory());
-                                    String x = itemsRepository.getEndBalanceByInventoryType(z.getCategory_name());
+                                    String x = itemsRepository.getEndBalanceByInventoryType(savedItem.getItem_category());
                                     balance.setEndbalance(ObjectUtils.isEmpty(x) ? 0 : DataUtil.formatDouble(x));
                                     balanceRepository.save(balance);//lagay sa loop
                                 } else {
@@ -122,15 +122,15 @@ public class AddItemController implements Initializable {
                                     balance.setMonth(AppTime.getMonth());
                                     balance.setDatecreated(String.valueOf(AppTime.now()));
                                     balance.setId(0);
-                                    String b = itemsRepository.getEndBalanceByInventoryType(z.getCategory_name());
+                                    String b = itemsRepository.getEndBalanceByInventoryType(savedItem.getItem_category());
                                     balance.setBeginbalance(ObjectUtils.isEmpty(b) ? 0 : DataUtil.formatDouble(b));
-                                    balance.setCategory(z.getCategory_name());
+                                    balance.setCategory(savedItem.getItem_category());
                                     balance.setEndbalance(ObjectUtils.isEmpty(b) ? 0 : DataUtil.formatDouble(b));
                                     balanceRepository.save(balance);//lagay sa loop
                                 }
                             }
 
-                        });
+
 
                         Barcode barcode = setBarcodeData(item);
                         qrcodeRepository.save(barcode);
@@ -149,6 +149,8 @@ public class AddItemController implements Initializable {
                     }
                 } catch (DataIntegrityViolationException dataIntegrityViolationException) {
                     Prompt.failed("Item existed already!");
+                } catch (Exception exception){
+                    Prompt.failed("An error occurred while saving item!");
                 }
 
             } else {
@@ -169,7 +171,7 @@ public class AddItemController implements Initializable {
 
     private void cancelOnAction() {
         cancel.setOnAction(e -> {
-            resetOnAction();
+            resetItem();
             Stage stage = (Stage) name.getScene().getWindow();
             new StageLoader().loadTest(MainDashboardController.class, applicationContext, stage);
         });
@@ -202,18 +204,25 @@ public class AddItemController implements Initializable {
     private void lowStockOnChange() {
         lowStock.textProperty().addListener((observable, oldValue, newValue) -> {
 
-            if (NumberUtils.isParsable(lowStock.getText()) && !ObjectUtils.isEmpty(lowStock.getText())) {
-                //VALID TEXT FIELD
-                item.setLow_stock(Integer.parseInt(lowStock.getText()));
-            } else if (ObjectUtils.isEmpty(lowStock.getText())) {
-                //EMPTY TEXT FIELD
-                item.setLow_stock(0);
-                lowStock.setText(lowStock.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
-            } else {
-                //INVALID TEXT FIELD
-                lowStock.setText(lowStock.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
-                lowStock.setText(lowStock.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
+            try {
+                if (NumberUtils.isParsable(lowStock.getText()) && !ObjectUtils.isEmpty(lowStock.getText())) {
+                    //VALID TEXT FIELD
+                    lowStock.setText(lowStock.getText().replaceAll(NEGATIVE_WHOLE_NUMBERS, ""));
+                    item.setLow_stock(Math.abs(Integer.parseInt(lowStock.getText())));
+                } else if (ObjectUtils.isEmpty(lowStock.getText())) {
+                    //EMPTY TEXT FIELD
+                    item.setLow_stock(0);
+                    lowStock.setText(lowStock.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                } else {
+                    //INVALID TEXT FIELD
+                    lowStock.setText(lowStock.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                    lowStock.setText(lowStock.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
+                }
+            } catch (IllegalArgumentException exception) {
+                quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
             }
+
         });
     }
 
@@ -234,8 +243,9 @@ public class AddItemController implements Initializable {
                     if (!ObjectUtils.isEmpty(purchaseCost.getText())) {
                         //VALID TEXT FIELD
                         purchaseCost.setText(purchaseCost.getText().replaceAll(FLOAT_NUMBERS_REGEX_EXCLUDE, ""));
-                        double itemPurchaseCost = Double.parseDouble(newValue);
-                        double itemQuantity = Integer.parseInt(quantity.getText());
+                        purchaseCost.setText(purchaseCost.getText().replaceAll(NEGATIVE_WHOLE_NUMBERS, ""));
+                        double itemPurchaseCost = Math.abs(Double.parseDouble(newValue));
+                        double itemQuantity = Math.abs(Integer.parseInt(quantity.getText()));
                         double itemTotalAmount = itemPurchaseCost * itemQuantity;
 
                         totalAmount.setText(String.valueOf(itemTotalAmount));
@@ -247,8 +257,9 @@ public class AddItemController implements Initializable {
                         totalAmount.setText("0");
                     }
 
-                } catch (NumberFormatException exception) {
-
+                } catch (IllegalArgumentException exception) {
+                    purchaseCost.setText(purchaseCost.getText().replaceAll(FLOAT_NUMBERS_REGEX_EXCLUDE, ""));
+                    purchaseCost.setText(purchaseCost.getText().replaceAll(NEGATIVE_WHOLE_NUMBERS, ""));
                 }
 
             }
@@ -257,27 +268,37 @@ public class AddItemController implements Initializable {
 
     private void quantityOnChange() {
         quantity.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (NumberUtils.isParsable(quantity.getText()) && !ObjectUtils.isEmpty(quantity.getText())) {
-                //VALID TEXT FIELD
-                double itemPurchaseCost = DataUtil.formatDouble(purchaseCost.getText());
-                int itemQuantity = Integer.parseInt(quantity.getText());
-                double itemTotalAmount = itemPurchaseCost * itemQuantity;
+            try {
+                if (NumberUtils.isParsable(quantity.getText()) && !ObjectUtils.isEmpty(quantity.getText())) {
+                    //VALID TEXT FIELD
+                    quantity.setText(quantity.getText().replaceAll(NEGATIVE_WHOLE_NUMBERS, ""));
+                    double itemPurchaseCost = Math.abs(DataUtil.formatDouble(purchaseCost.getText()));
+                    int itemQuantity = Math.abs(Integer.parseInt(quantity.getText()));
+                    double itemTotalAmount = itemPurchaseCost * itemQuantity;
 
-                totalAmount.setText(String.valueOf(itemTotalAmount));
-                item.setQuantity(itemQuantity);
-                item.setIn_stock(itemQuantity);
+                    totalAmount.setText(String.valueOf(itemTotalAmount));
+                    item.setQuantity(itemQuantity);
+                    item.setIn_stock(itemQuantity);
 
-            } else if (ObjectUtils.isEmpty(quantity.getText())) {
-                //EMPTY TEXT FIELD
+                } else if (ObjectUtils.isEmpty(quantity.getText())) {
+                    //EMPTY TEXT FIELD
+                    quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                    item.setQuantity(0);
+                    item.setIn_stock(0);
+                    totalAmount.setText("0.0");
+                } else {
+                    //INVALID TEXT FIELD
+                    quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                    quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
+                }
+            } catch (NumberFormatException exception) {
                 quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
-                item.setQuantity(0);
-                item.setIn_stock(0);
-                totalAmount.setText("0.0");
-            } else {
-                //INVALID TEXT FIELD
+                quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
+            } catch (IllegalArgumentException exception) {
                 quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                 quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
             }
+
         });
     }
 
@@ -300,6 +321,12 @@ public class AddItemController implements Initializable {
                 item.setItem_category((String) newValue);
             }
         });
+
+        if (itemCategories.iterator().hasNext()) {
+            itemCategoryCombo.setValue(itemCategories.iterator().next().getCategory_name());
+        }
+
+
     }
 
     private void loadUnits() {

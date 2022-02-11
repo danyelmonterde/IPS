@@ -381,6 +381,7 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
 
     public void cancel(ActionEvent actionEvent) {
         Stage stage = (Stage) btnAddRIS.getScene().getWindow();
+        resetRisTemplateFields();
         new StageLoader().loadTest(MainDashboardController.class, applicationContext, stage);
     }
 

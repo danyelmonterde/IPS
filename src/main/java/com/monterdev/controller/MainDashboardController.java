@@ -52,8 +52,8 @@ import java.util.stream.StreamSupport;
 import static com.monterdev.configuration.GlobalConfiguration.*;
 import static com.monterdev.constants.HistoryConstants.RELEASED_ITEM;
 import static com.monterdev.constants.InventoryTypeConstants.SUMMARY;
-import static com.monterdev.constants.TextFieldValidatorConstants.PLUS_DOLLAR_REGEX_EXCLUDE;
-import static com.monterdev.constants.TextFieldValidatorConstants.WHOLE_NUMBERS_REGEX_EXCLUDE;
+import static com.monterdev.constants.TextFieldValidatorConstants.*;
+import static com.monterdev.util.ComponentCreator.createButtonWithoutText;
 import static com.monterdev.util.ComponentCreator.createTextField;
 
 @Component
@@ -302,7 +302,7 @@ public class MainDashboardController implements Initializable {
     private void purchaseExistingItemButtonOnAction() {
         purchaseExistingItemButton.setOnAction(add -> {
             Stage currentStage = (Stage) mainAnchorpane.getScene().getWindow();
-            new StageLoader().load(InventoryListController.class, applicationContext, currentStage);
+            new StageLoader().load(EditItemController.class, applicationContext, currentStage);
         });
     }
 
@@ -337,6 +337,7 @@ public class MainDashboardController implements Initializable {
 
     private HBox createRow(VBox vBox, Item item, int currentIndex) {
 
+
         Item currentItem = new Item();
         itemLists.stream().forEach(s -> {
             if (s.getSku() == item.getSku() && (!(item.getItem_name().equalsIgnoreCase(s.getItem_name())))) {
@@ -352,10 +353,33 @@ public class MainDashboardController implements Initializable {
             }
         });
 
-        itemCart.add(currentItem);
+        itemCart.add(currentIndex,currentItem);
+
+
+        JFXButton delete = createButtonWithoutText("DELETE");
+        delete.setId(Integer.toString(currentIndex));
+        delete.setOnAction(del -> {
+            try {
+
+                    int id = Integer.parseInt(delete.getId());
+                    itemCart.remove(id);
+                    vBox.getChildren().remove(currentIndex);
+                    updateIdOfRemainingHbox(id);
+                    System.out.println(itemCart.size());
+                    rowIndex--;
+
+            } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+                vBox.getChildren().clear();
+            } catch (Exception exception) {
+                vBox.getChildren().clear();
+            }
+
+        });
+
 
 
         JFXTextField name = createTextField("ITEM NAME", "LIGHT GRAY");
+        name.setPrefWidth(220.0);
         name.setEditable(false);
         name.setText(currentItem.getItem_name());
         name.setId(String.valueOf(currentIndex));
@@ -378,7 +402,7 @@ public class MainDashboardController implements Initializable {
 
 
         JFXTextField cost = createTextField("COST", "LIGHT GRAY");
-        cost.setEditable(true);
+        cost.setEditable(false);
         cost.setId(String.valueOf(currentIndex));
         cost.setText(String.valueOf(currentItem.getCost()));
         cost.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -399,36 +423,34 @@ public class MainDashboardController implements Initializable {
         quantity.setText(String.valueOf(currentItem.getQuantity()));
         quantity.setId(String.valueOf(currentIndex));
         quantity.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (NumberUtils.isParsable(quantity.getText()) && !ObjectUtils.isEmpty(quantity.getText())) {
-                //VALID TEXT FIELD
-                currentItem.setQuantity(Integer.parseInt(newValue));
-                itemCart.get(Integer.parseInt(quantity.getId())).setQuantity(Integer.parseInt(newValue));
-                if (requisitionIssueSlip.getIs_customer_new() == 1) {
-                    amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost() + (currentItem.getCost() * .2)));
+            try{
+                if (NumberUtils.isParsable(quantity.getText()) && !ObjectUtils.isEmpty(quantity.getText())) {
+                    //VALID TEXT FIELD
+                    quantity.setText(quantity.getText().replaceAll(NEGATIVE_WHOLE_NUMBERS, ""));
+                    currentItem.setQuantity(Math.abs(Integer.parseInt(newValue)));
+                    itemCart.get(Integer.parseInt(quantity.getId())).setQuantity(Math.abs(Integer.parseInt(newValue)));
+                    if (requisitionIssueSlip.getIs_customer_new() == 1) {
+                        amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost() + (currentItem.getCost() * .2)));
+                    } else {
+                        amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
+                    }
+                } else if (ObjectUtils.isEmpty(quantity.getText())) {
+                    //EMPTY TEXT FIELD
+                    item.setLow_stock(0);
+                    quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                 } else {
-                    amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
+                    //INVALID TEXT FIELD
+                    quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                    quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
                 }
-            } else if (ObjectUtils.isEmpty(quantity.getText())) {
-                //EMPTY TEXT FIELD
-                item.setLow_stock(0);
+            } catch (NumberFormatException exception) {
                 quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
-            } else {
-                //INVALID TEXT FIELD
+                quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
+            } catch (IllegalArgumentException exception) {
                 quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                 quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
             }
 
-
-//            if (oldValue != newValue) {
-//                currentItem.setQuantity(Integer.parseInt(newValue));
-//                itemCart.get(Integer.parseInt(quantity.getId())).setQuantity(Integer.parseInt(newValue));
-//                if (requisitionIssueSlip.getIs_customer_new() == 1) {
-//                    amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost() + (currentItem.getCost() * .2)));
-//                } else {
-//                    amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
-//                }
-//
-//            }
         });
 
         JFXComboBox unit = new JFXComboBox();
@@ -453,10 +475,49 @@ public class MainDashboardController implements Initializable {
         HBox.setMargin(quantity, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(cost, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(amount, new Insets(50.0, 0.0, 0.0, 20.0));
-        hBox.getChildren().addAll(name, quantity, cost, amount);
+        HBox.setMargin(delete, new Insets(50.0, 0.0, 0.0, 20.0));
+        hBox.getChildren().addAll(name, quantity, cost, amount, delete);
 
         return hBox;
 
+    }
+
+    private void updateIdOfRemainingHbox(int indexOfItemDeleted){
+        ObservableList<Node> nodeStream = midHbox.getChildren();
+        for (Node node : nodeStream) {
+            if (node instanceof ScrollPane) {
+                Node node2 = ((ScrollPane) node).getContent();
+                if (node2 instanceof AnchorPane) {
+                    for (Node node3 : ((AnchorPane) node2).getChildren()) {
+                        if (node3 instanceof VBox) {
+                            //vbox
+                            //hbox
+                            for (Node node4: ((VBox) node3).getChildren()){
+                                if(node4 instanceof HBox){
+                                   for(Node node5: ((HBox) node4).getChildren()){
+                                       if(node5 instanceof JFXButton){
+                                           JFXButton deleteButton = (JFXButton) node5;
+                                           String currentId = deleteButton.getId();
+                                           if(Integer.parseInt(currentId)>indexOfItemDeleted){
+                                               deleteButton.setId(String.valueOf(Integer.parseInt(currentId)-1));
+                                           }
+
+                                       }
+                                   }
+                                }
+                            }
+
+//                            VBox vBox = (VBox) node3;
+//                            HBox row = createRow(vBox, selectedItem, rowIndex);
+//                            row.setId(String.valueOf(rowIndex));
+//                            VBox.setMargin(row, new Insets(20.0, 0.0, 0.0, 0.0));
+//                            vBox.getChildren().add(rowIndex, row);
+//                            rowIndex++;
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
@@ -730,22 +791,23 @@ public class MainDashboardController implements Initializable {
         scrollPane.setPrefWidth(600);
 
         AnchorPane anchorPane = new AnchorPane();
-        anchorPane.setPrefWidth(800);
-        anchorPane.setPrefHeight(800);
+        anchorPane.setPrefWidth(600);
+        anchorPane.setPrefHeight(600);
 
 
         VBox vbox = new VBox();
 
         anchorPane.getChildren().add(vbox);
         AnchorPane.setLeftAnchor(vbox, 0.0);
-        AnchorPane.setRightAnchor(vbox, 0.0);
+        AnchorPane.setRightAnchor(vbox, 40.0);
         AnchorPane.setTopAnchor(vbox, 0.0);
         AnchorPane.setBottomAnchor(vbox, 0.0);
 
         scrollPane.setContent(anchorPane);
 
         midHbox.setAlignment(Pos.CENTER_RIGHT);
-        HBox.setMargin(scrollPane, new Insets(0.0, 20.0, 20.0, 20.0));
+        midHbox.setPadding(new Insets(0.0, 20.0, 0.0, 20.0));
+        HBox.setMargin(scrollPane, new Insets(0.0, 40.0, 20.0, 20.0));
 
         JFXTextField itemName = new JFXTextField();
         itemName.setPrefWidth(200.0);

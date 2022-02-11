@@ -12,4 +12,6 @@ public interface RisTypeFieldsRepository extends CrudRepository<RisTypeFields, I
 
     @Query(value = "SELECT * FROM ristypefields WHERE control_number=:control_number", nativeQuery = true)
     List<RisTypeFields> findByControlNumber(@Param("control_number") String control_number);
+
+
 }

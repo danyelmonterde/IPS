@@ -13,4 +13,7 @@ public interface RisTypeRepository extends JpaRepository<RisType, Integer> {
     @Query(value = "SELECT * FROM ristype WHERE ristype=:risType", nativeQuery = true)
     List<RisType> findByRisType(@Param("risType") String risType);
 
+    @Query(value = "SELECT risfield FROM ristype WHERE ristype=:risType", nativeQuery = true)
+    List<String> findRisFieldsByRisType(@Param("risType") String risType);
+
 }

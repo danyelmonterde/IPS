@@ -5,6 +5,7 @@ import com.monterdev.model.RisType;
 import com.monterdev.model.RisTypeFields;
 import com.monterdev.model.Sales;
 import com.monterdev.repository.*;
+import com.monterdev.util.AppTime;
 import com.monterdev.util.ReportUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,32 +92,66 @@ public class ReportsMapper {
                 totalSales += sales.getTotal_sales();
                 totalCost += sales.getTotal_cost();
                 totalIncome += sales.getIncome();
-                //FIXED COLUMNS
-                mappedReport.put("COMPANY_NAME", getConfigValue(companyName));
-                mappedReport.put("ADDRESS", getConfigValue(companyAddress));
-                mappedReport.put("MONTH", selectedMonth + " " + selectedYear);
-                mappedReport.put("DOCUMENT_TRACKING_NUMBER", RandomStringUtils.randomAlphanumeric(5));
-                mappedReport.put("REPORT_NAME", reportUtil.getSelectedReport());
-                mappedReport.put("REPORT_DESCRIPTION", getReportDescription(reportUtil.getSelectedReport()));
-                mappedReport.put("SALES", sales.getTotal_sales());
-                mappedReport.put("COST", sales.getTotal_cost());
-                mappedReport.put("INCOME", sales.getIncome());
-                mappedReport.put("DATE", sales.getDate_transacted());
-                mappedReport.put("TOTAL_SALES", String.format("%d",(long)totalSales));
-                mappedReport.put("TOTAL_COST", String.format("%d",(long)totalCost));
-                mappedReport.put("TOTAL_INCOME", String.format("%d",(long)totalIncome));
-                mappedReport.put("PREPARED_BY", signatoryRepository.findSignatoryByRole("preparedBy", reportUtil.getReportId()).getSignatory());
-                mappedReport.put("NOTEDBY", signatoryRepository.findSignatoryByRole("notedBy", reportUtil.getReportId()).getSignatory());
-                mappedReport.put("CHECKED_BY", signatoryRepository.findSignatoryByRole("checkedBy", reportUtil.getReportId()).getSignatory());
-                mappedReport.put("CHECKED_BY_POSITION", signatoryRepository.findSignatoryByRole("checkedBy", reportUtil.getReportId()).getPosition());
-                mappedReport.put("PREPARED_BY_POSITION", signatoryRepository.findSignatoryByRole("preparedBy", reportUtil.getReportId()).getPosition());
-                mappedReport.put("NOTED_BY_POSITION", signatoryRepository.findSignatoryByRole("notedBy", reportUtil.getReportId()).getPosition());
+                mapSales(selectedMonth, selectedYear, mappedReport, sales);
             }
 
             mappedReportsList.add(mappedReport);
 
         });
+        if (ObjectUtils.isEmpty(requisitionIssueSlipListForTheSpecifiedMonth)) {
+            //Empty list because no transactions
+            Map<String, Object> mappedReport = new HashMap<>();
+            List<String> risTypeFieldsList = risTypeRepository.findRisFieldsByRisType(reportUtil.getSelectedReportRisTypeCode());
+            List<RisType> risTypeList = risTypeRepository.findByRisType(reportUtil.getSelectedReportRisTypeCode());
+
+            if (!ObjectUtils.isEmpty(risTypeFieldsList) && !ObjectUtils.isEmpty(risTypeList)) {
+                //ADDITIONAL FIELDS
+                risTypeList.stream().forEach(r1 -> {
+                    risTypeFieldsList.stream().forEach(r2 -> {
+                        if (r1.getRisfield().equalsIgnoreCase(r2)) {
+                            mappedReport.put(r1.getRisfield(), "empty");
+                        }
+                    });
+                });
+            }
+
+            Sales sales = new Sales();
+            sales.setTotal_cost(totalCost);
+            sales.setIncome(totalIncome);
+            sales.setControl_number("");
+            sales.setTotal_sales(totalSales);
+            sales.setDate_transacted(String.valueOf(AppTime.now()));
+            sales.setId(0);
+            mapSales(selectedMonth, selectedYear, mappedReport, sales);
+
+            mappedReportsList.add(mappedReport);
+        }
+
+
         return mappedReportsList;
+    }
+
+    private void mapSales(String selectedMonth, String selectedYear, Map<String, Object> mappedReport, Sales sales) {
+        //FIXED COLUMNS
+        mappedReport.put("COMPANY_NAME", getConfigValue(companyName));
+        mappedReport.put("ADDRESS", getConfigValue(companyAddress));
+        mappedReport.put("MONTH", selectedMonth + " " + selectedYear);
+        mappedReport.put("DOCUMENT_TRACKING_NUMBER", RandomStringUtils.randomAlphanumeric(5));
+        mappedReport.put("REPORT_NAME", reportUtil.getSelectedReport());
+        mappedReport.put("REPORT_DESCRIPTION", getReportDescription(reportUtil.getSelectedReport()));
+        mappedReport.put("SALES", sales.getTotal_sales());
+        mappedReport.put("COST", sales.getTotal_cost());
+        mappedReport.put("INCOME", sales.getIncome());
+        mappedReport.put("DATE", sales.getDate_transacted());
+        mappedReport.put("TOTAL_SALES", String.format("%d", (long) totalSales));
+        mappedReport.put("TOTAL_COST", String.format("%d", (long) totalCost));
+        mappedReport.put("TOTAL_INCOME", String.format("%d", (long) totalIncome));
+        mappedReport.put("PREPARED_BY", signatoryRepository.findSignatoryByRole("preparedBy", reportUtil.getReportId()).getSignatory());
+        mappedReport.put("NOTEDBY", signatoryRepository.findSignatoryByRole("notedBy", reportUtil.getReportId()).getSignatory());
+        mappedReport.put("CHECKED_BY", signatoryRepository.findSignatoryByRole("checkedBy", reportUtil.getReportId()).getSignatory());
+        mappedReport.put("CHECKED_BY_POSITION", signatoryRepository.findSignatoryByRole("checkedBy", reportUtil.getReportId()).getPosition());
+        mappedReport.put("PREPARED_BY_POSITION", signatoryRepository.findSignatoryByRole("preparedBy", reportUtil.getReportId()).getPosition());
+        mappedReport.put("NOTED_BY_POSITION", signatoryRepository.findSignatoryByRole("notedBy", reportUtil.getReportId()).getPosition());
     }
 
     private String getReportDescription(String reportName) {

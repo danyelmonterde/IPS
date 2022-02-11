@@ -3,7 +3,6 @@ package com.monterdev.controller;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
-import com.monterdev.constants.InventoryTypeConstants;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
 import com.monterdev.util.*;
@@ -45,17 +44,14 @@ import java.io.*;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static com.monterdev.configuration.GlobalConfiguration.*;
-import static com.monterdev.constants.InventoryTypeConstants.ALL_CATEGORIES;
 import static com.monterdev.configuration.ItemsUIConfiguration.stockAlerts;
+import static com.monterdev.constants.InventoryTypeConstants.ALL_CATEGORIES;
 import static com.monterdev.constants.TextFieldValidatorConstants.PLUS_DOLLAR_REGEX_EXCLUDE;
 import static com.monterdev.constants.TextFieldValidatorConstants.WHOLE_NUMBERS_REGEX_EXCLUDE;
 import static com.monterdev.util.BarCodeUtil.saveBarCode;
@@ -206,8 +202,8 @@ public class InventoryListController implements Initializable {
     }
 
     private void btnStockAdjustmentOnAction() {
-        btnStockAdjustment.setOnAction(e->{
-            Stage newStage = (Stage)btnStockAdjustment.getScene().getWindow();
+        btnStockAdjustment.setOnAction(e -> {
+            Stage newStage = (Stage) btnStockAdjustment.getScene().getWindow();
             new StageLoader().loadTest(StockAdjustmentController.class, applicationContext, newStage);
         });
     }
@@ -247,7 +243,7 @@ public class InventoryListController implements Initializable {
     }
 
     private void btnHistoryOnClick() {
-        btnHistory.setOnAction(e->{
+        btnHistory.setOnAction(e -> {
             Stage stage = (Stage) btnHistory.getScene().getWindow();
             new StageLoader().loadTest(InventoryHistoryController.class, applicationContext, stage);
         });
@@ -307,6 +303,7 @@ public class InventoryListController implements Initializable {
         Runnable timeUpdater = () -> Platform.runLater(() -> {
             LocalDateTime localDateTime = AppTime.now();
             currentDateLabel.setText(localDateTime.format(formatter) + " " + localDateTime.format(formatter1));
+            currentPageTextField.setText("1");
             loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
         });
 
@@ -318,6 +315,7 @@ public class InventoryListController implements Initializable {
                 lowStockIndicator.setVisible(true);
                 lowStockLabel.setVisible(true);
                 lowStockCircle.setVisible(true);
+
             } else {
                 lowStockIndicator.setText("0");
                 lowStockIndicator.setVisible(false);
@@ -402,10 +400,10 @@ public class InventoryListController implements Initializable {
         inventoryListTableView.getItems().setAll(itemObservableList);
         maximumPage = initialItemPage.getTotalPages();
         ofLabel.setText(String.valueOf(maximumPage));
-        if(maximumPage==0){
+        if (maximumPage == 0) {
             ofLabel.setVisible(false);
             currentPageTextField.setVisible(false);
-        }else{
+        } else {
             ofLabel.setVisible(true);
             currentPageTextField.setVisible(true);
         }
@@ -476,17 +474,22 @@ public class InventoryListController implements Initializable {
             if (NumberUtils.isParsable(currentPageTextField.getText()) && !org.springframework.util.ObjectUtils.isEmpty(currentPageTextField.getText())) {
                 //VALID TEXT FIELD
                 currentPage = Integer.parseInt(nv);
-                if (currentPage <= maximumPage) {
+                if (currentPage <= maximumPage && currentPage!=0) {
                     loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
-                }else if(currentPage > maximumPage){
+                } else if (currentPage > maximumPage) {
                     currentPageTextField.setText(String.valueOf(maximumPage));
+                } else if(currentPage <= 0){
+                    currentPageTextField.setText("1");
                 }
 
             } else if (org.springframework.util.ObjectUtils.isEmpty(currentPageTextField.getText())) {
                 //EMPTY TEXT FIELD
-               // currentPageTextField.setText(currentPageTextField.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                // currentPageTextField.setText(currentPageTextField.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                 currentPageTextField.setText("1");
-            } else {
+            }else if(currentPageTextField.getText().equalsIgnoreCase("0")){
+                currentPageTextField.setText("1");
+            }
+            else {
                 //INVALID TEXT FIELD
                 currentPageTextField.setText(currentPageTextField.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                 currentPageTextField.setText(currentPageTextField.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
@@ -517,7 +520,7 @@ public class InventoryListController implements Initializable {
     private void searchItemOnType() {
         searchItemTextField.textProperty().addListener((ob, ov, nv) -> {
             if (ov != nv) {
-                if(nv.length()==1){
+                if (nv.length() == 1) {
                     currentPageTextField.setText("1");
                 }
                 loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
@@ -608,85 +611,91 @@ public class InventoryListController implements Initializable {
             File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 try {
-                    itemsRepository.truncateItems();
                     //List<Item> importedItems = itemsRepository.saveAll(DataUtil.convertIQWDInventoryToItemList(file));
-                    List<Item> importedItems =new CsvToBeanBuilder(new FileReader(file))
+                    List<Item> importedItems = new CsvToBeanBuilder(new FileReader(file))
                             .withType(Item.class)
                             .build().parse();
 
                     if (!ObjectUtils.isEmpty(importedItems)) {
                         if (Prompt.confirm("Are you sure you want to import this file? Existing items will be deleted.").get().getText().equalsIgnoreCase("OK")) {
-                            deletedItemsRepository.truncateDeletedItems();
-                            List<Item> existingItems = itemsRepository.findAll();
-                            existingItems.stream().forEach(existingItem -> {
-                                DeletedItems deletedItems = new DeletedItems();
-                                deletedItems.setItem_category(existingItem.getItem_category());
-                                deletedItems.setCost(existingItem.getCost());
-                                deletedItems.setQuantity(existingItem.getQuantity());
-                                deletedItems.setSku(existingItem.getSku());
-                                deletedItems.setIn_stock(existingItem.getIn_stock());
-                                deletedItems.setLow_stock(existingItem.getLow_stock());
-                                deletedItems.setTag(existingItem.getTag());
-                                deletedItems.setItem_name(existingItem.getItem_name());
-                                deletedItems.setUnit(existingItem.getUnit());
-                                deletedItemsRepository.save(deletedItems);
-                            });
-
-                            List<Item> newlyAddedItemList = itemsRepository.saveAll(importedItems);
-                          //  List<Item> newlyAddedItemList =
-                            if(!ObjectUtils.isEmpty(newlyAddedItemList)){
-                                Prompt.success("Item was imported successfully!");
-                            }else{
-                                Prompt.failed("Item import failed!");
-                            }
-                            Balance balance = new Balance();
-                            categoryObservableList.stream().forEach(e->{
-                                Balance bal = balanceRepository.getBalanceIdOfCurrentInventoryMonth(AppTime.getMonth(),String.valueOf(AppTime.getYear()),e.getCategory_name());
-                                if(!(e.getCategory_name().equalsIgnoreCase(ALL_CATEGORIES))){
-                                    if(!ObjectUtils.isEmpty(bal)){
-                                        balance.setYear(String.valueOf(AppTime.getYear()));
-                                        balance.setMonth(AppTime.getMonth());
-                                        balance.setDatecreated(String.valueOf(AppTime.now()));
-                                        balance.setId(bal.getId());
-                                        balance.setBeginbalance(bal.getBeginbalance());
-                                        balance.setCategory(bal.getCategory());
-                                        String x = itemsRepository.getEndBalanceByInventoryType(e.getCategory_name());
-                                        balance.setEndbalance(ObjectUtils.isEmpty(x)?0:DataUtil.formatDouble(x));
-                                        balanceRepository.save(balance);//lagay sa loop
-                                    }else{
-                                        balance.setYear(String.valueOf(AppTime.getYear()));
-                                        balance.setMonth(AppTime.getMonth());
-                                        balance.setDatecreated(String.valueOf(AppTime.now()));
-                                        balance.setId(0);
-                                        String b = itemsRepository.getEndBalanceByInventoryType(e.getCategory_name());
-                                        balance.setBeginbalance(ObjectUtils.isEmpty(b)?0: DataUtil.formatDouble(b));
-                                        balance.setCategory(e.getCategory_name());
-                                        balance.setEndbalance(ObjectUtils.isEmpty(b)?0: DataUtil.formatDouble(b));
-                                        balanceRepository.save(balance);//lagay sa loop
-                                    }
-                                }
-
-                            });
-
-
-
-                            if (!ObjectUtils.isEmpty(importedItems)) {
-                                qrcodeRepository.truncateQrCodes();
-                                importedItems.stream().forEach(e -> {
-                                    Barcode barcode = new Barcode();
-                                    barcode.setSku(e.getSku());
-                                    barcode.setBar_code_path(getConfigValue(generatedQrCodeDirectory) + "\\" + e.getSku());
-                                    barcode.setDate_created(AppTime.now());
-                                    qrcodeRepository.save(barcode);
-                                    try {
-                                        saveBarCode(String.valueOf(e.getSku()), String.valueOf(e.getSku()));
-                                    } catch (Exception ex) {
-
-                                    }
+                            Optional<String> result = Prompt.importConfirm("Please select and month and year. ");
+                            if(result.isPresent()){
+                                String month = result.get().split("-")[0];
+                                String year = result.get().split("-")[1];
+                                itemsRepository.truncateItems();
+                                deletedItemsRepository.truncateDeletedItems();
+                                List<Item> existingItems = itemsRepository.findAll();
+                                existingItems.stream().forEach(existingItem -> {
+                                    DeletedItems deletedItems = new DeletedItems();
+                                    deletedItems.setItem_category(existingItem.getItem_category());
+                                    deletedItems.setCost(existingItem.getCost());
+                                    deletedItems.setQuantity(existingItem.getQuantity());
+                                    deletedItems.setSku(existingItem.getSku());
+                                    deletedItems.setIn_stock(existingItem.getIn_stock());
+                                    deletedItems.setLow_stock(existingItem.getLow_stock());
+                                    deletedItems.setTag(existingItem.getTag());
+                                    deletedItems.setItem_name(existingItem.getItem_name());
+                                    deletedItems.setUnit(existingItem.getUnit());
+                                    deletedItemsRepository.save(deletedItems);
                                 });
 
-                            } else {
-                                Prompt.failed("An error occurred while importing data!");
+                                List<Item> newlyAddedItemList = itemsRepository.saveAll(importedItems);
+                                //  List<Item> newlyAddedItemList =
+                                if (!ObjectUtils.isEmpty(newlyAddedItemList)) {
+                                    Prompt.success("Item was imported successfully!");
+                                } else {
+                                    Prompt.failed("Item import failed!");
+                                }
+
+                                Balance balance = new Balance();
+                                categoryObservableList.stream().forEach(e -> {
+                                    Balance bal = balanceRepository.getBalanceOfCurrentInventoryMonth(month, year, e.getCategory_name());
+                                    if (!(e.getCategory_name().equalsIgnoreCase(ALL_CATEGORIES))) {
+                                        if (!ObjectUtils.isEmpty(bal)) {
+                                            balance.setYear(year);
+                                            balance.setMonth(month);
+                                            balance.setDatecreated(String.valueOf(AppTime.now()));
+                                            balance.setId(bal.getId());
+                                            balance.setBeginbalance(bal.getBeginbalance());
+                                            balance.setCategory(bal.getCategory());
+                                            String x = itemsRepository.getEndBalanceByInventoryType(e.getCategory_name());
+                                            balance.setEndbalance(ObjectUtils.isEmpty(x) ? 0 : DataUtil.formatDouble(x));
+                                            balanceRepository.save(balance);
+                                        } else {
+                                            balance.setYear(year);
+                                            balance.setMonth(month);
+                                            balance.setDatecreated(String.valueOf(AppTime.now()));
+                                            balance.setId(0);
+                                            String b = itemsRepository.getEndBalanceByInventoryType(e.getCategory_name());
+                                            balance.setBeginbalance(ObjectUtils.isEmpty(b) ? 0 : DataUtil.formatDouble(b));
+                                            balance.setCategory(e.getCategory_name());
+                                            balance.setEndbalance(ObjectUtils.isEmpty(b) ? 0 : DataUtil.formatDouble(b));
+                                            balanceRepository.save(balance);
+                                        }
+                                    }
+
+                                });
+
+
+                                if (!ObjectUtils.isEmpty(importedItems)) {
+                                    qrcodeRepository.truncateQrCodes();
+                                    importedItems.stream().forEach(e -> {
+                                        Barcode barcode = new Barcode();
+                                        barcode.setSku(e.getSku());
+                                        barcode.setBar_code_path(getConfigValue(generatedQrCodeDirectory) + "\\" + e.getSku());
+                                        barcode.setDate_created(AppTime.now());
+                                        qrcodeRepository.save(barcode);
+                                        try {
+                                            saveBarCode(String.valueOf(e.getSku()), String.valueOf(e.getSku()));
+                                        } catch (Exception ex) {
+
+                                        }
+                                    });
+
+                                } else {
+                                    Prompt.failed("An error occurred while importing data!");
+                                }
+
                             }
 
                         } else {

@@ -22,6 +22,6 @@ public interface BalanceRepository extends CrudRepository<Balance,Integer> {
     List<Balance> getTotalBalancesForThisMonth(@Param("month") String month, @Param("year") String year);
 
     @Query(value = "SELECT * FROM balance WHERE month=:month and year=:year and category=:category" ,nativeQuery = true)
-    Balance getBalanceIdOfCurrentInventoryMonth(@Param("month") String month, @Param("year") String year, @Param("category") String category);
+    Balance getBalanceOfCurrentInventoryMonth(@Param("month") String month, @Param("year") String year, @Param("category") String category);
 
 }

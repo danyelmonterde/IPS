@@ -73,7 +73,9 @@ public class OnloadConfiguration {
     @Bean
     public Item item() {
         //set default category for loading
-        return new Item().builder().item_name("").build();
+        return new Item().builder().item_name("")
+                .sku(0)
+                .build();
     }
 
     @Bean
