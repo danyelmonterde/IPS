@@ -11,6 +11,7 @@ import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -134,6 +135,20 @@ public class ReportUtil {
         String convertedMonth = convertMonth();
         String randomDate = selectedYear + "-" + convertedMonth + staticDateString;
         List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findPurchaseOrderByItemCategory(randomDate, getInventoryType());
+
+        if(ObjectUtils.isEmpty(purchaseOrders)){
+            PurchaseOrder purchaseOrder = new PurchaseOrder();
+            purchaseOrder.setItem_category("empty");
+            purchaseOrder.setPurchase_cost(0);
+            purchaseOrder.setId(0);
+            purchaseOrder.setQuantity(0);
+            purchaseOrder.setItem_name("empty");
+            purchaseOrder.setSku(0);
+            purchaseOrder.setAmount(0);
+            purchaseOrder.setDatecreated(AppTime.now());
+            purchaseOrder.setIn_stock(0);
+            purchaseOrders.add(purchaseOrder);
+        }
         setPurchaseOrderList(mapList, purchaseOrders);
 
     }
@@ -141,6 +156,9 @@ public class ReportUtil {
     private void setPurchaseOrderList(List<Map> mapList, List<PurchaseOrder> purchaseOrders) {
         purchaseOrders.stream().forEach(po -> {
             String purchaseOrderNumber = supplierRepository.getPurchaseOrderNumberBySkuAndDate(po.getSku(), po.getDatecreated());
+            if(ObjectUtils.isEmpty(purchaseOrderNumber)){
+                purchaseOrderNumber = "empty";
+            }
             Map<String, Object> objectMap = new HashMap<>();
             objectMap.put("PURCHASE_LIST", po.getItem_name());
             objectMap.put("SALES_INVOICE_NUMBER", purchaseOrderNumber);
@@ -197,18 +215,29 @@ public class ReportUtil {
 
     private void getAllMaterialsIssuedForThisMonth(List<Map> mapList) {
         String randomDate = "01" + "-" + selectedMonth + "-" + selectedYear + "  01:01:01";
-        List<String> risTypesList = risRepository.findAllRISTypeByCurrentMonthOfDateSpecifiedAndInventoryType(randomDate, getInventoryType());
+       // List<String> risTypesList = risRepository.findAllRISTypeByCurrentMonthOfDateSpecifiedAndInventoryType(randomDate, getInventoryType());
+        List<String> risTypesList = risRepository.findAllRISTypeByInventoryType(getInventoryType());
         setRequisitionIssueSliplist(mapList, randomDate, risTypesList);
     }
 
     private void setRequisitionIssueSliplist(List<Map> mapList, String randomDate, List<String> risTypesList) {
         risTypesList.stream().forEach(ris -> {
-            double totalCostPerRisType = salesRepository.computeTotalCostPerRISType(ris, randomDate);
-            Map<String, Object> objectMap = new HashMap<>();
-            objectMap.put("RIS_TYPE_NAMES_LIST", risTypeNamesRepository.findRisNameByType(ris).getRisname());
-            objectMap.put("TOTAL_COST_OF_RIS",String.format("%d",(long)totalCostPerRisType));
-            mapList.add(objectMap);
-            totalMaterialsIssued += totalCostPerRisType;
+            String totalCostPerRisType = salesRepository.computeTotalCostPerRISType(ris, randomDate);
+            if(!ObjectUtils.isEmpty(totalCostPerRisType)){
+                Map<String, Object> objectMap = new HashMap<>();
+                objectMap.put("RIS_TYPE_NAMES_LIST", ris);
+                objectMap.put("TOTAL_COST_OF_RIS",String.format("%d",totalCostPerRisType));
+                mapList.add(objectMap);
+                totalMaterialsIssued += DataUtil.formatDouble(totalCostPerRisType);
+            }else{
+                Map<String, Object> objectMap = new HashMap<>();
+                objectMap.put("RIS_TYPE_NAMES_LIST", ris);
+                objectMap.put("TOTAL_COST_OF_RIS","0");
+                mapList.add(objectMap);
+                totalMaterialsIssued = 0;
+            }
+
+
         });
     }
 

@@ -58,6 +58,7 @@
                                 com.monterdev.app.MainSpringApplication
                             </mainClass>
                             <includeSystemScope>true</includeSystemScope>
+                            <outputDirectory>C:\Users\Daniel\Desktop</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

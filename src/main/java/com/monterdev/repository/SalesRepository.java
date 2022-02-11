@@ -15,5 +15,5 @@ public interface SalesRepository extends CrudRepository<Sales, Integer> {
     @Query(value = "SELECT round(sum(total_cost),2) FROM sales WHERE control_number IN (SELECT control_number FROM requisitionissueslip\n" +
             "WHERE ( UNIX_TIMESTAMP(STR_TO_DATE(requisitionissueslip.date_transacted, '%d-%b-%Y %s'))) >= UNIX_TIMESTAMP(LAST_DAY(STR_TO_DATE(:dateSpecified, '%d-%b-%Y %s')) + INTERVAL 1 DAY - INTERVAL 1 MONTH)\n" +
             "AND (UNIX_TIMESTAMP(STR_TO_DATE(requisitionissueslip.date_transacted, '%d-%b-%Y %s'))) <  UNIX_TIMESTAMP(LAST_DAY(STR_TO_DATE(:dateSpecified, '%d-%b-%Y %s')) + INTERVAL 1 DAY) AND ristype =:ristype)",nativeQuery = true)
-    double computeTotalCostPerRISType(@Param("ristype") String ristype, @Param("dateSpecified") String dateSpecified);
+    String computeTotalCostPerRISType(@Param("ristype") String ristype, @Param("dateSpecified") String dateSpecified);
 }
