@@ -1,5 +1,6 @@
 package com.monterdev.configuration;
 
+import com.monterdev.Recovery;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
 import com.monterdev.util.StageLoader;
@@ -23,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+
+
 @Configuration
 public class OnloadConfiguration {
 
@@ -40,10 +43,10 @@ public class OnloadConfiguration {
     @Bean(name = "mysqlDatasource")
     public DataSource dataSource() {
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.url("jdbc:mysql://localhost:3306/iqwddbv2?&serverTimezone=UTC");
+        dataSourceBuilder.url("jdbc:mysql://192.168.50.16:3306/iqwddbv2?&serverTimezone=UTC");
         dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
         dataSourceBuilder.username("root");
-        dataSourceBuilder.password("root");
+        dataSourceBuilder.password(new Recovery().get());
         return dataSourceBuilder.build();
     }
 
