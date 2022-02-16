@@ -14,4 +14,6 @@ public interface RisTypeNamesRepository extends CrudRepository<RisTypeNames,Inte
 
     @Query(value = "SELECT * FROM ristypenames WHERE name=:type", nativeQuery = true)
     RisTypeNames findRisNameByType(@Param("type") String type);
+
+
 }

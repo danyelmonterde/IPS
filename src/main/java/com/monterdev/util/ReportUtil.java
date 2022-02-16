@@ -102,6 +102,7 @@ public class ReportUtil {
         setReportMetadata(report);
         try {
             if(getSelectedReportRisTypeCode().equalsIgnoreCase(SUMMARY)  ){
+                setBalanceCategory(risTypeNamesRepository.findRisNameByType(getSelectedReportRisTypeCode()).getInventorytype());
                 createSummaryReport();
             } else if(getSelectedReportRisTypeCode().equalsIgnoreCase(ALL_CATEGORIES)  ){
                 createTotalInventoryReport();
@@ -226,7 +227,7 @@ public class ReportUtil {
             if(!ObjectUtils.isEmpty(totalCostPerRisType)){
                 Map<String, Object> objectMap = new HashMap<>();
                 objectMap.put("RIS_TYPE_NAMES_LIST", ris);
-                objectMap.put("TOTAL_COST_OF_RIS",String.format("%d",totalCostPerRisType));
+                objectMap.put("TOTAL_COST_OF_RIS",totalCostPerRisType);
                 mapList.add(objectMap);
                 totalMaterialsIssued += DataUtil.formatDouble(totalCostPerRisType);
             }else{
@@ -287,10 +288,10 @@ public class ReportUtil {
         String previousMonth = new SimpleDateFormat("MMM").format(c.getTime());
         String year = new SimpleDateFormat("YYYY").format(c.getTime());
         double result = 0;
-        if(!getInventoryType().equalsIgnoreCase(ALL_CATEGORIES)){
+        if(!getInventoryType().equalsIgnoreCase(ALL_CATEGORIES) || !getInventoryType().equalsIgnoreCase(SUMMARY)){
             result = balanceRepository.getBeginningBalanceInventoryByCategory(getInventoryType(), previousMonth, year);
         }else{
-            result = balanceRepository.getTotalBeginningBalanceForThisMonth( previousMonth, year);
+            result = balanceRepository.getTotalBeginningBalanceForThisMonth( previousMonth, year,getBalanceCategory());
         }
 
         return String.format("%d",(long)result);

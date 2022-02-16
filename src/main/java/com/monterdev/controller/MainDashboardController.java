@@ -179,6 +179,7 @@ public class MainDashboardController implements Initializable {
     private double totalIncome = 0; //totalSales - totalCost
     private boolean isFirstCharacter = true;
     private boolean isItemOnCart;
+    private boolean proceed = false;
     private ScheduledExecutorService currentTimeUpdater;
 
     @SneakyThrows
@@ -424,8 +425,14 @@ public class MainDashboardController implements Initializable {
         quantity.setId(String.valueOf(currentIndex));
         quantity.textProperty().addListener((observable, oldValue, newValue) -> {
             try{
+                int inStock =currentItem.getIn_stock() ;
                 if (NumberUtils.isParsable(quantity.getText()) && !ObjectUtils.isEmpty(quantity.getText())) {
                     //VALID TEXT FIELD
+                    if(Integer.parseInt(quantity.getText())>inStock){
+                        Prompt.failed("Quantity is greater than In Stock!");
+                        quantity.setText("0");
+                        return;
+                    }
                     quantity.setText(quantity.getText().replaceAll(NEGATIVE_WHOLE_NUMBERS, ""));
                     currentItem.setQuantity(Math.abs(Integer.parseInt(newValue)));
                     itemCart.get(Integer.parseInt(quantity.getId())).setQuantity(Math.abs(Integer.parseInt(newValue)));
@@ -595,7 +602,7 @@ public class MainDashboardController implements Initializable {
             try {
                 reportUtil.generateReport();
             } catch (Exception exception) {
-                System.out.println(exception.getLocalizedMessage());
+                    System.out.println(exception.getLocalizedMessage());
             }
         });
 
@@ -840,7 +847,8 @@ public class MainDashboardController implements Initializable {
                 searchUtil.searchItem(itemName.getText(), itemLists, responseList, "NAME");
                 if (responseList.size() > 0) {
 
-                    listView.setPrefWidth(200.0);
+                    listView.setPrefWidth(800);
+
                     HBox.setMargin(listView, new Insets(20.0, 0.0, 20.0, 0.0));
                     listView.getItems().clear();
                     responseList.stream().forEach(data -> {
@@ -950,7 +958,7 @@ public class MainDashboardController implements Initializable {
         midHbox.getChildren().addAll(listView,scrollPane);
         midHbox.setPrefHeight(500.0);
 
-         HBox.setMargin(listView, new Insets(20.0, 20.0, 20.0, 20.0));
+         HBox.setMargin(listView, new Insets(20.0, 20.0, 20.0, 0.0));
          HBox.setMargin(scrollPane, new Insets(20.0, 20.0, 20.0, 20.0));
         //HBox.setMargin(viewRisDetails, new Insets(20.0, 20.0, 20.0, 20.0));
 
@@ -1027,7 +1035,14 @@ public class MainDashboardController implements Initializable {
 
     private void releaseItemsOnCart() {
         if (!ObjectUtils.isEmpty(itemCart) && selectedItem.getSku() != 0) {
+
             itemCart.stream().forEach(item -> {
+                if(item.getQuantity()==0 || item.getIn_stock()==0 || item.getCost()==0 ){
+                    proceed = false;
+                    return;
+                }else{
+                    proceed = true;
+                }
 
                 History history = new History();
                 history.setDate(AppTime.now());
@@ -1056,51 +1071,58 @@ public class MainDashboardController implements Initializable {
                 historyRepository.save(history);
 
             });
-            if (!ObjectUtils.isEmpty(itemsRepository.saveAll(itemCart))) {
-                resetSelectedItem();
-                sku.setText("0");
-                itemCart.clear();
-                try {
-                 //   midHbox.getChildren().remove(1);
-                    cancelTransaction();
-                } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+            if(proceed){
+                if (!ObjectUtils.isEmpty(itemsRepository.saveAll(itemCart))) {
+                    resetSelectedItem();
+                    sku.setText("0");
+                    itemCart.clear();
+                    try {
+                        //   midHbox.getChildren().remove(1);
+                        cancelTransaction();
+                    } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
 
-                }
+                    }
 
-                if (!ObjectUtils.isEmpty(requisitionIssueSlip)) {
-                    requisitionIssueSlip.setId(0);
-                    if (!ObjectUtils.isEmpty(risRepository.save(requisitionIssueSlip))) {
-                        if (!ObjectUtils.isEmpty(risTypeFieldsList)) {
-                            risTypeFieldsList.stream().forEach(data -> {
-                                risTypeFieldsRepository.save(data);
-                            });
-                            Prompt.success("Item released!");
-                            isFirstCharacter = true;
-                            risTypeFieldsList.clear();
+                    if (!ObjectUtils.isEmpty(requisitionIssueSlip)) {
+                        requisitionIssueSlip.setId(0);
+                        if (!ObjectUtils.isEmpty(risRepository.save(requisitionIssueSlip))) {
+                            if (!ObjectUtils.isEmpty(risTypeFieldsList)) {
+                                risTypeFieldsList.stream().forEach(data -> {
+                                    risTypeFieldsRepository.save(data);
+                                });
+                                Prompt.success("Item released!");
+                                isFirstCharacter = true;
+                                risTypeFieldsList.clear();
+                            } else {
+                                Prompt.failed("Item could not be released! Please check RIS details!");
+                            }
                         } else {
                             Prompt.failed("Item could not be released! Please check RIS details!");
                         }
+
+                        Sales sales = new Sales();
+                        sales.setControl_number(requisitionIssueSlip.getControl_number());
+                        sales.setTotal_sales((double) Math.round(totalSales * 100d) / 100d);
+                        sales.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern("dd-MMM-YYYY")));
+                        sales.setIncome((double) Math.round(totalIncome * 100d) / 100d);
+                        sales.setTotal_cost(totalCost);
+
+                        salesRepository.save(sales);
+
+                        customerRepository.save(customer);
                     } else {
                         Prompt.failed("Item could not be released! Please check RIS details!");
                     }
 
-                    Sales sales = new Sales();
-                    sales.setControl_number(requisitionIssueSlip.getControl_number());
-                    sales.setTotal_sales((double) Math.round(totalSales * 100d) / 100d);
-                    sales.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern("dd-MMM-YYYY")));
-                    sales.setIncome((double) Math.round(totalIncome * 100d) / 100d);
-                    sales.setTotal_cost(totalCost);
-
-                    salesRepository.save(sales);
-
-                    customerRepository.save(customer);
                 } else {
-                    Prompt.failed("Item could not be released! Please check RIS details!");
+                    Prompt.failed("An error occurred while saving!");
                 }
-
-            } else {
-                Prompt.failed("An error occurred while saving!");
+            }else{
+                //Please check item list if there is no zero values
+                Prompt.failed("Please check the quantity, in stock and cost of item. It must not be equal to 0!");
+                return;
             }
+
 
 
         } else {

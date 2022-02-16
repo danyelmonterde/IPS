@@ -5,10 +5,7 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.monterdev.app.MainJavaFXApplication;
 import com.monterdev.model.*;
-import com.monterdev.repository.BalanceRepository;
-import com.monterdev.repository.CategoryRepository;
-import com.monterdev.repository.ItemsRepository;
-import com.monterdev.repository.QrcodeRepository;
+import com.monterdev.repository.*;
 import com.monterdev.util.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -72,6 +69,8 @@ public class AddItemController implements Initializable {
     private CategoryRepository categoryRepository;
     @Autowired
     private BalanceRepository balanceRepository;
+    @Autowired
+    private UnitRepository unitRepository;
 
     private Item item;
 
@@ -330,6 +329,9 @@ public class AddItemController implements Initializable {
     }
 
     private void loadUnits() {
+        if(ObjectUtils.isEmpty(unitList)){
+            unitList = unitRepository.findAllItemUnits();
+        }
         unitList.stream().forEach(unit -> {
             comboUnit.getItems().add(unit.getUnit());
         });

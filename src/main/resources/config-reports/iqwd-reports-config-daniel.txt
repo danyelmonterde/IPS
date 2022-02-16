@@ -23,14 +23,14 @@
   ,
     {
       "configId": "SYSTEM_REPORT_LOCATION",
-      "configValue": "C:\\Users\\AlexM\\Desktop\\GeneratedReports\\"
+      "configValue": "C:\\Users\\Ibang Tao\\Desktop\\GeneratedReports\\"
     }  ,
     {
       "configId": "REPORT_SIGNATORY_ROLES",
       "configValue": "preparedBy,checkedBy,notedBy"
     },{
       "configId": "REPORT_JRXML_LOCATION",
-      "configValue": "C:\\Users\\AlexM\\Desktop\\SystemReportTemplate\\"
+      "configValue": "C:\\Users\\Ibang Tao\\Desktop\\system-reports-template\\"
     }
   ]
 }

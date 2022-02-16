@@ -14,7 +14,8 @@
     },    {
       "configId": "DELETE_BUTTON",
       "configValue": "C:\\Users\\AlexM\\Desktop\\IQWD-APP-RESOURCES\\Main\\trash.png"
-    }, {
+    },
+    {
       "configId": "CUSTOMER_TYPES",
       "configValue": "OLD,NEW"
     },

@@ -2,18 +2,18 @@
   "customConfigurations": [
     {
       "configId": "CAPTURED_QR_CODE_DIRECTORY",
-      "configValue": "C:\\Users\\AlexM\\Desktop\\CapturedQrCode\\out.png"
+      "configValue": "C:\\Users\\Daniel\\Desktop\\CapturedQrCode\\out.png"
     },
     {
       "configId": "GENERATED_QR_CODE_DIRECTORY",
-      "configValue": "C:\\Users\\AlexM\\Desktop\\GeneratedQrCode\\"
+      "configValue": "C:\\Users\\Ibang Tao\\Desktop\\GeneratedQrCodes"
     },
     {
       "configId": "EDIT_BUTTON",
-      "configValue": "C:\\Users\\AlexM\\Desktop\\IQWD-APP-RESOURCES\\Main\\check.png"
-    },  {
+      "configValue": "C:\\Users\\Ibang Tao\\Desktop\\IPS\\src\\main\\resources\\config-ui\\IQWD-APP-RESOURCES\\Main\\check.png"
+    },    {
       "configId": "DELETE_BUTTON",
-      "configValue": "C:\\Users\\AlexM\\Desktop\\IQWD-APP-RESOURCES\\Main\\trash.png"
+      "configValue": "C:\\Users\\Ibang Tao\\Desktop\\IPS\\src\\main\\resources\\config-ui\\IQWD-APP-RESOURCES\\Main\\trash.png"
     },
     {
       "configId": "CUSTOMER_TYPES",
