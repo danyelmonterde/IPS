@@ -46,18 +46,19 @@ public class UpdatePasswordController implements Initializable {
     @Autowired
     private User user;
 
-    @Autowired
     private LoginUtil loginUtil;
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         btnCancelOnAction();
         btnUpdatePasswordOnAction();
     }
 
     private void btnUpdatePasswordOnAction() {
         btnUpdatePassword.setOnAction(e->{
+            loginUtil = new LoginUtil();
             if(loginUtil.isPasswordEqual(txtCurrentPassword.getText(),user.getPassword())){
                 User userUpdate = new User();
                 userUpdate.setId(user.getId());

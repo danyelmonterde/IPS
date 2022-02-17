@@ -68,7 +68,6 @@ public class RisDetailsController implements Initializable {
     @Autowired
     private RisTypeRepository risTypeRepository;
 
-    @Autowired
     private ControlNumberGenerator controlNumberGenerator;
 
     private String generatedControlNumber = null;
@@ -88,6 +87,9 @@ public class RisDetailsController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        if(ObjectUtils.isEmpty(controlNumberGenerator)){
+            controlNumberGenerator = new ControlNumberGenerator();
+        }
 
             if (ObjectUtils.isEmpty(risTypeFieldsList)) {
                 generatedControlNumber = controlNumberGenerator.generate();

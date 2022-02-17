@@ -146,8 +146,6 @@ public class InventoryListController implements Initializable {
     @Autowired
     private QrcodeRepository qrcodeRepository;
     @Autowired
-    private InventoryListUtil inventoryListUtil;
-    @Autowired
     private User user;
     @Autowired
     private BalanceRepository balanceRepository;

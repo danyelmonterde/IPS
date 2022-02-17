@@ -5,14 +5,16 @@ import nu.pattern.OpenCV;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.io.IOException;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.monterdev.controller, com.monterdev.serviceimpl, com.monterdev.configuration, com.monterdev.mapper,com.monterdev.service,com.monterdev.util")
-@EnableJpaRepositories(basePackages = "com.monterdev.repository")
-@EntityScan(basePackages = "com.monterdev.model")
+@Configuration
+@EnableJpaRepositories(basePackages = {"com.monterdev.repository"})
+@ComponentScan(basePackages = {"com.monterdev.controller","com.monterdev.configuration","com.monterdev.exception", "com.monterdev.mapper","com.monterdev.util"})
+@EntityScan("com.monterdev.model")
 public class MainSpringApplication {
 
 

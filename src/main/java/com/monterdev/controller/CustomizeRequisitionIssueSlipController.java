@@ -8,6 +8,7 @@ import com.monterdev.model.RequisitionIssueSlip;
 import com.monterdev.model.RisType;
 import com.monterdev.model.RisTypeFields;
 import com.monterdev.model.RisTypeNames;
+import com.monterdev.repository.RisTypeNamesRepository;
 import com.monterdev.repository.RisTypeRepository;
 import com.monterdev.util.*;
 import javafx.collections.ObservableList;
@@ -73,15 +74,11 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     @Autowired
     private RequisitionIssueSlip requisitionIssueSlip;
     @Autowired
-    private List<RisTypeNames> risTemplates;
-    @Autowired
-    private LoginUtil session;
-    @Autowired
-    private ControlNumberGenerator controlNumberGenerator;
-    @Autowired
     private RisTypeRepository risTypeRepository;
     @Autowired
     private List<RisTypeFields> risTypeFieldsList;
+    @Autowired
+    private RisTypeNamesRepository risTypeNamesRepository;
 
     private static final String DATE_FORMAT = "dd-MMM-YYYY hh:mm:ss";
     private static final String RIS_TYPE_DATE_FORMAT = "dd-MMM-yyyy";
@@ -93,10 +90,19 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     private int currentIndex = 0;
     private int successFields = 0;
     private List<String> fieldTypes;
+    private List<RisTypeNames> risTemplates;
+
+    private ControlNumberGenerator controlNumberGenerator;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        session.isValid(btnAddRIS);
+        if(ObjectUtils.isEmpty(risTemplates)){
+            risTemplates = risTypeNamesRepository.findAllRisTypeNames();
+        }
+        if(ObjectUtils.isEmpty(controlNumberGenerator)){
+            controlNumberGenerator = new ControlNumberGenerator();
+        }
+
 
         getFieldTypes();
         setDate();

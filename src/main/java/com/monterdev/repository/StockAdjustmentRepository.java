@@ -1,7 +1,9 @@
 package com.monterdev.repository;
 
 import com.monterdev.model.StockAdjustment;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
-public interface StockAdjustmentRepository extends CrudRepository<StockAdjustment, Integer> {
+@NoRepositoryBean
+public interface StockAdjustmentRepository extends JpaRepository<StockAdjustment, Integer> {
 }

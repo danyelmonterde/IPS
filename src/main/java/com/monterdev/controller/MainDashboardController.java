@@ -129,17 +129,11 @@ public class MainDashboardController implements Initializable {
     private Item selectedItem;
     @Autowired
     private CapturedItem capturedItem;
-    @Autowired
-    @Qualifier("itemLists")
-    private List<Item> itemLists;
+
     @Autowired
     private ItemsRepository itemsRepository;
     @Autowired
     private RisRepository risRepository;
-    @Autowired
-    private SearchUtil searchUtil;
-    @Autowired
-    private ReportUtil reportUtil;
     @Autowired
     private RequisitionIssueSlip requisitionIssueSlip;
     @Autowired
@@ -165,6 +159,13 @@ public class MainDashboardController implements Initializable {
     @Autowired
     private User user;
 
+    @Autowired
+    private ReportUtil reportUtil;
+    @Autowired
+    private SearchUtil searchUtil;
+
+    private List<Item> itemLists;
+
     private List<String> responseList = new ArrayList<>();
     private static int rowIndex = 0;
     private int indexToBeRemoved = 0;
@@ -185,6 +186,13 @@ public class MainDashboardController implements Initializable {
     @SneakyThrows
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        if(ObjectUtils.isEmpty(reportUtil)){
+            reportUtil = new ReportUtil();
+        }
+        if(ObjectUtils.isEmpty(itemLists)){
+            itemLists = itemsRepository.findAll();
+        }
+
 
         if(!ObjectUtils.isEmpty(requisitionIssueSlip.getRequisition_and_issue_slip_number())){
             createRequisitionIssueSlip();

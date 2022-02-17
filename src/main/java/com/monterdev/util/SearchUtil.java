@@ -13,7 +13,6 @@ import java.util.List;
 
 import static sun.misc.MessageUtils.where;
 
-@Component
 public class SearchUtil {
 
     @Autowired

@@ -4,7 +4,7 @@
 
     <groupId>com.monterdev</groupId>
     <artifactId>ips</artifactId>
-    <version>1.0</version>
+    <version>1.0.2</version>
     <packaging>jar</packaging>
 
     <name>Inventory Management and Point of Sale System</name>
@@ -15,6 +15,7 @@
         <start-class>com.monterdev.app.MainSpringApplication</start-class>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <buildOutputDirectory>${project.build.directory}</buildOutputDirectory>
     </properties>
 
     <organization>
@@ -55,11 +56,11 @@
                         <configuration>
                             <classifier>spring-boot</classifier>
                             <mainClass>
-                                com.monterdev.app.MainSpringApplication
+                                ${start-class}
                             </mainClass>
                             <includeSystemScope>true</includeSystemScope>
 <!--                            <outputDirectory>C:\Users\Daniel\Desktop\</outputDirectory>-->
-                            <outputDirectory>C:\Users\Ibang Tao\Desktop</outputDirectory>
+                            <outputDirectory>${buildOutputDirectory}</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -89,46 +90,81 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <version>2.3.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>proguard</goal>
                         </goals>
-                        <id>obfuscate</id>
-                        <configuration>
-                            <tasks>
-                                <property name="runtime_classpath" refid="maven.runtime.classpath"/>
-                                <taskdef name="yguard" classname="com.yworks.yguard.YGuardTask" classpath="${runtime_classpath}"/>
-                                <yguard>
-                                    <inoutpair in="${project.build.directory}/${project.build.finalName}.jar" out="${project.build.directory}/${project.build.finalName}_obfuscated.jar" />
-
-                                    <shrink logfile="${project.build.directory}/yshrink.log.xml">
-                                        <keep>
-                                            <!-- main method -->
-                                            <method name="void main(java.lang.String[])" class="${start-class}" />
-                                        </keep>
-                                    </shrink>
-
-                                    <rename mainclass="${start-class}" logfile="${project.build.directory}/yguard.log.xml">
-                                        <property name="error-checking" value="pedantic"/>
-                                    </rename>
-                                </yguard>
-                            </tasks>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <proguardVersion>6.0.3</proguardVersion>
+                    <injar>${project.build.finalName}.jar</injar>
+                    <outjar>${project.build.finalName}.jar</outjar>
+                    <obfuscate>true</obfuscate>
+                    <proguardInclude>${project.basedir}/proguard.cfg</proguardInclude>
+                    <libs>
+                        <lib>${java.home}/lib/rt.jar</lib>
+                        <lib>${java.home}/lib/jce.jar</lib>
+                        <lib>${java.home}/lib/jsse.jar</lib>
+                    </libs>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sf.proguard</groupId>
+                        <artifactId>proguard-base</artifactId>
+                        <version>6.0.3</version>
+                    </dependency>
+                </dependencies>
             </plugin>
+
+            <!--            <plugin>-->
+<!--                <artifactId>maven-antrun-plugin</artifactId>-->
+<!--                <version>1.8</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>run</goal>-->
+<!--                        </goals>-->
+<!--                        <id>obfuscate</id>-->
+<!--                        <configuration>-->
+<!--                            <tasks>-->
+<!--                                <property name="runtime_classpath" refid="maven.runtime.classpath"/>-->
+<!--                                <taskdef name="yguard" classname="com.yworks.yguard.YGuardTask" classpath="${runtime_classpath}"/>-->
+<!--                                <yguard>-->
+<!--                                    &lt;!&ndash;<inoutpair in="${project.build.directory}/${project.build.finalName}.jar" out="${project.build.directory}/${project.build.finalName}_obfuscated.jar" />&ndash;&gt;-->
+<!--                                    <inoutpair in="${project.build.directory}/${project.build.finalName}-spring-boot.jar" out="${project.build.directory}/${project.build.finalName}_obfuscated.jar" />-->
+<!--                                    <shrink logfile="${project.build.directory}/yshrink.log.xml">-->
+<!--                                        <keep>-->
+<!--                                            &lt;!&ndash; main method &ndash;&gt;-->
+<!--                                            <method name="void main(java.lang.String[])" class="org.springframework.boot.loader.JarLauncher" />-->
+
+
+<!--                                        </keep>-->
+<!--                                    </shrink>-->
+
+<!--                                    <rename mainclass="${start-class}" logfile="${project.build.directory}/yguard.log.xml">-->
+<!--                                        <property name="error-checking" value="pedantic"/>-->
+<!--                                    </rename>-->
+<!--                                </yguard>-->
+<!--                            </tasks>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
     <dependencies>
-        <dependency>
-            <groupId>com.yworks</groupId>
-            <artifactId>yguard</artifactId>
-            <version>2.9.1</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.yworks</groupId>-->
+<!--            <artifactId>yguard</artifactId>-->
+<!--            <version>2.9.1</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -154,6 +190,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
             <version>2.5.4</version>
@@ -166,7 +207,7 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>18-ea+2</version>
+            <version>11-ea+19</version>
         </dependency>
         <dependency>
             <groupId>net.rgielen</groupId>

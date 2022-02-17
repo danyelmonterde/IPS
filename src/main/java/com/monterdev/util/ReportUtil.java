@@ -25,7 +25,7 @@ import static com.monterdev.configuration.GlobalConfiguration.*;
 import static com.monterdev.constants.InventoryTypeConstants.*;
 import static com.monterdev.constants.ReportFieldsConstant.*;
 
-@Component
+
 @Getter
 @Setter
 public class ReportUtil {
@@ -59,25 +59,18 @@ public class ReportUtil {
     @Autowired
     private Reports report;
 
-    @Autowired
     private ReportRepository reportRepository;
 
-    @Autowired
     private SalesRepository salesRepository;
 
-    @Autowired
     private RisRepository risRepository;
 
-    @Autowired
     private RisTypeNamesRepository risTypeNamesRepository;
 
-    @Autowired
     private PurchaseOrderRepository purchaseOrderRepository;
 
-    @Autowired
     private SignatoryRepository signatoryRepository;
 
-    @Autowired
     private BalanceRepository balanceRepository;
 
     private File FILE_UPPER_PART = null;
@@ -89,8 +82,26 @@ public class ReportUtil {
     @Autowired
     private ReportsMapper reportsMapper;
 
-    @Autowired
+
     private SupplierRepository supplierRepository;
+
+    public ReportUtil(){
+
+    }
+
+    @Autowired
+    public ReportUtil (ReportRepository reportRepository,SalesRepository salesRepository
+            ,RisRepository risRepository,RisTypeNamesRepository risTypeNamesRepository,PurchaseOrderRepository purchaseOrderRepository,
+      SignatoryRepository signatoryRepository, BalanceRepository balanceRepository
+        ){
+        this.reportRepository = reportRepository;
+        this.salesRepository = salesRepository;
+        this.risRepository = risRepository;
+        this.risTypeNamesRepository = risTypeNamesRepository;
+        this.purchaseOrderRepository = purchaseOrderRepository;
+        this.signatoryRepository = signatoryRepository;
+        this.balanceRepository = balanceRepository;
+    }
 
     public void generateReport() throws JRException, SQLException, FileNotFoundException {
         classifyReport();

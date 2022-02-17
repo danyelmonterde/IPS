@@ -60,8 +60,6 @@ public class AddItemController implements Initializable {
     @Autowired
     private ConfigurableApplicationContext applicationContext;
     @Autowired
-    private List<Unit> unitList;
-    @Autowired
     private ItemsRepository itemsRepository;
     @Autowired
     private QrcodeRepository qrcodeRepository;
@@ -73,6 +71,8 @@ public class AddItemController implements Initializable {
     private UnitRepository unitRepository;
 
     private Item item;
+
+    private List<Unit> unitList;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainJavaFXApplication.class);
 

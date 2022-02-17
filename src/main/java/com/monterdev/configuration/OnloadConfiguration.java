@@ -1,12 +1,11 @@
 package com.monterdev.configuration;
 
 import com.monterdev.Recovery;
+import com.monterdev.mapper.reports.construction.ReportsMapper;
 import com.monterdev.model.*;
-import com.monterdev.repository.*;
+import com.monterdev.util.ReportUtil;
+import com.monterdev.util.SearchUtil;
 import com.monterdev.util.StageLoader;
-import javafx.stage.Stage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,12 +24,11 @@ import java.util.List;
 import java.util.Properties;
 
 
-
 @Configuration
 public class OnloadConfiguration {
 
     @Bean
-    public User user(){
+    public User user() {
         return new User();
     }
 
@@ -50,23 +48,21 @@ public class OnloadConfiguration {
         return dataSourceBuilder.build();
     }
 
-    @Autowired
-    private ItemsRepository itemsRepository;
 
-    @Autowired
-    private InventoryTypeRepository inventoryTypeRepository;
-
-    @Autowired
-    private ReportNamesRepository reportNamesRepository;
-
-    @Autowired
-    private RisTypeRepository risTypeRepository;
-
-    @Autowired
-    private RisTypeNamesRepository risTypeNamesRepository;
-
-    @Autowired
-    private UnitRepository unitRepository;
+//    @Autowired
+//    private InventoryTypeRepository inventoryTypeRepository;
+//
+//    @Autowired
+//    private ReportNamesRepository reportNamesRepository;
+//
+//    @Autowired
+//    private RisTypeRepository risTypeRepository;
+//
+//    @Autowired
+//    private RisTypeNamesRepository risTypeNamesRepository;
+//
+//    @Autowired
+//    private UnitRepository unitRepository;
 
     @Bean
     public RequisitionIssueSlip requisitionIssueSlip() {
@@ -82,20 +78,20 @@ public class OnloadConfiguration {
     }
 
     @Bean
-    public CapturedItem capturedItem(){
+    public CapturedItem capturedItem() {
         CapturedItem capturedItem = new CapturedItem();
         capturedItem.setSku(0);
         return capturedItem;
     }
 
+    @Bean
+    public ReportUtil reportUtil() {
+        return new ReportUtil();
+    }
 
     @Bean
-    @Qualifier("itemLists")
-    public List<Item> itemLists() {
-        Iterable<Item> initialItemList = itemsRepository.findAll();
-        List<Item> itemLists = new ArrayList<>();
-        initialItemList.forEach(itemLists::add);
-        return itemLists;
+    public ReportsMapper reportsMapper() {
+        return new ReportsMapper();
     }
 
 
@@ -149,10 +145,10 @@ public class OnloadConfiguration {
         return new ArrayList<>();
     }
 
-    @Bean
-    public List<RisTypeNames> risTemplates() {
-        return risTypeNamesRepository.findAllRisTypeNames();
-    }
+//    @Bean
+//    public List<RisTypeNames> risTemplates() {
+//        return risTypeNamesRepository.findAllRisTypeNames();
+//    }
 
 
     @Bean
@@ -160,27 +156,31 @@ public class OnloadConfiguration {
         return new Reports();
     }
 
-    @Bean
-    public List<InventoryType> inventoryType() {
-        List<InventoryType> inventoryTypeList = inventoryTypeRepository.findAllInventoryType();
-        return inventoryTypeList;
-    }
+//    @Bean
+//    public List<InventoryType> inventoryType() {
+//        List<InventoryType> inventoryTypeList = inventoryTypeRepository.findAllInventoryType();
+//        return inventoryTypeList;
+//    }
 
-    @Bean
-    public List<ReportNames> reportNamesList() {
-        return reportNamesRepository.findAllAvailableReports();
-    }
+//    @Bean
+//    public List<ReportNames> reportNamesList() {
+//        return reportNamesRepository.findAllAvailableReports();
+//    }
 
 
-    @Bean
-    public List<Unit> unitList() {
-        return unitRepository.findAllItemUnits();
-    }
+//    @Bean
+//    public List<Unit> unitList() {
+//        return unitRepository.findAllItemUnits();
+//    }
 
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public SearchUtil searchUtil() {
+        return new SearchUtil();
+    }
 
 }

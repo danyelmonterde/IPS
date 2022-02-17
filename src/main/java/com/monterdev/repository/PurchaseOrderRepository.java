@@ -1,13 +1,13 @@
 package com.monterdev.repository;
 
 import com.monterdev.model.PurchaseOrder;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface PurchaseOrderRepository extends CrudRepository<PurchaseOrder, Integer> {
+public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Integer> {
 
     @Query(value = "SELECT * FROM purchaseorder", nativeQuery = true)
     List<PurchaseOrder> findAllPurchaseOrder();

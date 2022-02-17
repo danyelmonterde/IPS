@@ -26,6 +26,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.PostConstruct;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
@@ -122,10 +123,6 @@ public class EditItemController implements Initializable {
     private DeletedItemsRepository deletedItemsRepository;
 
     @Autowired
-    @Qualifier("itemLists")
-    private List<Item> itemLists;
-
-    @Autowired
     private PurchaseOrderRepository purchaseOrderRepository;
 
     @Autowired
@@ -133,9 +130,6 @@ public class EditItemController implements Initializable {
 
     @Autowired
     private QrcodeRepository qrcodeRepository;
-
-    @Autowired
-    private SearchUtil searchUtil;
 
     @Autowired
     private UnitRepository unitRepository;
@@ -147,13 +141,21 @@ public class EditItemController implements Initializable {
 
     private List<String> responseList = new ArrayList<>();
 
+    private List<Item> itemLists;
+
     private ScheduledExecutorService timer;
 
     private static String NO_CATEGORY_ON_MASTER_DATA = "You don't have any Category / Inventory type yet! Please add it to Master data. ";
 
+    @Autowired
+    private SearchUtil searchUtil;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        if(ObjectUtils.isEmpty(itemLists)){
+            itemLists = itemsRepository.findAll();
+        }
 
         selectedItem = applicationContext.getBean(Item.class);
 

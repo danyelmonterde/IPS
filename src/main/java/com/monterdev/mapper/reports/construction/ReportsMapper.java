@@ -9,6 +9,7 @@ import com.monterdev.util.AppTime;
 import com.monterdev.util.ReportUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -47,7 +48,11 @@ public class ReportsMapper {
 
     private double totalIncome;
 
+    @Autowired
+    private ConfigurableApplicationContext applicationContext;
+
     public List<Map> map() {
+
         totalSales = 0.0;
         totalCost = 0.0;
         totalIncome = 0.0;
