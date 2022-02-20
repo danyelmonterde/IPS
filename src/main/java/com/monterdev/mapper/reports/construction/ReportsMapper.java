@@ -13,13 +13,14 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 import static com.monterdev.configuration.GlobalConfiguration.*;
 import static com.monterdev.constants.InventoryTypeConstants.SUMMARY;
 
-@Component
 public class ReportsMapper {
+
 
     @Autowired
     private RisRepository risRepository;
@@ -35,10 +36,8 @@ public class ReportsMapper {
 
     @Autowired
     private ReportUtil reportUtil;
-
     @Autowired
     private ReportNamesRepository reportNamesRepository;
-
     @Autowired
     private SignatoryRepository signatoryRepository;
 
@@ -50,6 +49,21 @@ public class ReportsMapper {
 
     @Autowired
     private ConfigurableApplicationContext applicationContext;
+
+    public ReportsMapper(){
+
+    }
+
+
+    @Autowired
+    public ReportsMapper(RisRepository risRepository, RisTypeFieldsRepository risTypeFieldsRepository, RisTypeRepository risTypeRepository, SalesRepository salesRepository, ReportNamesRepository reportNamesRepository, SignatoryRepository signatoryRepository) {
+        this.risRepository = risRepository;
+        this.risTypeFieldsRepository = risTypeFieldsRepository;
+        this.risTypeRepository = risTypeRepository;
+        this.salesRepository = salesRepository;
+        this.reportNamesRepository = reportNamesRepository;
+        this.signatoryRepository = signatoryRepository;
+    }
 
     public List<Map> map() {
 

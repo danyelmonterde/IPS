@@ -58,19 +58,19 @@ public class ReportUtil {
 
     @Autowired
     private Reports report;
-
+    @Autowired
     private ReportRepository reportRepository;
-
+    @Autowired
     private SalesRepository salesRepository;
-
+    @Autowired
     private RisRepository risRepository;
-
+    @Autowired
     private RisTypeNamesRepository risTypeNamesRepository;
-
+    @Autowired
     private PurchaseOrderRepository purchaseOrderRepository;
-
+    @Autowired
     private SignatoryRepository signatoryRepository;
-
+    @Autowired
     private BalanceRepository balanceRepository;
 
     private File FILE_UPPER_PART = null;
@@ -81,8 +81,7 @@ public class ReportUtil {
 
     @Autowired
     private ReportsMapper reportsMapper;
-
-
+    @Autowired
     private SupplierRepository supplierRepository;
 
     public ReportUtil(){
@@ -92,7 +91,7 @@ public class ReportUtil {
     @Autowired
     public ReportUtil (ReportRepository reportRepository,SalesRepository salesRepository
             ,RisRepository risRepository,RisTypeNamesRepository risTypeNamesRepository,PurchaseOrderRepository purchaseOrderRepository,
-      SignatoryRepository signatoryRepository, BalanceRepository balanceRepository
+      SignatoryRepository signatoryRepository, BalanceRepository balanceRepository,SupplierRepository supplierRepository
         ){
         this.reportRepository = reportRepository;
         this.salesRepository = salesRepository;
@@ -101,6 +100,7 @@ public class ReportUtil {
         this.purchaseOrderRepository = purchaseOrderRepository;
         this.signatoryRepository = signatoryRepository;
         this.balanceRepository = balanceRepository;
+        this.supplierRepository = supplierRepository;
     }
 
     public void generateReport() throws JRException, SQLException, FileNotFoundException {

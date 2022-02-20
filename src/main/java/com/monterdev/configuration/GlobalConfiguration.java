@@ -141,6 +141,7 @@ public class GlobalConfiguration {
     //On-startup setting of the Global json configuration
     public void setJsonFileConfiguration(JsonFileConfiguration jsonFileConfiguration) throws IqwdException {
         ObjectMapper objectMapper = new ObjectMapper();
+       // System.out.println(jsonFileConfiguration.getCustomConfigurations().get(0).getConfigId());
         try {
             customConfigs = objectMapper.readValue(objectMapper.writeValueAsString(jsonFileConfiguration.getCustomConfigurations()), new TypeReference<List<CustomConfig>>() {
             });

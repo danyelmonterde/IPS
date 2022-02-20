@@ -13,7 +13,7 @@ import java.io.IOException;
 @SpringBootApplication
 @Configuration
 @EnableJpaRepositories(basePackages = {"com.monterdev.repository"})
-@ComponentScan(basePackages = {"com.monterdev.controller","com.monterdev.configuration","com.monterdev.exception", "com.monterdev.mapper","com.monterdev.util"})
+@ComponentScan(basePackages = {"com.monterdev.controller", "com.monterdev.configuration", "com.monterdev.exception", "com.monterdev.mapper", "com.monterdev.util"})
 @EntityScan("com.monterdev.model")
 public class MainSpringApplication {
 

@@ -59,22 +59,24 @@ public class AddItemController implements Initializable {
 
     @Autowired
     private ConfigurableApplicationContext applicationContext;
-    @Autowired
     private ItemsRepository itemsRepository;
-    @Autowired
     private QrcodeRepository qrcodeRepository;
-    @Autowired
     private CategoryRepository categoryRepository;
-    @Autowired
     private BalanceRepository balanceRepository;
-    @Autowired
     private UnitRepository unitRepository;
-
     private Item item;
-
     private List<Unit> unitList;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainJavaFXApplication.class);
+
+    @Autowired
+    public AddItemController(ItemsRepository itemsRepository, QrcodeRepository qrcodeRepository, CategoryRepository categoryRepository, BalanceRepository balanceRepository, UnitRepository unitRepository) {
+        this.itemsRepository = itemsRepository;
+        this.qrcodeRepository = qrcodeRepository;
+        this.categoryRepository = categoryRepository;
+        this.balanceRepository = balanceRepository;
+        this.unitRepository = unitRepository;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

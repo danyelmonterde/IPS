@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +91,7 @@ public class OnloadConfiguration {
     }
 
     @Bean
-    public ReportsMapper reportsMapper() {
+    public ReportsMapper reportsMapper(){
         return new ReportsMapper();
     }
 
