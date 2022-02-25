@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -33,6 +34,7 @@ import java.util.concurrent.ScheduledExecutorService;
 
 import static com.monterdev.configuration.ItemsUIConfiguration.getItemsTopHboxSpacing;
 import static com.monterdev.constants.HistoryConstants.PURCHASED_ITEM;
+import static com.monterdev.constants.TextFieldValidatorConstants.*;
 import static com.monterdev.util.ComponentCreator.createSearchBox;
 import static com.monterdev.util.ControlNumberGenerator.generateControlNumber;
 
@@ -89,9 +91,6 @@ public class EditItemController implements Initializable {
 
     @FXML
     private JFXButton save;
-
-    @FXML
-    private JFXButton view;
 
     @FXML
     private ToggleGroup toggleGroup = new ToggleGroup();
@@ -260,28 +259,28 @@ public class EditItemController implements Initializable {
     }
 
 
-    public void create() {
-        selectedItem = applicationContext.getBean(Item.class);
-        EditItemAnchorpane = new AnchorPane();
-
-        vBox = new VBox();
-
-        //INITIAL HBOX CONFIGURATION
-        HBox topHbox = new HBox();
-        topHbox.setAlignment(Pos.TOP_CENTER);
-        topHbox.setSpacing(DataUtil.formatDouble(getItemsTopHboxSpacing()));
-
-        HBox midHbox = new HBox();
-        midHbox.setAlignment(Pos.TOP_LEFT);
-        midHbox.setSpacing(DataUtil.formatDouble(getItemsTopHboxSpacing()));
-
-
-        HBox botHbox = new HBox();
-        botHbox.setAlignment(Pos.TOP_LEFT);
-        botHbox.setSpacing(DataUtil.formatDouble(getItemsTopHboxSpacing()));
-        Stage stage = (Stage) cancel.getScene().getWindow();
-        new StageLoader().load(EditItemController.class, applicationContext, stage);
-    }
+//    public void create() {
+//        selectedItem = applicationContext.getBean(Item.class);
+//        EditItemAnchorpane = new AnchorPane();
+//
+//        vBox = new VBox();
+//
+//        //INITIAL HBOX CONFIGURATION
+//        HBox topHbox = new HBox();
+//        topHbox.setAlignment(Pos.TOP_CENTER);
+//        topHbox.setSpacing(DataUtil.formatDouble(getItemsTopHboxSpacing()));
+//
+//        HBox midHbox = new HBox();
+//        midHbox.setAlignment(Pos.TOP_LEFT);
+//        midHbox.setSpacing(DataUtil.formatDouble(getItemsTopHboxSpacing()));
+//
+//
+//        HBox botHbox = new HBox();
+//        botHbox.setAlignment(Pos.TOP_LEFT);
+//        botHbox.setSpacing(DataUtil.formatDouble(getItemsTopHboxSpacing()));
+//        Stage stage = (Stage) cancel.getScene().getWindow();
+//        new StageLoader().load(EditItemController.class, applicationContext, stage);
+//    }
 
 
     private void loadCategories(ItemCategory itemCategory, List<Unit> unitList) {
@@ -344,16 +343,40 @@ public class EditItemController implements Initializable {
     }
 
     private void purchaseCostOnChange() {
-        try {
-            purchaseCost.textProperty().addListener((observable, oldValue, newValue) -> {
-                if (oldValue != newValue) {
-                    selectedItem.setCost(DataUtil.formatDouble(newValue));
-                }
-            });
-        } catch (NumberFormatException numberFormatException) {
-            purchaseCost.setText("0");
-        }
+//        try {
+//            purchaseCost.textProperty().addListener((observable, oldValue, newValue) -> {
+//                if (oldValue != newValue) {
+//                    selectedItem.setCost(DataUtil.formatDouble(newValue));
+//                }
+//            });
+//        } catch (NumberFormatException numberFormatException) {
+//            purchaseCost.setText("0");
+//        }
+        purchaseCost.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                try {
+                    if (!ObjectUtils.isEmpty(purchaseCost.getText())) {
+                        //VALID TEXT FIELD
+                        purchaseCost.setText(purchaseCost.getText().replaceAll(FLOAT_NUMBERS_REGEX_EXCLUDE, ""));
+                       // double itemPurchaseCost = Double.parseDouble(newValue);
+                        //double itemQuantity = Integer.parseInt(quantity.getText());
+                        //double itemTotalAmount = itemPurchaseCost * itemQuantity;
 
+                        //totalAmount.setText(String.valueOf(itemTotalAmount));
+                        selectedItem.setCost(Double.parseDouble(newValue));
+
+                    } else {
+                        //EMPTY TEXT FIELD
+                        selectedItem.setCost(0);
+                      //  totalAmount.setText("0");
+                    }
+
+                } catch (NumberFormatException exception) {
+
+                }
+
+            }
+        });
     }
 
     private void setFields(String itemName) {
@@ -373,32 +396,53 @@ public class EditItemController implements Initializable {
 
 
     private void quantityOnChange() {
-        quantity.textProperty().addListener((observable, oldvalue, newvalue) -> {
-            if (oldvalue != newvalue && StringUtils.isNumeric(newvalue)) {
-                selectedItem.setQuantity(Integer.parseInt(newvalue));
+//        quantity.textProperty().addListener((observable, oldvalue, newvalue) -> {
+//            if (oldvalue != newvalue && StringUtils.isNumeric(newvalue)) {
+//                selectedItem.setQuantity(Integer.parseInt(newvalue));
+//            } else {
+//                quantity.setText("0");
+//            }
+//        });
+
+        quantity.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (NumberUtils.isParsable(quantity.getText()) && !ObjectUtils.isEmpty(quantity.getText())) {
+                //VALID TEXT FIELD
+                selectedItem.setQuantity(Integer.parseInt(quantity.getText()));
+
+            } else if (ObjectUtils.isEmpty(quantity.getText())) {
+                //EMPTY TEXT FIELD
+                quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                selectedItem.setQuantity(0);
             } else {
-                quantity.setText("0");
+                //INVALID TEXT FIELD
+                quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
             }
         });
     }
 
     private void lowStockOnChange() {
         lowStock.textProperty().addListener((obs, old, newv) -> {
-            if (old != newv && StringUtils.isNumeric(newv)) {
-                selectedItem.setLow_stock(Integer.parseInt(newv));
+//            if (old != newv && StringUtils.isNumeric(newv)) {
+//                selectedItem.setLow_stock(Integer.parseInt(newv));
+//            } else {
+//                lowStock.setText("1");
+//            }
+            if (NumberUtils.isParsable(lowStock.getText()) && !ObjectUtils.isEmpty(lowStock.getText())) {
+                //VALID TEXT FIELD
+                selectedItem.setLow_stock(Integer.parseInt(lowStock.getText()));
+            } else if (ObjectUtils.isEmpty(lowStock.getText())) {
+                //EMPTY TEXT FIELD
+                selectedItem.setLow_stock(0);
+                lowStock.setText(lowStock.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
             } else {
-                lowStock.setText("1");
+                //INVALID TEXT FIELD
+                lowStock.setText(lowStock.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                lowStock.setText(lowStock.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
             }
         });
     }
 
-
-    public void viewHistory(ActionEvent actionEvent) {
-        Stage stage = new Stage();
-        Stage currentStage = (Stage) save.getScene().getWindow();
-        new StageLoader().load(InventoryHistoryController.class, applicationContext, stage);
-        currentStage.close();
-    }
 
     public void delete(ActionEvent actionEvent) {
         if (delete.getText().equalsIgnoreCase("DELETE")) {
@@ -475,7 +519,7 @@ public class EditItemController implements Initializable {
         selectedItem = applicationContext.getBean(Item.class);
         resetSelectedItem();
         Stage stage = (Stage) cancel.getScene().getWindow();
-        new StageLoader().load(InventoryListController.class, applicationContext, stage);
+        new StageLoader().loadTest(InventoryListController.class, applicationContext, stage);
     }
 
     public void save(ActionEvent actionEvent) {
@@ -518,7 +562,7 @@ public class EditItemController implements Initializable {
                     historyRepository.save(history);
 
                     try {
-                        QrCodeUtil.saveQrCode(String.valueOf(savedItem.getSku()), savedItem.getSku() + "-" + savedItem.getItem_name());
+                        BarCodeUtil.saveBarCode(String.valueOf(savedItem.getSku()), savedItem.getSku() + "-" + savedItem.getItem_name());
                     } catch (Exception ioException) {
                         Prompt.failed("Error in Saving QR Code!");
                     }

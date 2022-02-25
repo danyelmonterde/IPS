@@ -18,7 +18,7 @@ public class MainJavaFXApplication extends Application {
 
     private ConfigurableApplicationContext applicationContext;
 
-    private Logger LOGGER = LoggerFactory.getLogger(MainJavaFXApplication.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainJavaFXApplication.class);
 
 
     @Override

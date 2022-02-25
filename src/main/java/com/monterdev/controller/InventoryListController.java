@@ -31,6 +31,7 @@ import lombok.Setter;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.domain.Page;
@@ -45,6 +46,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
@@ -54,7 +56,9 @@ import java.util.concurrent.TimeUnit;
 import static com.monterdev.configuration.GlobalConfiguration.*;
 import static com.monterdev.constants.InventoryTypeConstants.ALL_CATEGORIES;
 import static com.monterdev.configuration.ItemsUIConfiguration.stockAlerts;
-import static com.monterdev.util.QrCodeUtil.saveQrCode;
+import static com.monterdev.constants.TextFieldValidatorConstants.PLUS_DOLLAR_REGEX_EXCLUDE;
+import static com.monterdev.constants.TextFieldValidatorConstants.WHOLE_NUMBERS_REGEX_EXCLUDE;
+import static com.monterdev.util.BarCodeUtil.saveBarCode;
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Component
@@ -203,8 +207,8 @@ public class InventoryListController implements Initializable {
 
     private void btnStockAdjustmentOnAction() {
         btnStockAdjustment.setOnAction(e->{
-            Stage newStage = new Stage();
-            new StageLoader().load(StockAdjustmentController.class, applicationContext, newStage);
+            Stage newStage = (Stage)btnStockAdjustment.getScene().getWindow();
+            new StageLoader().loadTest(StockAdjustmentController.class, applicationContext, newStage);
         });
     }
 
@@ -244,10 +248,8 @@ public class InventoryListController implements Initializable {
 
     private void btnHistoryOnClick() {
         btnHistory.setOnAction(e->{
-            Stage newStage = new Stage();
-            Stage stage2 = (Stage) btnHistory.getScene().getWindow();
-            new StageLoader().load(InventoryHistoryController.class, applicationContext, newStage);
-            stage2.close();
+            Stage stage = (Stage) btnHistory.getScene().getWindow();
+            new StageLoader().loadTest(InventoryHistoryController.class, applicationContext, stage);
         });
     }
 
@@ -279,7 +281,7 @@ public class InventoryListController implements Initializable {
         btnClose.setOnAction(e -> {
             resetTable();
             Stage currentStage = (Stage) btnClose.getScene().getWindow();
-            new StageLoader().load(MainDashboardController.class, applicationContext, currentStage);
+            new StageLoader().loadTest(MainDashboardController.class, applicationContext, currentStage);
         });
     }
 
@@ -357,6 +359,10 @@ public class InventoryListController implements Initializable {
 
     private void initializeItemCategories() {
         List<ItemCategory> itemCategories = categoryRepository.findAll();
+        ItemCategory allCategoriesOption = new ItemCategory();
+        allCategoriesOption.setCategory_name(ALL_CATEGORIES);
+        itemCategories.add(allCategoriesOption);
+        Collections.sort(itemCategories);
         categoryObservableList = FXCollections.observableArrayList(itemCategories);
         itemCategoriesCombo.getItems().setAll(categoryObservableList);
     }
@@ -396,6 +402,13 @@ public class InventoryListController implements Initializable {
         inventoryListTableView.getItems().setAll(itemObservableList);
         maximumPage = initialItemPage.getTotalPages();
         ofLabel.setText(String.valueOf(maximumPage));
+        if(maximumPage==0){
+            ofLabel.setVisible(false);
+            currentPageTextField.setVisible(false);
+        }else{
+            ofLabel.setVisible(true);
+            currentPageTextField.setVisible(true);
+        }
         tableRowOnClick();
     }
 
@@ -460,13 +473,21 @@ public class InventoryListController implements Initializable {
 
     private void currentPageOnChange() {
         currentPageTextField.textProperty().addListener((ob, ov, nv) -> {
-            if (ov != nv) {
-                if (StringUtils.isNumeric(nv)) {
-                    currentPage = Integer.parseInt(nv);
-                    if (currentPage <= maximumPage) {
-                        loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
-                    }
+            if (NumberUtils.isParsable(currentPageTextField.getText()) && !org.springframework.util.ObjectUtils.isEmpty(currentPageTextField.getText())) {
+                //VALID TEXT FIELD
+                currentPage = Integer.parseInt(nv);
+                if (currentPage <= maximumPage) {
+                    loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
                 }
+
+            } else if (org.springframework.util.ObjectUtils.isEmpty(currentPageTextField.getText())) {
+                //EMPTY TEXT FIELD
+                currentPageTextField.setText(currentPageTextField.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                currentPage = 1;
+            } else {
+                //INVALID TEXT FIELD
+                currentPageTextField.setText(currentPageTextField.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
+                currentPageTextField.setText(currentPageTextField.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
             }
         });
     }
@@ -509,7 +530,7 @@ public class InventoryListController implements Initializable {
     }
 
     private void loadTableViewFilteredByStockAlertsAndCategoryAndItemName(String selectedStockAlert, String itemToSearch) {
-        if (selectedStockAlert.equalsIgnoreCase(stockAlertLists.get(0))) {
+        if (selectedStockAlert.equalsIgnoreCase(stockAlertLists.get(0)) || itemCategoriesCombo.getValue().equals(ALL_CATEGORIES)) {
             loadTableViewWithPaginationAndItemName(currentPage - 1, numberOfRowsPerPage, where(hasItemNameLike(itemToSearch).and(hasCategoryLike(CURRENT_SELECTED_CATEGORY))));
         } else if (selectedStockAlert.equalsIgnoreCase(stockAlertLists.get(1))) {
             loadTableViewWithPaginationAndItemName(currentPage - 1, numberOfRowsPerPage, where(hasItemNameLike(itemToSearch).and(hasCategoryLike(CURRENT_SELECTED_CATEGORY)).and(lowStockEqualsToInStock())));
@@ -579,9 +600,12 @@ public class InventoryListController implements Initializable {
             File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 try {
-                    List<Item> importedItems = new CsvToBeanBuilder(new FileReader(file))
+                    itemsRepository.truncateItems();
+                    //List<Item> importedItems = itemsRepository.saveAll(DataUtil.convertIQWDInventoryToItemList(file));
+                    List<Item> importedItems =new CsvToBeanBuilder(new FileReader(file))
                             .withType(Item.class)
                             .build().parse();
+
                     if (!ObjectUtils.isEmpty(importedItems)) {
                         if (Prompt.confirm("Are you sure you want to import this file? Existing items will be deleted.").get().getText().equalsIgnoreCase("OK")) {
                             deletedItemsRepository.truncateDeletedItems();
@@ -599,9 +623,14 @@ public class InventoryListController implements Initializable {
                                 deletedItems.setUnit(existingItem.getUnit());
                                 deletedItemsRepository.save(deletedItems);
                             });
-                            itemsRepository.truncateItems();
-                          //  List<Item> newlyAddedItemList = itemsRepository.saveAll(importedItems);
-                              List<Item> newlyAddedItemList = itemsRepository.saveAll(DataUtil.convertIQWDInventoryToItemList());
+
+                            List<Item> newlyAddedItemList = itemsRepository.saveAll(importedItems);
+                          //  List<Item> newlyAddedItemList =
+                            if(!ObjectUtils.isEmpty(newlyAddedItemList)){
+                                Prompt.success("Item was imported successfully!");
+                            }else{
+                                Prompt.failed("Item import failed!");
+                            }
                             Balance balance = new Balance();
                             categoryObservableList.stream().forEach(e->{
                                 Balance bal = balanceRepository.getBalanceIdOfCurrentInventoryMonth(AppTime.getMonth(),String.valueOf(AppTime.getYear()),e.getCategory_name());
@@ -633,16 +662,16 @@ public class InventoryListController implements Initializable {
 
 
 
-                            if (!ObjectUtils.isEmpty(newlyAddedItemList)) {
+                            if (!ObjectUtils.isEmpty(importedItems)) {
                                 qrcodeRepository.truncateQrCodes();
-                                newlyAddedItemList.stream().forEach(e -> {
-                                    Qrcode qrcode = new Qrcode();
-                                    qrcode.setSku(e.getSku());
-                                    qrcode.setQr_code_path(getConfigValue(generatedQrCodeDirectory) + "\\" + e.getSku());
-                                    qrcode.setDate_created(AppTime.now());
-                                    qrcodeRepository.save(qrcode);
+                                importedItems.stream().forEach(e -> {
+                                    Barcode barcode = new Barcode();
+                                    barcode.setSku(e.getSku());
+                                    barcode.setBar_code_path(getConfigValue(generatedQrCodeDirectory) + "\\" + e.getSku());
+                                    barcode.setDate_created(AppTime.now());
+                                    qrcodeRepository.save(barcode);
                                     try {
-                                        saveQrCode(String.valueOf(e.getSku()), String.valueOf(e.getSku()));
+                                        saveBarCode(String.valueOf(e.getSku()), String.valueOf(e.getSku()));
                                     } catch (Exception ex) {
 
                                     }
@@ -657,10 +686,8 @@ public class InventoryListController implements Initializable {
                         }
                     }
 
-                } catch (IOException exception) {
-                    System.out.println(exception.getMessage());
                 } catch (Exception exception) {
-                    System.out.println(exception.getMessage());
+                    Prompt.failed("An error occurred while importing data!");
                 }
             }
         });

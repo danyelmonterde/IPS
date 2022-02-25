@@ -183,11 +183,11 @@ public class CreateRequisitionTemplateController implements Initializable {
                     risTypeRepository.save(risTypeList.get(ctr));
                     Prompt.success("Newly Created Template was saved!");
                     Stage stage = (Stage) risTemplateContainer.getScene().getWindow();
-                    new StageLoader().load(CustomizeRequisitionIssueSlipController.class, applicationContext,stage);
+                    new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext,stage);
                 } else {
                     risTypeRepository.save(risTypeList.get(ctr));
                     Stage stage = (Stage) risTemplateContainer.getScene().getWindow();
-                    new StageLoader().load(CustomizeRequisitionIssueSlipController.class, applicationContext,stage);
+                    new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext,stage);
                 }
             } else {
                 Prompt.failed("Pls fill in all details!");

@@ -11,14 +11,14 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "qrcode")
-public class Qrcode {
+@Table(name = "barcode")
+public class Barcode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String qr_code_path;
+    private String bar_code_path;
 
     private LocalDateTime date_created;
 

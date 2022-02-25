@@ -3,6 +3,7 @@ package com.monterdev.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Comparator;
 
 @Getter
 @Setter
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Table(name = "itemcategory")
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemCategory {
+public class ItemCategory implements Comparable<ItemCategory> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,4 +20,10 @@ public class ItemCategory {
     private int id;
 
     private String category_name;
+
+    @Override
+    public int compareTo(ItemCategory o) {
+        return this.getCategory_name().compareTo(o.getCategory_name());
+
+    }
 }

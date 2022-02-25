@@ -32,7 +32,7 @@ public class Prompt {
     public static void failed(String message){
         Alert alert = new Alert(Alert.AlertType.ERROR, message);
         alert.show();
-        Timeline idlestage = new Timeline( new KeyFrame( Duration.seconds(5), new EventHandler<ActionEvent>()
+        Timeline idlestage = new Timeline( new KeyFrame( Duration.seconds(2), new EventHandler<ActionEvent>()
         {
 
             @Override

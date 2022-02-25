@@ -39,6 +39,11 @@ public class GlobalConfiguration {
     public static final String systemReportLocation;
     public static final String signatoryRole;
     public static final String reportJrxmlLocation;
+    public static final String sessionCookieData;
+    public static final String sessionCookieMM;
+    public static final String sessionCookieDD;
+    public static final String sessionCookieYY;
+    public static final String initialLoginSettings;
 
     static {
         homePage = "HOME_PAGE";
@@ -60,6 +65,11 @@ public class GlobalConfiguration {
         systemReportLocation = "SYSTEM_REPORT_LOCATION";
         signatoryRole = "REPORT_SIGNATORY_ROLES";
         reportJrxmlLocation = "REPORT_JRXML_LOCATION";
+        sessionCookieData = "SESSION_COOKIE_DATA";
+        sessionCookieMM = "SESSION_COOKIE_MM";
+        sessionCookieDD = "SESSION_COOKIE_DD";
+        sessionCookieYY = "SESSION_COOKIE_YYYY";
+        initialLoginSettings = "INITIAL_LOGIN_SETTINGS";
     }
 
 

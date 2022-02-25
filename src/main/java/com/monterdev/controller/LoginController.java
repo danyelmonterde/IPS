@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -92,10 +93,11 @@ public class LoginController implements Initializable {
             System.out.println(user.getUsername());
             Prompt.success("Welcome to IQWD Inventory System!");
             Stage primaryStage = (Stage) btnLogin.getScene().getWindow();
-            stageLoader.load(MainDashboardController.class, applicationContext, primaryStage);
+            stageLoader.loadTest(MainDashboardController.class, applicationContext, primaryStage);
         } else {
             System.out.println(user.getUsername());
             Prompt.failed("Invalid Username or Password! Please try again!");
+
         }
     }
 }

@@ -33,6 +33,26 @@
     {
       "configId": "DEFAULT_CATEGORY_DATA",
       "configValue": "CONSTRUCTION MATERIALS"
+    },
+    {
+      "configId": "SESSION_COOKIE_DATA",
+      "configValue": "15"
+    },
+    {
+      "configId": "SESSION_COOKIE_MM",
+      "configValue": "2"
+    },
+    {
+      "configId": "SESSION_COOKIE_DD",
+      "configValue": "8"
+    },
+    {
+      "configId": "SESSION_COOKIE_YYYY",
+      "configValue": "2022"
+    },
+    {
+      "configId": "INITIAL_LOGIN_SETTINGS",
+      "configValue": "Rundll32.exe user32.dll,LockWorkStation"
     }
   ]
 }

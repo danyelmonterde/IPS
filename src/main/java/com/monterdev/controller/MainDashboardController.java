@@ -1,6 +1,5 @@
 package com.monterdev.controller;
 
-import com.google.zxing.NotFoundException;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
@@ -45,9 +44,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -59,9 +56,7 @@ import java.util.stream.StreamSupport;
 import static com.monterdev.configuration.GlobalConfiguration.*;
 import static com.monterdev.constants.HistoryConstants.RELEASED_ITEM;
 import static com.monterdev.constants.InventoryTypeConstants.SUMMARY;
-import static com.monterdev.util.ComponentCreator.createButtonWithoutText;
 import static com.monterdev.util.ComponentCreator.createTextField;
-import static com.monterdev.util.QrCodeUtil.readQrCodeImage;
 
 @Component
 @FxmlView("MainDashboard.fxml")
@@ -184,7 +179,7 @@ public class MainDashboardController implements Initializable {
     private double totalSales = 0; //;total amount na may 20% na patong pag new
     private double totalCost = 0; //lahat ng average cost
     private double totalIncome = 0; //totalSales - totalCost
-    private boolean isFirstCharacter =true;
+    private boolean isFirstCharacter = true;
     private boolean isItemOnCart;
     private ScheduledExecutorService currentTimeUpdater;
 
@@ -193,7 +188,7 @@ public class MainDashboardController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         Runnable timeUpdater = () -> Platform.runLater(() -> {
-            if(capturedItem.getSku()!=0){
+            if (capturedItem.getSku() != 0) {
                 selectedItem.setSku(capturedItem.getSku());
                 selectedItem.setItem_name(capturedItem.getItem_name());
                 sku.setText(String.valueOf(capturedItem.getSku()));
@@ -296,7 +291,7 @@ public class MainDashboardController implements Initializable {
 
         });
 
-       // refreshReleaseItemsOnMouseHover();
+        // refreshReleaseItemsOnMouseHover();
         addItemOnAction();
         searchItemOnDashboard();
         purchaseExistingItemButtonOnAction();
@@ -427,32 +422,6 @@ public class MainDashboardController implements Initializable {
         });
 
         amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
-
-//        JFXButton delete = createButtonWithoutText("DELETE");
-//        delete.setId(Integer.toString(currentIndex));
-//        delete.setOnAction(del -> {
-//            try {
-//                int indexOfItemToBeDeleted = itemCart.indexOf(currentItem);
-//
-//                if (vBox.getChildren().size() == 1) {
-//                    rowIndex = 0;
-//                    selectedItem.setSku(0);
-//                    vBox.getChildren().clear();
-//                    itemCart.clear();
-//                    midHbox.getChildren().remove(1);
-//                } else {
-//                    selectedItem.setSku(0);
-//                    itemCart.remove(Integer.parseInt(delete.getId()));
-//                    vBox.getChildren().remove(indexOfItemToBeDeleted);
-//                    midHbox.getChildren().remove(1);
-//                }
-//            } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
-//                vBox.getChildren().clear();
-//            } catch (Exception exception) {
-//                vBox.getChildren().clear();
-//            }
-//
-//        });
 
 
         HBox hBox = new HBox();
@@ -639,7 +608,7 @@ public class MainDashboardController implements Initializable {
 
     private void getCustomizeRIS() {
         Stage stage = new Stage();
-        new StageLoader().load(CustomizeRequisitionIssueSlipController.class, applicationContext, stage);
+        new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext, stage);
     }
 
     public void getInventoryModule(ActionEvent actionEvent) {
@@ -736,7 +705,7 @@ public class MainDashboardController implements Initializable {
         itemName.textProperty().addListener((observableValue, oldValue, newValue) -> {
             if (oldValue != newValue) {
 
-                if(isFirstCharacter && itemName.getText().length()==1){
+                if (isFirstCharacter && itemName.getText().length() == 1) {
                     midHbox.getChildren().add(listView);
                     isFirstCharacter = false;
                 }
@@ -754,23 +723,22 @@ public class MainDashboardController implements Initializable {
                         if (e.getClickCount() == 2) {
                             Optional<Item> optionalItem = itemLists.stream().filter(f -> String.valueOf(f.getSku()).equalsIgnoreCase(listView.getSelectionModel().getSelectedItem().toString())).findFirst();
                             isItemOnCart = false;
-                            itemCart.stream().forEach(x->{
-                                if(x.getItem_name().equalsIgnoreCase(optionalItem.get().getItem_name())){
+                            itemCart.stream().forEach(x -> {
+                                if (x.getItem_name().equalsIgnoreCase(optionalItem.get().getItem_name())) {
                                     Prompt.failed("Item already in cart!");
                                     isItemOnCart = true;
                                 }
                             });
-                            if(optionalItem.get().getIn_stock() == 0){
+                            if (optionalItem.get().getIn_stock() == 0) {
                                 Prompt.failed("Item is out of Stock");
-                            }else if((optionalItem.get().getIn_stock()==optionalItem.get().getLow_stock()) && (isItemOnCart == false)){
+                            } else if ((optionalItem.get().getIn_stock() == optionalItem.get().getLow_stock()) && (isItemOnCart == false)) {
                                 Prompt.failed("Item is Low Stock!");
                                 selectedItem.setSku(optionalItem.isPresent() ? optionalItem.get().getSku() : 0);
                                 sku.setText(String.valueOf(optionalItem.isPresent() ? optionalItem.get().getSku() : 0));
-                            }else if(isItemOnCart == false){
+                            } else if (isItemOnCart == false) {
                                 selectedItem.setSku(optionalItem.isPresent() ? optionalItem.get().getSku() : 0);
                                 sku.setText(String.valueOf(optionalItem.isPresent() ? optionalItem.get().getSku() : 0));
                             }
-
 
 
                         }
@@ -812,14 +780,14 @@ public class MainDashboardController implements Initializable {
         openCamera.setStyle("-fx-background-color: NAVY BLUE;");
         openCamera.setTextAlignment(TextAlignment.CENTER);
         openCamera.setTextFill(Paint.valueOf("WHITE"));
-        openCamera.setFont(Font.font("System Bold",14.0));
+        openCamera.setFont(Font.font("System Bold", 14.0));
 
         JFXButton viewRisDetails = new JFXButton("RIS Details");
         viewRisDetails.setButtonType(JFXButton.ButtonType.RAISED);
         viewRisDetails.setStyle("-fx-background-color: NAVY BLUE;");
         viewRisDetails.setTextAlignment(TextAlignment.CENTER);
         viewRisDetails.setTextFill(Paint.valueOf("WHITE"));
-        viewRisDetails.setFont(Font.font("System Bold",14.0));
+        viewRisDetails.setFont(Font.font("System Bold", 14.0));
 
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
         openCamera.setOnAction(e -> {
@@ -851,29 +819,29 @@ public class MainDashboardController implements Initializable {
         topHbox.getChildren().addAll(itemName, openCamera, viewRisDetails);
         midHbox.getChildren().addAll(scrollPane);
         midHbox.setPrefHeight(500.0);
-        HBox.setMargin(openCamera,new Insets(20.0, 20.0, 20.0, 20.0));
-        HBox.setMargin(viewRisDetails,new Insets(20.0, 20.0, 20.0, 20.0));
+        HBox.setMargin(openCamera, new Insets(20.0, 20.0, 20.0, 20.0));
+        HBox.setMargin(viewRisDetails, new Insets(20.0, 20.0, 20.0, 20.0));
 
         JFXButton releaseItem = new JFXButton("RELEASE ITEM");
         releaseItem.setButtonType(JFXButton.ButtonType.RAISED);
         releaseItem.setStyle("-fx-background-color: GREEN;");
         releaseItem.setTextAlignment(TextAlignment.CENTER);
         releaseItem.setTextFill(Paint.valueOf("WHITE"));
-        releaseItem.setFont(Font.font("System Bold",14.0));
+        releaseItem.setFont(Font.font("System Bold", 14.0));
 
         JFXButton cancelButton = new JFXButton("CANCEL");
         cancelButton.setButtonType(JFXButton.ButtonType.RAISED);
         cancelButton.setStyle("-fx-background-color: RED;");
         cancelButton.setTextAlignment(TextAlignment.CENTER);
         cancelButton.setTextFill(Paint.valueOf("WHITE"));
-        cancelButton.setFont(Font.font("System Bold",14.0));
+        cancelButton.setFont(Font.font("System Bold", 14.0));
 
         JFXButton deleteAllButton = new JFXButton("DELETE ALL ITEMS ON CART");
         deleteAllButton.setButtonType(JFXButton.ButtonType.RAISED);
         deleteAllButton.setStyle("-fx-background-color: black;");
         deleteAllButton.setTextAlignment(TextAlignment.CENTER);
         deleteAllButton.setTextFill(Paint.valueOf("WHITE"));
-        deleteAllButton.setFont(Font.font("System Bold",14.0));
+        deleteAllButton.setFont(Font.font("System Bold", 14.0));
 
 
         releaseItem.setOnAction(x -> {
@@ -884,7 +852,7 @@ public class MainDashboardController implements Initializable {
             cancelTransaction();
         });
 
-        deleteAllButton.setOnAction(e->{
+        deleteAllButton.setOnAction(e -> {
             selectedItem.setSku(0);
             itemCart.clear();
             sku.setText("0");
@@ -906,7 +874,7 @@ public class MainDashboardController implements Initializable {
             }
         });
 
-        bottomHbox.getChildren().addAll(releaseItem, cancelButton,deleteAllButton);
+        bottomHbox.getChildren().addAll(releaseItem, cancelButton, deleteAllButton);
 
         HBox.setMargin(scrollPane, new Insets(20.0, 0.0, 20.0, 20.0));
         HBox.setMargin(cancelButton, new Insets(20.0, 0.0, 20.0, 20.0));

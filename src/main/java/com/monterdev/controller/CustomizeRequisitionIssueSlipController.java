@@ -5,6 +5,8 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.monterdev.model.*;
 import com.monterdev.util.AppTime;
+import com.monterdev.util.LoginUtil;
+import com.monterdev.util.Prompt;
 import com.monterdev.util.StageLoader;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import lombok.Getter;
 import net.rgielen.fxweaver.core.FxmlView;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
@@ -84,8 +87,13 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     @Autowired
     private List<RisTypeNames> risTemplates;
 
+    @Autowired
+    private LoginUtil session;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        session.isValid(btnRisTemplate);
+
         setDate();
         resetFields();
         customerTypeOnload();
@@ -173,13 +181,18 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     }
 
     public void addRIS(ActionEvent actionEvent) {
-        requisitionIssueSlip.setCustomer_name(customer.getFirst_name()+" "+customer.getMiddle_name()+" "+customer.getLast_name());
-        customer.setFirst_name(customer.getFirst_name());
-        customer.setMiddle_name(customer.getMiddle_name());
-        customer.setLast_name((customer.getLast_name()));
-        selectedRisTemplate.setSelectedRisTemplate(this.comboRisTemplate.getValue().toString().intern());
-        Stage stage = (Stage) btnRisTemplate.getScene().getWindow();
-        stage.close();
+        try{
+            requisitionIssueSlip.setCustomer_name(customer.getFirst_name()+" "+customer.getMiddle_name()+" "+customer.getLast_name());
+            customer.setFirst_name(customer.getFirst_name());
+            customer.setMiddle_name(customer.getMiddle_name());
+            customer.setLast_name((customer.getLast_name()));
+            selectedRisTemplate.setSelectedRisTemplate(this.comboRisTemplate.getValue().toString().intern());
+            Stage stage = (Stage) btnRisTemplate.getScene().getWindow();
+            stage.close();
+        }catch(NullPointerException nullPointerException){
+            Prompt.failed("Please select RIS Template!");
+        }
+
     }
 
     public void cancel(ActionEvent actionEvent) {
