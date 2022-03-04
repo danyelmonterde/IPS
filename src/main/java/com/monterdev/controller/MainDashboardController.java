@@ -35,11 +35,14 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -163,6 +166,8 @@ public class MainDashboardController implements Initializable {
     private ReportUtil reportUtil;
     @Autowired
     private SearchUtil searchUtil;
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     private List<Item> itemLists;
 
@@ -584,10 +589,19 @@ public class MainDashboardController implements Initializable {
                 reportUtil.setSelectedReport(newValue.getName());
                 reportUtil.setReportId(newValue.getId());
                 reportUtil.setSelectedReportRisTypeCode(newValue.getRisTypeName());//ex.CM-NEW CONNECTION
-                reportUtil.setFILE_UPPER_PART(new File(getReportJrxmlLocation() + newValue.getJrxmlReportFileName() + ".jrxml"));
+               // reportUtil.setFILE_UPPER_PART(new File(getReportJrxmlLocation() + newValue.getJrxmlReportFileName() + ".jrxml"));
+                try {
+                    reportUtil.setFILE_UPPER_PART(resourceLoader.getResource(getReportJrxmlLocation() + newValue.getJrxmlReportFileName() + ".jrxml").getInputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 reportUtil.setInventoryType(newValue.getInventorytype());
                 if (newValue.getRisTypeName().equalsIgnoreCase(SUMMARY)) {
-                    reportUtil.setFILE_LOWER_PART(new File(getReportJrxmlLocation() + "SINGLE_INVENTORY_SUMMARY_LOWER_PART.jrxml"));
+                    try {
+                        reportUtil.setFILE_LOWER_PART(resourceLoader.getResource(getReportJrxmlLocation() + "SINGLE_INVENTORY_SUMMARY_LOWER_PART.jrxml").getInputStream());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });

@@ -9,12 +9,15 @@ import lombok.Getter;
 import lombok.Setter;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -73,9 +76,9 @@ public class ReportUtil {
     @Autowired
     private BalanceRepository balanceRepository;
 
-    private File FILE_UPPER_PART = null;
+    private InputStream FILE_UPPER_PART = null;
 
-    private File FILE_LOWER_PART = null;
+    private InputStream FILE_LOWER_PART = null;
 
     private String balanceCategory = null;
 
@@ -84,28 +87,9 @@ public class ReportUtil {
     @Autowired
     private SupplierRepository supplierRepository;
 
-    public ReportUtil(){
-
-    }
-
-    @Autowired
-    public ReportUtil (ReportRepository reportRepository,SalesRepository salesRepository
-            ,RisRepository risRepository,RisTypeNamesRepository risTypeNamesRepository,PurchaseOrderRepository purchaseOrderRepository,
-      SignatoryRepository signatoryRepository, BalanceRepository balanceRepository,SupplierRepository supplierRepository
-        ){
-        this.reportRepository = reportRepository;
-        this.salesRepository = salesRepository;
-        this.risRepository = risRepository;
-        this.risTypeNamesRepository = risTypeNamesRepository;
-        this.purchaseOrderRepository = purchaseOrderRepository;
-        this.signatoryRepository = signatoryRepository;
-        this.balanceRepository = balanceRepository;
-        this.supplierRepository = supplierRepository;
-    }
 
     public void generateReport() throws JRException, SQLException, FileNotFoundException {
         classifyReport();
-
     }
 
     private void classifyReport() throws FileNotFoundException {
@@ -309,7 +293,7 @@ public class ReportUtil {
     }
 
     private void createTotalInventoryReport() throws JRException{
-        JasperReport totalInventoryReport = JasperCompileManager.compileReport(FILE_UPPER_PART.getAbsolutePath());
+        JasperReport totalInventoryReport = JasperCompileManager.compileReport(FILE_UPPER_PART);
         List<Balance> totalBalanceListForThisMonth = balanceRepository.getTotalBalancesForThisMonth(selectedMonth,selectedYear);
         List<Map> inventoryListAndEndingBalances = new ArrayList<>();
         totalBalanceListForThisMonth.stream().forEach(e->{
@@ -359,8 +343,8 @@ public class ReportUtil {
     }
 
     private void createInventoryReport(List<Map> purchaseOrderAndHeaderList, List<Map> salesAndFooterList) throws JRException {
-        JasperReport purchaseOrderJasperReport = JasperCompileManager.compileReport(FILE_UPPER_PART.getAbsolutePath());
-        JasperReport salesJasperReport = JasperCompileManager.compileReport(FILE_LOWER_PART.getAbsolutePath());
+        JasperReport purchaseOrderJasperReport = JasperCompileManager.compileReport(FILE_UPPER_PART);
+        JasperReport salesJasperReport = JasperCompileManager.compileReport(FILE_LOWER_PART);
 
         JRBeanCollectionDataSource purchaseOrderDatasource = new JRBeanCollectionDataSource(purchaseOrderAndHeaderList);
         JRBeanCollectionDataSource saleDatasource = new JRBeanCollectionDataSource(salesAndFooterList);
@@ -421,7 +405,7 @@ public class ReportUtil {
         }
         reports.setReport_name(selectedMonth + "_" + selectedYear + "_" + selectedReport + "_"+ UUID.randomUUID() + ".pdf");
                 reports.setMonth_of_report(selectedMonth);
-        reports.setReport_location(getSystemLocationOfReport() + reports.getReport_name());
+        reports.setReport_location(FileUtils.getUserDirectoryPath()+"\\"+getSystemLocationOfReport() + reports.getReport_name());
         reports.setYear_of_report(selectedYear);
         reports.setDay_of_report(Integer.toString(LocalDateTime.now().getDayOfMonth()));
         reports.setChecked_by(this.getReportCheckedBy());
@@ -434,8 +418,8 @@ public class ReportUtil {
         return getSystemReportLocation();
     }
 
-    private void createReport() throws JRException {
-        JasperReport jasperReport = JasperCompileManager.compileReport(FILE_UPPER_PART.getAbsolutePath());
+    private void createReport() throws JRException, FileNotFoundException {
+        JasperReport jasperReport = JasperCompileManager.compileReport(FILE_UPPER_PART);
         List<Map> mappedReportsList = reportsMapper.map();
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(mappedReportsList);
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, dataSource);
