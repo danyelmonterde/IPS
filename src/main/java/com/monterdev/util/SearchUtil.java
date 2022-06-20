@@ -15,13 +15,13 @@ import static sun.misc.MessageUtils.where;
 
 public class SearchUtil {
 
+    @Autowired
     private ItemsRepository itemsRepository;
 
     public SearchUtil(){
 
     }
 
-    @Autowired
     public SearchUtil(ItemsRepository itemsRepository) {
         this.itemsRepository = itemsRepository;
     }

@@ -33,15 +33,12 @@ import lombok.SneakyThrows;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
@@ -169,6 +166,7 @@ public class MainDashboardController implements Initializable {
     @Autowired
     private ResourceLoader resourceLoader;
 
+    @Autowired
     private List<Item> itemLists;
 
     private List<String> responseList = new ArrayList<>();
@@ -187,6 +185,8 @@ public class MainDashboardController implements Initializable {
     private boolean isItemOnCart;
     private boolean proceed = false;
     private ScheduledExecutorService currentTimeUpdater;
+    private static final String DATE_FORMAT = "dd-MMM-YYYY hh:mm:ss";
+    private int validNumberOfItemsInCart = 0;
 
     @SneakyThrows
     @Override
@@ -208,6 +208,7 @@ public class MainDashboardController implements Initializable {
                 selectedItem.setSku(capturedItem.getSku());
                 selectedItem.setItem_name(capturedItem.getItem_name());
                 sku.setText(String.valueOf(capturedItem.getSku()));
+                itemLists = itemsRepository.findAll();
             }
         });
 
@@ -353,6 +354,7 @@ public class MainDashboardController implements Initializable {
 
 
         Item currentItem = new Item();
+        itemLists = itemsRepository.findAll();
         itemLists.stream().forEach(s -> {
             if (s.getSku() == item.getSku() && (!(item.getItem_name().equalsIgnoreCase(s.getItem_name())))) {
                 currentItem.setLow_stock(s.getLow_stock());
@@ -463,6 +465,7 @@ public class MainDashboardController implements Initializable {
                     quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                     quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
                 }
+                checkIfItemIsInCart(quantity,newValue);
             } catch (NumberFormatException exception) {
                 quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                 quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
@@ -500,6 +503,17 @@ public class MainDashboardController implements Initializable {
 
         return hBox;
 
+    }
+
+    private void checkIfItemIsInCart(JFXTextField item, String newValue) {
+       try{
+           int itemIndex= Integer.parseInt(item.getId());
+           String s = newValue;
+           itemCart.get(itemIndex).setQuantity(Integer.parseInt(newValue));
+           System.out.println("New qty is "+itemCart.get(itemIndex).getQuantity());
+       }catch (IndexOutOfBoundsException e){
+            System.out.println("Item not in cart");
+       }
     }
 
     private void updateIdOfRemainingHbox(int indexOfItemDeleted){
@@ -802,6 +816,12 @@ public class MainDashboardController implements Initializable {
     }
 
     public void getLogoutModule(ActionEvent actionEvent) {
+        rowIndex = 0;
+        requisitionIssueSlip.setRequisition_and_issue_slip_number("");
+        requisitionIssueSlip.setRistype("");
+        requisitionIssueSlip.setPurpose("");
+        requisitionIssueSlip.setCustomer_name("");
+        requisitionIssueSlip.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT)));
         resetSelectedItem();
         user.setUsername(null);
         user.setIsAdmin(null);
@@ -809,7 +829,9 @@ public class MainDashboardController implements Initializable {
         user.setPassword(null);
         user.setId(0);
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
-        new StageLoader().load(LoginController.class, applicationContext, currentStage);
+        currentStage.close();
+        Stage newStage = new Stage();
+        new StageLoader().load(LoginController.class, applicationContext, newStage);
     }
 
     public void createRequisitionIssueSlip() {
@@ -866,10 +888,11 @@ public class MainDashboardController implements Initializable {
                    // midHbox.getChildren().add(0,listView);
                     isFirstCharacter = false;
                 }
+                itemLists = itemsRepository.findAll();
                 searchUtil.searchItem(itemName.getText(), itemLists, responseList, "NAME");
                 if (responseList.size() > 0) {
 
-                    listView.setPrefWidth(800);
+                    listView.setPrefWidth(400);
 
                     HBox.setMargin(listView, new Insets(20.0, 0.0, 20.0, 0.0));
                     listView.getItems().clear();
@@ -880,7 +903,8 @@ public class MainDashboardController implements Initializable {
                     });
                     listView.setOnMouseClicked(e -> {
                         if (e.getClickCount() == 2) {
-                            Optional<Item> optionalItem = itemLists.stream().filter(f -> String.valueOf(f.getItem_name()).equalsIgnoreCase(listView.getSelectionModel().getSelectedItem().toString())).findFirst();
+                            List<Item> updatedItemList = itemsRepository.findAll();
+                            Optional<Item> optionalItem = updatedItemList.stream().filter(f -> String.valueOf(f.getItem_name()).equalsIgnoreCase(listView.getSelectionModel().getSelectedItem().toString())).findFirst();
                             isItemOnCart = false;
                             itemCart.stream().forEach(x -> {
                                 if (x.getItem_name().equalsIgnoreCase(optionalItem.get().getItem_name())) {
@@ -1020,6 +1044,7 @@ public class MainDashboardController implements Initializable {
             itemCart.clear();
             sku.setText("0");
             rowIndex = 0;
+            validNumberOfItemsInCart = 0;
 
             ObservableList<Node> nodeStream = midHbox.getChildren();
             for (Node node : nodeStream) {
@@ -1052,48 +1077,51 @@ public class MainDashboardController implements Initializable {
         rowIndex = 0;
         resetSelectedItem();
         itemCart.clear();
+        validNumberOfItemsInCart = 0;
         getDashboardModule(null);
     }
 
     private void releaseItemsOnCart() {
-        if (!ObjectUtils.isEmpty(itemCart) && selectedItem.getSku() != 0) {
 
-            itemCart.stream().forEach(item -> {
-                if(item.getQuantity()==0 || item.getIn_stock()==0 || item.getCost()==0 ){
+        if (!ObjectUtils.isEmpty(itemCart) && selectedItem.getSku() != 0) {
+            int numberOfItemsInCart = itemCart.size();
+            for(int counter=0;counter<numberOfItemsInCart;counter++){
+                if(itemCart.get(counter).getQuantity()==0 || itemCart.get(counter).getIn_stock()==0 || itemCart.get(counter).getCost()==0 ){
                     proceed = false;
-                    return;
+                    break;
                 }else{
+                    validNumberOfItemsInCart++;
                     proceed = true;
                 }
 
                 History history = new History();
                 history.setDate(AppTime.now());
-                history.setItem_name(item.getItem_name());
-                history.setAdjustment(item.getQuantity() * -1);
-                history.setItem_category(item.getItem_category());
+                history.setItem_name(itemCart.get(counter).getItem_name());
+                history.setAdjustment(itemCart.get(counter).getQuantity() * -1);
+                history.setItem_category(itemCart.get(counter).getItem_category());
                 history.setReason(RELEASED_ITEM);
-                history.setItem_category(item.getItem_category());
+                history.setItem_category(itemCart.get(counter).getItem_category());
 
                 if (requisitionIssueSlip.getIs_customer_new() == 1) {
-                    totalCost += item.getCost() * item.getQuantity();
-                    totalSales += (item.getCost() + (item.getCost() * .2)) * item.getQuantity();
+                    totalCost += itemCart.get(counter).getCost() * itemCart.get(counter).getQuantity();
+                    totalSales += (itemCart.get(counter).getCost() + (itemCart.get(counter).getCost() * .2)) * itemCart.get(counter).getQuantity();
                     totalIncome = totalSales - totalCost;
                 } else {
-                    totalCost += item.getCost() * item.getQuantity();
-                    totalSales += item.getCost() * item.getQuantity();
+                    totalCost += itemCart.get(counter).getCost() * itemCart.get(counter).getQuantity();
+                    totalSales += itemCart.get(counter).getCost() * itemCart.get(counter).getQuantity();
                     totalIncome = totalSales - totalCost;
                 }
 
-                int inStock = item.getIn_stock() - item.getQuantity();
-                item.setQuantity(inStock);
-                item.setIn_stock(inStock);
-                item.setTag(null);
+                int inStock = itemCart.get(counter).getIn_stock() - itemCart.get(counter).getQuantity();
+                itemCart.get(counter).setQuantity(inStock);
+                itemCart.get(counter).setIn_stock(inStock);
+                itemCart.get(counter).setTag(null);
 
                 history.setStock_after(inStock);
                 historyRepository.save(history);
 
-            });
-            if(proceed){
+            }
+            if(proceed && numberOfItemsInCart==validNumberOfItemsInCart){
                 if (!ObjectUtils.isEmpty(itemsRepository.saveAll(itemCart))) {
                     resetSelectedItem();
                     sku.setText("0");
