@@ -4,10 +4,8 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTextField;
-import com.monterdev.model.RequisitionIssueSlip;
-import com.monterdev.model.RisType;
-import com.monterdev.model.RisTypeFields;
-import com.monterdev.model.RisTypeNames;
+import com.monterdev.model.*;
+import com.monterdev.repository.RISSignatoryRepository;
 import com.monterdev.repository.RisTypeNamesRepository;
 import com.monterdev.repository.RisTypeRepository;
 import com.monterdev.util.*;
@@ -49,7 +47,7 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     @FXML
     private Label currentDate;
     @FXML
-    private JFXTextField requestedBy;
+    private JFXComboBox requestedBy;
     @FXML
     private JFXTextField division;
     @FXML
@@ -79,6 +77,8 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     private List<RisTypeFields> risTypeFieldsList;
     @Autowired
     private RisTypeNamesRepository risTypeNamesRepository;
+    @Autowired
+    private RISSignatoryRepository risSignatoryRepository;
 
     private static final String DATE_FORMAT = "dd-MMM-YYYY hh:mm:ss";
     private static final String RIS_TYPE_DATE_FORMAT = "dd-MMM-yyyy";
@@ -91,6 +91,7 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     private int successFields = 0;
     private List<String> fieldTypes;
     private List<RisTypeNames> risTemplates;
+    private List<RequisitionIssueSlipSignatories> requisitionIssueSlipSignatories;
 
     private ControlNumberGenerator controlNumberGenerator;
 
@@ -99,6 +100,10 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
         if(ObjectUtils.isEmpty(risTemplates)){
             risTemplates = risTypeNamesRepository.findAllRisTypeNames();
         }
+        if(ObjectUtils.isEmpty(requisitionIssueSlipSignatories)){
+            requisitionIssueSlipSignatories = risSignatoryRepository.findAll();
+        }
+        requisitionIssueSlipSignatories.stream().forEach(d -> this.requestedBy.getItems().add(d.getRequested_by()));
         if(ObjectUtils.isEmpty(controlNumberGenerator)){
             controlNumberGenerator = new ControlNumberGenerator();
         }
@@ -154,9 +159,15 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
 
 
     private void setRequestedBy() {
-        requestedBy.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldValue != newValue) {
-                requisitionIssueSlip.setRequested_by(newValue);
+        requestedBy.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if(oldValue!=newValue){
+                Optional<RequisitionIssueSlipSignatories> optRisSignatory
+                        =requisitionIssueSlipSignatories.stream().filter(e->e.getRequested_by().equalsIgnoreCase((String) newValue)).findFirst();
+                if(optRisSignatory.isPresent()){
+                    txtDesignation.setText(optRisSignatory.get().getDesignation());
+                    division.setText(optRisSignatory.get().getDivision());
+                    unit.setText(optRisSignatory.get().getUnit());
+                }
             }
         });
     }

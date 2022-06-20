@@ -779,12 +779,17 @@ public class MainDashboardController implements Initializable {
         JFXButton rolesAndPrivileges = new JFXButton("ADMIN ROLES & PRIVILEGES");
         JFXButton balanceSettings = new JFXButton("BALANCE SETTINGS");
         JFXButton stockAdjusment = new JFXButton("STOCK ADJUSTMENT");
+        JFXButton risSignatory = new JFXButton("RIS SIGNATORY");
 
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
 
         createMasterData.setOnAction(e -> {
             new StageLoader().load(MasterDataController.class, applicationContext, currentStage);
 
+        });
+
+        risSignatory.setOnAction(e -> {
+            new StageLoader().load(RisSignatoryController.class, applicationContext, currentStage);
         });
 
         updatePassword.setOnAction(e -> {
@@ -808,7 +813,7 @@ public class MainDashboardController implements Initializable {
 
         });
 
-        topHbox.getChildren().addAll(createMasterData, updatePassword, rolesAndPrivileges, balanceSettings, stockAdjusment);
+        topHbox.getChildren().addAll(createMasterData, updatePassword, rolesAndPrivileges, balanceSettings, stockAdjusment, risSignatory);
         topHbox.setAlignment(Pos.CENTER);
         midHbox.setAlignment(Pos.CENTER);
         bottomHbox.setAlignment(Pos.CENTER);
