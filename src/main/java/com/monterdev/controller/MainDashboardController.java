@@ -371,6 +371,16 @@ public class MainDashboardController implements Initializable {
 
         itemCart.add(currentIndex,currentItem);
 
+        JFXTextField inStockQuantity = createTextField("IN STOCK", "LIGHT GRAY");
+        inStockQuantity.setPrefWidth(220.0);
+        inStockQuantity.setEditable(false);
+        inStockQuantity.setText(String.valueOf(currentItem.getIn_stock()));
+        inStockQuantity.setId(String.valueOf(currentIndex));
+        inStockQuantity.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+                Prompt.success(currentItem.getItem_name()+ "in stock has been updated!");
+            }
+        });
 
         JFXButton delete = createButtonWithoutText("DELETE");
         delete.setId(Integer.toString(currentIndex));
@@ -440,7 +450,17 @@ public class MainDashboardController implements Initializable {
         quantity.setId(String.valueOf(currentIndex));
         quantity.textProperty().addListener((observable, oldValue, newValue) -> {
             try{
-                int inStock =currentItem.getIn_stock() ;
+                Optional<Item> optionalItem = itemsRepository.findById(currentItem.getSku());
+                int inStock = optionalItem.isPresent() ? optionalItem.get().getIn_stock():0;
+                if(inStock != Integer.parseInt(inStockQuantity.getText())){
+                    inStockQuantity.setText(String.valueOf(inStock));
+                }
+                if(inStock < Integer.parseInt(newValue)){
+                    Prompt.failed("Quantity is greater than In stock! Please replenish stock");
+                    quantity.setText("0");
+                    return;
+                }
+
                 if (NumberUtils.isParsable(quantity.getText()) && !ObjectUtils.isEmpty(quantity.getText())) {
                     //VALID TEXT FIELD
                     if(Integer.parseInt(quantity.getText())>inStock){
@@ -496,10 +516,12 @@ public class MainDashboardController implements Initializable {
         HBox hBox = new HBox();
         HBox.setMargin(name, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(quantity, new Insets(50.0, 0.0, 0.0, 20.0));
+        HBox.setMargin(inStockQuantity, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(cost, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(amount, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(delete, new Insets(50.0, 0.0, 0.0, 20.0));
-        hBox.getChildren().addAll(name, quantity, cost, amount, delete);
+
+        hBox.getChildren().addAll(name, quantity,inStockQuantity, cost, amount, delete);
 
         return hBox;
 
@@ -510,9 +532,9 @@ public class MainDashboardController implements Initializable {
            int itemIndex= Integer.parseInt(item.getId());
            String s = newValue;
            itemCart.get(itemIndex).setQuantity(Integer.parseInt(newValue));
-           System.out.println("New qty is "+itemCart.get(itemIndex).getQuantity());
+
        }catch (IndexOutOfBoundsException e){
-            System.out.println("Item not in cart");
+
        }
     }
 
@@ -541,12 +563,6 @@ public class MainDashboardController implements Initializable {
                                 }
                             }
 
-//                            VBox vBox = (VBox) node3;
-//                            HBox row = createRow(vBox, selectedItem, rowIndex);
-//                            row.setId(String.valueOf(rowIndex));
-//                            VBox.setMargin(row, new Insets(20.0, 0.0, 0.0, 0.0));
-//                            vBox.getChildren().add(rowIndex, row);
-//                            rowIndex++;
                         }
                     }
                 }
@@ -603,7 +619,7 @@ public class MainDashboardController implements Initializable {
                 reportUtil.setSelectedReport(newValue.getName());
                 reportUtil.setReportId(newValue.getId());
                 reportUtil.setSelectedReportRisTypeCode(newValue.getRisTypeName());//ex.CM-NEW CONNECTION
-               // reportUtil.setFILE_UPPER_PART(new File(getReportJrxmlLocation() + newValue.getJrxmlReportFileName() + ".jrxml"));
+
                 try {
                     reportUtil.setFILE_UPPER_PART(resourceLoader.getResource(getReportJrxmlLocation() + newValue.getJrxmlReportFileName() + ".jrxml").getInputStream());
                 } catch (IOException e) {
@@ -779,12 +795,17 @@ public class MainDashboardController implements Initializable {
         JFXButton rolesAndPrivileges = new JFXButton("ADMIN ROLES & PRIVILEGES");
         JFXButton balanceSettings = new JFXButton("BALANCE SETTINGS");
         JFXButton stockAdjusment = new JFXButton("STOCK ADJUSTMENT");
+        JFXButton risSignatory = new JFXButton("RIS SIGNATORY");
 
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
 
         createMasterData.setOnAction(e -> {
             new StageLoader().load(MasterDataController.class, applicationContext, currentStage);
 
+        });
+
+        risSignatory.setOnAction(e -> {
+            new StageLoader().load(RisSignatoryController.class, applicationContext, currentStage);
         });
 
         updatePassword.setOnAction(e -> {
@@ -808,7 +829,7 @@ public class MainDashboardController implements Initializable {
 
         });
 
-        topHbox.getChildren().addAll(createMasterData, updatePassword, rolesAndPrivileges, balanceSettings, stockAdjusment);
+        topHbox.getChildren().addAll(createMasterData, updatePassword, rolesAndPrivileges, balanceSettings, stockAdjusment, risSignatory);
         topHbox.setAlignment(Pos.CENTER);
         midHbox.setAlignment(Pos.CENTER);
         bottomHbox.setAlignment(Pos.CENTER);
@@ -958,48 +979,7 @@ public class MainDashboardController implements Initializable {
             }
         });
 
-//        JFXButton openCamera = new JFXButton("Open Camera");
-//        openCamera.setButtonType(JFXButton.ButtonType.RAISED);
-//        openCamera.setStyle("-fx-background-color: NAVY BLUE;");
-//        openCamera.setTextAlignment(TextAlignment.CENTER);
-//        openCamera.setTextFill(Paint.valueOf("WHITE"));
-//        openCamera.setFont(Font.font("System Bold", 14.0));
-//
-//        JFXButton viewRisDetails = new JFXButton("RIS Details");
-//        viewRisDetails.setButtonType(JFXButton.ButtonType.RAISED);
-//        viewRisDetails.setStyle("-fx-background-color: NAVY BLUE;");
-//        viewRisDetails.setTextAlignment(TextAlignment.CENTER);
-//        viewRisDetails.setTextFill(Paint.valueOf("WHITE"));
-//        viewRisDetails.setFont(Font.font("System Bold", 14.0));
 
-  //      Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
-//        openCamera.setOnAction(e -> {
-//            if (ObjectUtils.isEmpty(selectedRisTemplate.getSelectedRisTemplate())) {
-//                Prompt.failed("Please set RIS Type first!");
-//                Stage stage = new Stage();
-//                currentStage.close();
-//                new StageLoader().load(MainDashboardController.class, applicationContext, stage);
-//            } else {
-//                Stage stage = new Stage();
-//                new StageLoader().load(CaptureQrCodeController.class, applicationContext, stage);
-//            }
-//
-//        });
-
-//        viewRisDetails.setOnAction(e -> {
-//            if (ObjectUtils.isEmpty(selectedRisTemplate.getSelectedRisTemplate())) {
-//                Prompt.failed("Please set RIS Type first!");
-//                Stage stage = new Stage();
-//                currentStage.close();
-//                new StageLoader().load(MainDashboardController.class, applicationContext, stage);
-//            } else {
-//                Stage stage = new Stage();
-//                new StageLoader().load(RisDetailsController.class, applicationContext, stage);
-//            }
-//
-//        });
-
-        //topHbox.getChildren().addAll(itemName, openCamera, viewRisDetails);
         topHbox.getChildren().addAll(itemName);
         midHbox.getChildren().addAll(listView,scrollPane);
         midHbox.setPrefHeight(500.0);
