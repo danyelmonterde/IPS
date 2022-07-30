@@ -22,6 +22,8 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.monterdev.constants.DateConstants.*;
 import static com.monterdev.configuration.GlobalConfiguration.*;
@@ -141,6 +143,7 @@ public class ReportUtil {
             purchaseOrder.setItem_name("empty");
             purchaseOrder.setSku(0);
             purchaseOrder.setAmount(0);
+            purchaseOrder.setStock_before(0);
             purchaseOrder.setDatecreated(AppTime.now());
             purchaseOrder.setIn_stock(0);
             purchaseOrders.add(purchaseOrder);
@@ -344,9 +347,13 @@ public class ReportUtil {
 
     private void createInventoryReport(List<Map> purchaseOrderAndHeaderList, List<Map> salesAndFooterList) throws JRException {
         JasperReport purchaseOrderJasperReport = JasperCompileManager.compileReport(FILE_UPPER_PART);
-        JasperReport salesJasperReport = JasperCompileManager.compileReport(FILE_LOWER_PART);
+        //JasperReport salesJasperReport = JasperCompileManager.compileReport(FILE_LOWER_PART);
 
-        JRBeanCollectionDataSource purchaseOrderDatasource = new JRBeanCollectionDataSource(purchaseOrderAndHeaderList);
+        List<Map> combinedPurchaseOrderAndSalesOrders = Stream.of(purchaseOrderAndHeaderList,salesAndFooterList)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+
+        JRBeanCollectionDataSource purchaseOrderDatasource = new JRBeanCollectionDataSource(combinedPurchaseOrderAndSalesOrders);
         JRBeanCollectionDataSource saleDatasource = new JRBeanCollectionDataSource(salesAndFooterList);
 
         Map<String, Object> titleParams = new HashMap<>();
@@ -384,7 +391,7 @@ public class ReportUtil {
 
 
         JasperPrint purchaseOrderJasperPrint = JasperFillManager.fillReport(purchaseOrderJasperReport, titleParams, purchaseOrderDatasource);
-        JasperPrint salesJasperPrint = JasperFillManager.fillReport(salesJasperReport, titleParams, saleDatasource);
+        //JasperPrint salesJasperPrint = JasperFillManager.fillReport(salesJasperReport, titleParams, saleDatasource);
 
         JasperExportManager.exportReportToPdfFile(purchaseOrderJasperPrint, report.getReport_location());
         String purchaseOrderReportLocation = report.getReport_location();
@@ -392,11 +399,62 @@ public class ReportUtil {
         this.report = null;
         setReportMetadata(report);
         String salesReportLocation = report.getReport_location();
-        JasperExportManager.exportReportToPdfFile(salesJasperPrint, report.getReport_location());
-        saveReport();
-        Prompt.success("Done saving report to " + purchaseOrderReportLocation + " and " + salesReportLocation);
+        //JasperExportManager.exportReportToPdfFile(salesJasperPrint, report.getReport_location());
+        //saveReport();
+        Prompt.success("Done saving report to " + purchaseOrderReportLocation );
         purchaseOrderReportLocation = null;
         salesReportLocation = null;
+    }
+
+    private void singleInventoryReport(List<Map> purchaseOrderAndHeaderList) throws JRException {
+        JasperReport purchaseOrderJasperReport = JasperCompileManager.compileReport(FILE_UPPER_PART);
+
+        JRBeanCollectionDataSource purchaseOrderDatasource = new JRBeanCollectionDataSource(purchaseOrderAndHeaderList);
+
+        Map<String, Object> titleParams = new HashMap<>();
+        String beginningBalance = computeBeginningBalanceInventory();
+        titleParams.put(COMPANY_NAME_FIELD, getConfigValue(companyName));
+        titleParams.put(STREET_ADDRESS_FIELD, getConfigValue(companyAddress));
+        titleParams.put(REPORT_NAME_FIELD, selectedReport);
+        titleParams.put(SELECTED_MONTH_FIELD, selectedMonth);
+        titleParams.put(SELECTED_YEAR_FIELD, selectedYear);
+        totalMaterialsForUse = purchaseAmount + DataUtil.formatDouble(beginningBalance);
+        titleParams.put(BEGINNING_BALANCE_INVENTORY_FIELD, beginningBalance);
+        titleParams.put(TOTAL_COST_FIELD, String.valueOf(totalMaterialsForUse));
+        double totalEndingBalance = totalMaterialsForUse - totalMaterialsIssued;
+        titleParams.put(TOTAL_ENDING_BALANCE_FIELD, String.valueOf(totalEndingBalance));
+
+        purchaseAmount = 0;
+        totalMaterialsForUse = 0;
+        totalMaterialsIssued = 0;
+
+
+        this.setReportPreparedBy(signatoryRepository.findSignatoryByRole(PREPARED_BY_ROLE_FIELD, reportId).getSignatory());
+        this.setReportCheckedBy(signatoryRepository.findSignatoryByRole(CHECKED_BY_ROLE_FIELD, reportId).getSignatory());
+        this.setReportNotedBy(signatoryRepository.findSignatoryByRole(NOTED_BY_ROLE_FIELD, reportId).getSignatory());
+
+        this.report.setPrepared_by(this.getReportPreparedBy());
+        this.report.setChecked_by(this.getReportCheckedBy());
+        this.report.setNoted_by(this.getReportNotedBy());
+
+        titleParams.put(PREPARED_BY_FIELD, reportPreparedBy);
+        titleParams.put(NOTED_BY_FIELD, reportNotedBy);
+        titleParams.put(CHECKED_BY_FIELD, reportCheckedBy);
+        titleParams.put(CHECKED_BY_POSITION_FIELD, signatoryRepository.findSignatoryByRole(CHECKED_BY_ROLE_FIELD, reportId).getPosition());
+        titleParams.put(PREPARED_BY_POSITION_FIELD, signatoryRepository.findSignatoryByRole(PREPARED_BY_ROLE_FIELD, reportId).getPosition());
+        titleParams.put(NOTED_BY_POSITION_FIELD, signatoryRepository.findSignatoryByRole(NOTED_BY_ROLE_FIELD, reportId).getPosition());
+
+
+        JasperPrint purchaseOrderJasperPrint = JasperFillManager.fillReport(purchaseOrderJasperReport, titleParams, purchaseOrderDatasource);
+
+        JasperExportManager.exportReportToPdfFile(purchaseOrderJasperPrint, report.getReport_location());
+        String purchaseOrderReportLocation = report.getReport_location();
+        saveReport();
+        this.report = null;
+        setReportMetadata(report);
+
+        purchaseOrderReportLocation = null;
+
     }
 
     private void setReportMetadata(Reports reports) {

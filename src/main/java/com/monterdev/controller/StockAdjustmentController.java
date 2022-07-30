@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.monterdev.model.History;
 import com.monterdev.model.Item;
+import com.monterdev.model.User;
 import com.monterdev.repository.HistoryRepository;
 import com.monterdev.repository.ItemsRepository;
 import com.monterdev.util.AppTime;
@@ -83,6 +84,8 @@ public class StockAdjustmentController implements Initializable {
     private ItemsRepository itemsRepository;
     @Autowired
     private HistoryRepository historyRepository;
+    @Autowired
+    private User user;
 
     private List<Item> itemList = new ArrayList<>();
     private ObservableList<Item> itemObservableList;
@@ -231,7 +234,9 @@ public class StockAdjustmentController implements Initializable {
         history.setItem_category(savedItem.getItem_category());
         history.setReason((String)comboReason.getValue());
         history.setStock_after(savedItem.getIn_stock());
+        history.setStock_before(Integer.parseInt(oldInStockValue));
         history.setDate(AppTime.now());
+        history.setUpdated_by(user.getUsername());
         if(isPositiveNumber){
             history.setAdjustment(Integer.parseInt(txtInStock.getText()));
         }else{

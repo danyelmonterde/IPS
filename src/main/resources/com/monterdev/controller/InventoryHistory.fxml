@@ -51,18 +51,25 @@
                   </JFXButton>
                   <JFXComboBox fx:id="comboReasonType" labelFloat="true" promptText="REASON TYPE" AnchorPane.leftAnchor="236.0" />
                   <JFXComboBox fx:id="comboItemCategory" labelFloat="true" promptText="ITEM CATEGORY" AnchorPane.leftAnchor="512.0" />
+                  <JFXButton fx:id="btnExportCurrentView" buttonType="RAISED" layoutX="990.0" layoutY="-1.0" style="-fx-background-color: BLACK;" text="EXPORT CURRENT VIEW" textFill="WHITE">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </JFXButton>
                </children>
             </AnchorPane>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
                   <TableView fx:id="tableResult" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="1260.0" style="-fx-alignment: center; -fx-font-size: 14px;">
                     <columns>
-                      <TableColumn fx:id="columnDate" prefWidth="75.0" text="Date" />
-                      <TableColumn fx:id="columnName" prefWidth="75.0" text="Item Name" />
-                        <TableColumn fx:id="columnCategory" prefWidth="75.0" text="Item Category" />
-                        <TableColumn fx:id="columnReason" prefWidth="75.0" text="Reason" />
-                        <TableColumn fx:id="columnAdjustment" prefWidth="75.0" text="Adjustment" />
-                        <TableColumn fx:id="columnStockAfter" prefWidth="75.0" text="Stock After" />
+                      <TableColumn fx:id="columnDate" prefWidth="75.0" style="-fx-alignment: center;" text="Date" />
+                      <TableColumn fx:id="columnName" prefWidth="75.0" style="-fx-alignment: center;" text="Item Name" />
+                        <TableColumn fx:id="columnCategory" prefWidth="75.0" style="-fx-alignment: center;" text="Item Category" />
+                        <TableColumn fx:id="columnReason" prefWidth="75.0" style="-fx-alignment: center;" text="Reason" />
+                        <TableColumn fx:id="columnAdjustment" prefWidth="75.0" style="-fx-alignment: center;" text="Adjustment" />
+                        <TableColumn fx:id="columnStockAfter" prefWidth="75.0" style="-fx-alignment: center;" text="Stock After" />
+                        <TableColumn fx:id="columnStockBefore" prefWidth="75.0" style="-fx-alignment: center;" text="Stock Before" />
+                        <TableColumn fx:id="columnUpdatedBy" prefWidth="75.0" style="-fx-alignment: center;" text="Updated By" />
                     </columns>
                      <HBox.margin>
                         <Insets left="20.0" right="20.0" />

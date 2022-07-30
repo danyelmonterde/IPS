@@ -1,6 +1,9 @@
 package com.monterdev.controller;
 
-import com.jfoenix.controls.*;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXListView;
+import com.jfoenix.controls.JFXTextField;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
 import com.monterdev.util.*;
@@ -46,8 +49,6 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.monterdev.configuration.GlobalConfiguration.*;
 import static com.monterdev.constants.HistoryConstants.RELEASED_ITEM;
@@ -191,15 +192,15 @@ public class MainDashboardController implements Initializable {
     @SneakyThrows
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        if(ObjectUtils.isEmpty(reportUtil)){
+        if (ObjectUtils.isEmpty(reportUtil)) {
             reportUtil = new ReportUtil();
         }
-        if(ObjectUtils.isEmpty(itemLists)){
+        if (ObjectUtils.isEmpty(itemLists)) {
             itemLists = itemsRepository.findAll();
         }
 
 
-        if(!ObjectUtils.isEmpty(requisitionIssueSlip.getRequisition_and_issue_slip_number())){
+        if (!ObjectUtils.isEmpty(requisitionIssueSlip.getRequisition_and_issue_slip_number())) {
             createRequisitionIssueSlip();
         }
 
@@ -329,17 +330,6 @@ public class MainDashboardController implements Initializable {
         });
     }
 
-    private void refreshReleaseItemsOnMouseHover() {
-
-        mainAnchorpane.hoverProperty().addListener((observableValue, oldValue, newValue) -> {
-            Iterable<Item> initialItemList = itemsRepository.findAll();
-            itemLists = StreamSupport.stream(initialItemList.spliterator(), false).collect(Collectors.toList());
-            if (newValue != oldValue && currentLocationBanner.getText().equalsIgnoreCase("RELEASE ITEMS") && selectedItem.getSku() != 0) {
-                refresher();
-            }
-        });
-    }
-
     private void refresher() {
         ObservableList<Node> nodeStreamTopHbox = topHbox.getChildren();
         for (Node node : nodeStreamTopHbox) {
@@ -369,7 +359,7 @@ public class MainDashboardController implements Initializable {
             }
         });
 
-        itemCart.add(currentIndex,currentItem);
+        itemCart.add(currentIndex, currentItem);
 
         JFXTextField inStockQuantity = createTextField("IN STOCK", "LIGHT GRAY");
         inStockQuantity.setPrefWidth(220.0);
@@ -378,7 +368,7 @@ public class MainDashboardController implements Initializable {
         inStockQuantity.setId(String.valueOf(currentIndex));
         inStockQuantity.textProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
-                Prompt.success(currentItem.getItem_name()+ "in stock has been updated!");
+                Prompt.success(currentItem.getItem_name() + "in stock has been updated!");
             }
         });
 
@@ -387,12 +377,12 @@ public class MainDashboardController implements Initializable {
         delete.setOnAction(del -> {
             try {
 
-                    int id = Integer.parseInt(delete.getId());
-                    itemCart.remove(id);
-                    vBox.getChildren().remove(currentIndex);
-                    updateIdOfRemainingHbox(id);
-                    System.out.println(itemCart.size());
-                    rowIndex--;
+                int id = Integer.parseInt(delete.getId());
+                itemCart.remove(id);
+                vBox.getChildren().remove(currentIndex);
+                updateIdOfRemainingHbox(id);
+                System.out.println(itemCart.size());
+                rowIndex--;
 
             } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
                 vBox.getChildren().clear();
@@ -401,7 +391,6 @@ public class MainDashboardController implements Initializable {
             }
 
         });
-
 
 
         JFXTextField name = createTextField("ITEM NAME", "LIGHT GRAY");
@@ -449,21 +438,23 @@ public class MainDashboardController implements Initializable {
         quantity.setText(String.valueOf(currentItem.getQuantity()));
         quantity.setId(String.valueOf(currentIndex));
         quantity.textProperty().addListener((observable, oldValue, newValue) -> {
-            try{
+            try {
+
                 Optional<Item> optionalItem = itemsRepository.findById(currentItem.getSku());
-                int inStock = optionalItem.isPresent() ? optionalItem.get().getIn_stock():0;
-                if(inStock != Integer.parseInt(inStockQuantity.getText())){
+                int inStock = optionalItem.isPresent() ? optionalItem.get().getIn_stock() : 0;
+                if (inStock != Integer.parseInt(inStockQuantity.getText())) {
                     inStockQuantity.setText(String.valueOf(inStock));
                 }
-                if(inStock < Integer.parseInt(newValue)){
+                if (inStock < Integer.parseInt(newValue)) {
                     Prompt.failed("Quantity is greater than In stock! Please replenish stock");
                     quantity.setText("0");
+                    amount.setText("0");
                     return;
                 }
 
                 if (NumberUtils.isParsable(quantity.getText()) && !ObjectUtils.isEmpty(quantity.getText())) {
                     //VALID TEXT FIELD
-                    if(Integer.parseInt(quantity.getText())>inStock){
+                    if (Integer.parseInt(quantity.getText()) > inStock) {
                         Prompt.failed("Quantity is greater than In Stock!");
                         quantity.setText("0");
                         return;
@@ -485,13 +476,15 @@ public class MainDashboardController implements Initializable {
                     quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                     quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
                 }
-                checkIfItemIsInCart(quantity,newValue);
+                checkIfItemIsInCart(quantity, newValue);
             } catch (NumberFormatException exception) {
                 quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                 quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
             } catch (IllegalArgumentException exception) {
                 quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                 quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
+            } catch (IndexOutOfBoundsException indexOutOfBoundsException){
+                System.out.println("Index out of bounds");
             }
 
         });
@@ -521,24 +514,23 @@ public class MainDashboardController implements Initializable {
         HBox.setMargin(amount, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(delete, new Insets(50.0, 0.0, 0.0, 20.0));
 
-        hBox.getChildren().addAll(name, quantity,inStockQuantity, cost, amount, delete);
+        hBox.getChildren().addAll(name, quantity, inStockQuantity, cost, amount, delete);
 
         return hBox;
 
     }
 
     private void checkIfItemIsInCart(JFXTextField item, String newValue) {
-       try{
-           int itemIndex= Integer.parseInt(item.getId());
-           String s = newValue;
-           itemCart.get(itemIndex).setQuantity(Integer.parseInt(newValue));
+        try {
+            int itemIndex = Integer.parseInt(item.getId());
+            itemCart.get(itemIndex).setQuantity(Integer.parseInt(newValue));
 
-       }catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
 
-       }
+        }
     }
 
-    private void updateIdOfRemainingHbox(int indexOfItemDeleted){
+    private void updateIdOfRemainingHbox(int indexOfItemDeleted) {
         ObservableList<Node> nodeStream = midHbox.getChildren();
         for (Node node : nodeStream) {
             if (node instanceof ScrollPane) {
@@ -548,18 +540,18 @@ public class MainDashboardController implements Initializable {
                         if (node3 instanceof VBox) {
                             //vbox
                             //hbox
-                            for (Node node4: ((VBox) node3).getChildren()){
-                                if(node4 instanceof HBox){
-                                   for(Node node5: ((HBox) node4).getChildren()){
-                                       if(node5 instanceof JFXButton){
-                                           JFXButton deleteButton = (JFXButton) node5;
-                                           String currentId = deleteButton.getId();
-                                           if(Integer.parseInt(currentId)>indexOfItemDeleted){
-                                               deleteButton.setId(String.valueOf(Integer.parseInt(currentId)-1));
-                                           }
+                            for (Node node4 : ((VBox) node3).getChildren()) {
+                                if (node4 instanceof HBox) {
+                                    for (Node node5 : ((HBox) node4).getChildren()) {
+                                        if (node5 instanceof JFXButton) {
+                                            JFXButton deleteButton = (JFXButton) node5;
+                                            String currentId = deleteButton.getId();
+                                            if (Integer.parseInt(currentId) > indexOfItemDeleted) {
+                                                deleteButton.setId(String.valueOf(Integer.parseInt(currentId) - 1));
+                                            }
 
-                                       }
-                                   }
+                                        }
+                                    }
                                 }
                             }
 
@@ -629,6 +621,7 @@ public class MainDashboardController implements Initializable {
                 if (newValue.getRisTypeName().equalsIgnoreCase(SUMMARY)) {
                     try {
                         reportUtil.setFILE_LOWER_PART(resourceLoader.getResource(getReportJrxmlLocation() + "SINGLE_INVENTORY_SUMMARY_LOWER_PART.jrxml").getInputStream());
+                        //reportUtil.setFILE_LOWER_PART(resourceLoader.getResource(getReportJrxmlLocation() + "SINGLE_INVENTORY_SUMMARY_UPPER_PART - Copy.jrxml").getInputStream());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -654,7 +647,7 @@ public class MainDashboardController implements Initializable {
             try {
                 reportUtil.generateReport();
             } catch (Exception exception) {
-                    System.out.println(exception.getLocalizedMessage());
+                System.out.println(exception.getLocalizedMessage());
             }
         });
 
@@ -721,7 +714,6 @@ public class MainDashboardController implements Initializable {
         purchaseItem.setFitWidth(200.0);
         purchaseItem.setPickOnBounds(true);
         purchaseItem.setPreserveRatio(true);
-
 
 
         JFXButton jfxBtnAddItem = new JFXButton();
@@ -887,9 +879,9 @@ public class MainDashboardController implements Initializable {
 
         ToggleGroup searchGroup = new ToggleGroup();
 
-        searchGroup.selectedToggleProperty().addListener((observable,oldValue,newValue)->{
+        searchGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
             RadioButton rb = (RadioButton) searchGroup.getSelectedToggle();
-            if(rb != null){
+            if (rb != null) {
                 System.out.println(rb.getText());
             }
         });
@@ -898,15 +890,15 @@ public class MainDashboardController implements Initializable {
         itemName.textProperty().addListener((observableValue, oldValue, newValue) -> {
             if (oldValue != newValue) {
 
-                if(NumberUtils.isParsable(newValue)){
-                   Optional<Item> item = itemsRepository.findById(Integer.parseInt(newValue));
-                    if(item.isPresent()){
+                if (NumberUtils.isParsable(newValue)) {
+                    Optional<Item> item = itemsRepository.findById(Integer.parseInt(newValue));
+                    if (item.isPresent()) {
                         itemName.setText(item.get().getItem_name());
                     }
                 }
 
                 if (isFirstCharacter && itemName.getText().length() == 1) {
-                   // midHbox.getChildren().add(0,listView);
+                    // midHbox.getChildren().add(0,listView);
                     isFirstCharacter = false;
                 }
                 itemLists = itemsRepository.findAll();
@@ -957,7 +949,7 @@ public class MainDashboardController implements Initializable {
                     sku.setText("");
                     rowIndex = 0;
                     try {
-                     //   midHbox.getChildren().remove(0);
+
                     } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
 
                     }
@@ -972,7 +964,6 @@ public class MainDashboardController implements Initializable {
                     isFirstCharacter = true;
                     responseList.clear();
                     selectedItem.setSku(0);
-                //    midHbox.getChildren().retainAll(scrollPane);
                 } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
 
                 }
@@ -981,12 +972,11 @@ public class MainDashboardController implements Initializable {
 
 
         topHbox.getChildren().addAll(itemName);
-        midHbox.getChildren().addAll(listView,scrollPane);
+        midHbox.getChildren().addAll(listView, scrollPane);
         midHbox.setPrefHeight(500.0);
 
-         HBox.setMargin(listView, new Insets(20.0, 20.0, 20.0, 0.0));
-         HBox.setMargin(scrollPane, new Insets(20.0, 20.0, 20.0, 20.0));
-        //HBox.setMargin(viewRisDetails, new Insets(20.0, 20.0, 20.0, 20.0));
+        HBox.setMargin(listView, new Insets(20.0, 20.0, 20.0, 0.0));
+        HBox.setMargin(scrollPane, new Insets(20.0, 20.0, 20.0, 20.0));
 
 
         JFXButton releaseItem = new JFXButton("RELEASE ITEM");
@@ -1016,7 +1006,7 @@ public class MainDashboardController implements Initializable {
         });
 
         cancelButton.setOnAction(v -> {
-            cancelTransaction();
+            endTransaction();
         });
 
         deleteAllButton.setOnAction(e -> {
@@ -1053,107 +1043,124 @@ public class MainDashboardController implements Initializable {
     }
 
 
-    private void cancelTransaction() {
+    private void endTransaction() {
+        sku.setText("");
+        requisitionIssueSlip.setRequisition_and_issue_slip_number("");
+        requisitionIssueSlip.setRistype("");
+        requisitionIssueSlip.setPurpose("");
+        requisitionIssueSlip.setCustomer_name("");
+        requisitionIssueSlip.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT)));
         rowIndex = 0;
         resetSelectedItem();
         itemCart.clear();
         validNumberOfItemsInCart = 0;
+        isItemOnCart = false;
         getDashboardModule(null);
     }
 
     private void releaseItemsOnCart() {
 
         if (!ObjectUtils.isEmpty(itemCart) && selectedItem.getSku() != 0) {
-            int numberOfItemsInCart = itemCart.size();
-            for(int counter=0;counter<numberOfItemsInCart;counter++){
-                if(itemCart.get(counter).getQuantity()==0 || itemCart.get(counter).getIn_stock()==0 || itemCart.get(counter).getCost()==0 ){
-                    proceed = false;
-                    break;
-                }else{
-                    validNumberOfItemsInCart++;
-                    proceed = true;
-                }
-
-                History history = new History();
-                history.setDate(AppTime.now());
-                history.setItem_name(itemCart.get(counter).getItem_name());
-                history.setAdjustment(itemCart.get(counter).getQuantity() * -1);
-                history.setItem_category(itemCart.get(counter).getItem_category());
-                history.setReason(RELEASED_ITEM);
-                history.setItem_category(itemCart.get(counter).getItem_category());
-
-                if (requisitionIssueSlip.getIs_customer_new() == 1) {
-                    totalCost += itemCart.get(counter).getCost() * itemCart.get(counter).getQuantity();
-                    totalSales += (itemCart.get(counter).getCost() + (itemCart.get(counter).getCost() * .2)) * itemCart.get(counter).getQuantity();
-                    totalIncome = totalSales - totalCost;
-                } else {
-                    totalCost += itemCart.get(counter).getCost() * itemCart.get(counter).getQuantity();
-                    totalSales += itemCart.get(counter).getCost() * itemCart.get(counter).getQuantity();
-                    totalIncome = totalSales - totalCost;
-                }
-
-                int inStock = itemCart.get(counter).getIn_stock() - itemCart.get(counter).getQuantity();
-                itemCart.get(counter).setQuantity(inStock);
-                itemCart.get(counter).setIn_stock(inStock);
-                itemCart.get(counter).setTag(null);
-
-                history.setStock_after(inStock);
-                historyRepository.save(history);
-
-            }
-            if(proceed && numberOfItemsInCart==validNumberOfItemsInCart){
-                if (!ObjectUtils.isEmpty(itemsRepository.saveAll(itemCart))) {
-                    resetSelectedItem();
-                    sku.setText("0");
-                    itemCart.clear();
-                    try {
-                        //   midHbox.getChildren().remove(1);
-                        cancelTransaction();
-                    } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
-
+            ButtonType buttonType = Prompt.confirmItemsToRelease("Are you sure you want to release the following items?", requisitionIssueSlip,itemCart);
+            if(buttonType.getText().equalsIgnoreCase("OK")){
+                validNumberOfItemsInCart = 0;
+                int numberOfItemsInCart = itemCart.size();
+                List<History> historyList = new ArrayList<>();
+                for (int counter = 0; counter < numberOfItemsInCart; counter++) {
+                    History history = new History();
+                    if (itemCart.get(counter).getQuantity() == 0 || itemCart.get(counter).getIn_stock() == 0 || itemCart.get(counter).getCost() == 0) {
+                        System.out.println(itemCart.get(counter).getItem_name() + " has invalid data!");
+                    } else {
+                        validNumberOfItemsInCart++;
                     }
 
-                    if (!ObjectUtils.isEmpty(requisitionIssueSlip)) {
-                        requisitionIssueSlip.setId(0);
-                        if (!ObjectUtils.isEmpty(risRepository.save(requisitionIssueSlip))) {
-                            if (!ObjectUtils.isEmpty(risTypeFieldsList)) {
-                                risTypeFieldsList.stream().forEach(data -> {
-                                    risTypeFieldsRepository.save(data);
-                                });
-                                Prompt.success("Item released!");
-                                isFirstCharacter = true;
-                                risTypeFieldsList.clear();
+
+                    history.setDate(AppTime.now());
+                    history.setStock_before(itemCart.get(counter).getIn_stock());
+                    history.setItem_name(itemCart.get(counter).getItem_name());
+                    history.setAdjustment(itemCart.get(counter).getQuantity() * -1);
+                    history.setItem_category(itemCart.get(counter).getItem_category());
+                    history.setReason(RELEASED_ITEM);
+                    history.setItem_category(itemCart.get(counter).getItem_category());
+                    history.setUpdated_by(user.getUsername());
+                    history.setStock_after(itemCart.get(counter).getIn_stock() - itemCart.get(counter).getQuantity());
+
+                    if (requisitionIssueSlip.getIs_customer_new() == 1) {
+                        totalCost += itemCart.get(counter).getCost() * itemCart.get(counter).getQuantity();
+                        totalSales += (itemCart.get(counter).getCost() + (itemCart.get(counter).getCost() * .2)) * itemCart.get(counter).getQuantity();
+                        totalIncome = totalSales - totalCost;
+                    } else {
+                        totalCost += itemCart.get(counter).getCost() * itemCart.get(counter).getQuantity();
+                        totalSales += itemCart.get(counter).getCost() * itemCart.get(counter).getQuantity();
+                        totalIncome = totalSales - totalCost;
+                    }
+
+                    if (numberOfItemsInCart == validNumberOfItemsInCart) {
+                        itemCart.stream().forEach(item -> {
+                            item.setIn_stock(item.getIn_stock() - item.getQuantity());
+                            item.setTag(null);
+                        });
+                    }
+
+                    historyList.add(history);
+
+                }
+                if (numberOfItemsInCart == validNumberOfItemsInCart) {
+                    if (!ObjectUtils.isEmpty(itemsRepository.saveAll(itemCart))) {
+                        historyRepository.saveAll(historyList);
+                        resetSelectedItem();
+                        sku.setText("0");
+                        itemCart.clear();
+
+
+                        if (!ObjectUtils.isEmpty(requisitionIssueSlip)) {
+                            requisitionIssueSlip.setId(0);
+                            if (!ObjectUtils.isEmpty(risRepository.save(requisitionIssueSlip))) {
+                                if (!ObjectUtils.isEmpty(risTypeFieldsList)) {
+                                    risTypeFieldsList.stream().forEach(data -> {
+                                        risTypeFieldsRepository.save(data);
+                                    });
+                                    isFirstCharacter = true;
+                                    risTypeFieldsList.clear();
+                                } else {
+                                    Prompt.failed("Item could not be released! Please check RIS details!");
+                                }
                             } else {
                                 Prompt.failed("Item could not be released! Please check RIS details!");
                             }
+
+                            Sales sales = new Sales();
+                            sales.setControl_number(requisitionIssueSlip.getControl_number());
+                            sales.setTotal_sales((double) Math.round(totalSales * 100d) / 100d);
+                            sales.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern("dd-MMM-YYYY")));
+                            sales.setIncome((double) Math.round(totalIncome * 100d) / 100d);
+                            sales.setTotal_cost(totalCost);
+
+                            if (!ObjectUtils.isEmpty(salesRepository.save(sales))) {
+                                if (!ObjectUtils.isEmpty(customerRepository.save(customer))) {
+                                    Prompt.success("Item released!");
+                                    endTransaction();
+                                } else {
+                                    Prompt.failed("Error saving customer!");
+                                }
+                            } else {
+                                Prompt.failed("Error saving Sales!");
+                            }
+
+
                         } else {
                             Prompt.failed("Item could not be released! Please check RIS details!");
                         }
 
-                        Sales sales = new Sales();
-                        sales.setControl_number(requisitionIssueSlip.getControl_number());
-                        sales.setTotal_sales((double) Math.round(totalSales * 100d) / 100d);
-                        sales.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern("dd-MMM-YYYY")));
-                        sales.setIncome((double) Math.round(totalIncome * 100d) / 100d);
-                        sales.setTotal_cost(totalCost);
-
-                        salesRepository.save(sales);
-
-                        customerRepository.save(customer);
                     } else {
-                        Prompt.failed("Item could not be released! Please check RIS details!");
+                        Prompt.failed("An error occurred while saving!");
                     }
-
                 } else {
-                    Prompt.failed("An error occurred while saving!");
+                    //Please check item list if there is no zero values
+                    Prompt.failed("Please check the quantity, in stock and cost of item. It must not be equal to 0!");
                 }
-            }else{
-                //Please check item list if there is no zero values
-                Prompt.failed("Please check the quantity, in stock and cost of item. It must not be equal to 0!");
-                return;
+
             }
-
-
 
         } else {
             Prompt.failed("Please enter valid input!");

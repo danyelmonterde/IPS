@@ -43,8 +43,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static com.monterdev.configuration.ItemsUIConfiguration.stockAdjustmentReasons;
-import static com.monterdev.constants.HistoryConstants.PURCHASED_ITEM;
-import static com.monterdev.constants.HistoryConstants.RELEASED_ITEM;
+import static com.monterdev.constants.HistoryConstants.*;
 import static org.springframework.data.jpa.domain.Specification.where;
 
 @Component
@@ -66,7 +65,7 @@ public class InventoryHistoryController implements Initializable {
     @FXML
     private JFXComboBox comboItemCategory;
     @FXML
-    private TableView tableResult;
+    private TableView<History> tableResult;
     @FXML
     private TableColumn<History, String> columnDate;
     @FXML
@@ -79,6 +78,12 @@ public class InventoryHistoryController implements Initializable {
     private TableColumn<History, String> columnAdjustment;
     @FXML
     private TableColumn<History, String> columnStockAfter;
+    @FXML
+    private TableColumn<History, String> columnUpdatedBy;
+    @FXML
+    private TableColumn<History, String> columnStockBefore;
+    @FXML
+    private JFXButton btnExportCurrentView;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -97,11 +102,31 @@ public class InventoryHistoryController implements Initializable {
         loadReasonType();
         loadItemCategory();
         setTableColumnNames();
-        loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
+        loadTableView(where(hasReasonType("")).and(where(hasCategoryName(""))));
         btnPreviousOnAction();
         btnNextOnAction();
         btnExportOnAction();
         btnCloseOnAction();
+        btnExportCurrentView();
+    }
+
+    private void btnExportCurrentView() {
+        btnExportCurrentView.setOnAction(e -> {
+            List<History> historyList = new ArrayList<>();
+            tableResult.getItems().stream().forEach(result->{
+                History history = new History();
+                history.setDate(result.getDate());
+                history.setAdjustment(result.getAdjustment());
+                history.setReason(result.getReason());
+                history.setStock_after(result.getStock_after());
+                history.setItem_category(result.getItem_category());
+                history.setItem_name(result.getItem_name());
+                history.setUpdated_by(result.getUpdated_by());
+                history.setId(result.getId());
+                historyList.add(history);
+            });
+            exportToCSV(historyList);
+        });
     }
 
     private void btnCloseOnAction() {
@@ -113,44 +138,52 @@ public class InventoryHistoryController implements Initializable {
 
     private void btnExportOnAction() {
         btnExport.setOnAction(e->{
-            if (Prompt.confirm("Are you sure you want to export all list of items?").get().getText().equalsIgnoreCase("OK")) {
-                Stage stage = (Stage) btnExport.getScene().getWindow();
-                FileChooser fileChooser = new FileChooser();
-                FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Comma-Separated Values (*.csv)", "*.csv");
-                fileChooser.getExtensionFilters().add(extensionFilter);
-                fileChooser.setTitle("Export Item List to CSV File");
-                File file = fileChooser.showSaveDialog(stage);
-                List<History> itemList = historyRepository.findAll();
-                if (file != null) {
-                    try {
-                        Writer writer = new FileWriter(file.getAbsolutePath());
-                        StatefulBeanToCsv statefulBeanToCsv = new StatefulBeanToCsvBuilder(writer)
-                                .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
-                                .build();
-                        statefulBeanToCsv.write(itemList);
-                        writer.close();
-                        Prompt.success("Success! History backup was saved to " + file.getAbsolutePath());
-
-                    } catch (IOException x) {
-                        x.printStackTrace();
-                    } catch (CsvRequiredFieldEmptyException f) {
-                        f.printStackTrace();
-                    } catch (CsvDataTypeMismatchException g) {
-                        g.printStackTrace();
-                    } finally {
-                    }
-
-                }
-            }
+            List<History> itemList = historyRepository.findAll();
+            exportToCSV(itemList);
         });
+    }
+
+    private void exportToCSV(List<History> itemList) {
+        if (Prompt.confirm("Are you sure you want to export all list of history?").get().getText().equalsIgnoreCase("OK")) {
+            Stage stage = (Stage) btnExport.getScene().getWindow();
+            FileChooser fileChooser = new FileChooser();
+            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Comma-Separated Values (*.csv)", "*.csv");
+            fileChooser.getExtensionFilters().add(extensionFilter);
+            fileChooser.setTitle("Export Item List to CSV File");
+            File file = fileChooser.showSaveDialog(stage);
+
+            if (file != null) {
+                try {
+                    Writer writer = new FileWriter(file.getAbsolutePath());
+                    StatefulBeanToCsv statefulBeanToCsv = new StatefulBeanToCsvBuilder(writer)
+                            .withSeparator(CSVWriter.DEFAULT_SEPARATOR)
+                            .build();
+                    statefulBeanToCsv.write(itemList);
+                    writer.close();
+                    Prompt.success("Success! History backup was saved to " + file.getAbsolutePath());
+
+                } catch (IOException x) {
+                    x.printStackTrace();
+                } catch (CsvRequiredFieldEmptyException f) {
+                    f.printStackTrace();
+                } catch (CsvDataTypeMismatchException g) {
+                    g.printStackTrace();
+                } finally {
+                }
+
+            }
+        }
     }
 
     private void btnNextOnAction() {
         btnNext.setOnAction(e -> {
-            if (currentPage < maximumPage) {
+            if (currentPage < maximumPage && (currentPage > 0)) {
                 loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
                 currentPage++;
-            }else{
+            }else if(currentPage ==0){
+                loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
+            }
+            else{
                 currentPage = maximumPage-1;
                 loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
             }
@@ -194,11 +227,18 @@ public class InventoryHistoryController implements Initializable {
         columnReason.setCellValueFactory(new PropertyValueFactory<>("reason"));
         columnAdjustment.setCellValueFactory(new PropertyValueFactory<>("adjustment"));
         columnStockAfter.setCellValueFactory(new PropertyValueFactory<>("stock_after"));
+        columnStockBefore.setCellValueFactory(new PropertyValueFactory<>("stock_before"));
+        columnUpdatedBy.setCellValueFactory(new PropertyValueFactory<>("updated_by"));
     }
 
     private void loadReasonType() {
         comboReasonType.valueProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
+            if(newValue == ALL_REASON && comboItemCategory.getValue() == ALL_CATEGORY){
+                loadTableView(where(hasReasonType("")).and(where(hasCategoryName(""))));
+            }else if(comboItemCategory.getValue() == ALL_CATEGORY){
+                loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName(""))));
+            }
+            else{
                 loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
             }
         });
@@ -207,19 +247,25 @@ public class InventoryHistoryController implements Initializable {
         });
         comboReasonType.getItems().add(PURCHASED_ITEM);
         comboReasonType.getItems().add(RELEASED_ITEM);
-        comboReasonType.setValue(stockAdjustmentReasons().get(0));
+        comboReasonType.getItems().add(ALL_REASON);
+        comboReasonType.setValue(ALL_REASON);
 
     }
 
     private void loadItemCategory() {
         comboItemCategory.valueProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
-                loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
-            }
+                if(newValue == ALL_CATEGORY && oldValue != newValue){
+                    loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName(""))));
+                }else if(newValue == ALL_CATEGORY && comboReasonType.getValue() == ALL_REASON){
+                    loadTableView(where(hasReasonType("")).and(where(hasCategoryName(""))));
+                }
+                else
+                    loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
         });
         categoryRepository.findAll().stream().forEach(e -> {
             comboItemCategory.getItems().add(e.getCategory_name());
         });
-        comboItemCategory.setValue(categoryRepository.findAll().get(0).getCategory_name());
+        comboItemCategory.getItems().add(ALL_CATEGORY);
+        comboItemCategory.setValue(ALL_CATEGORY);
     }
 }

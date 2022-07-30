@@ -2,18 +2,18 @@
   "customConfigurations": [
     {
       "configId": "CAPTURED_QR_CODE_DIRECTORY",
-      "configValue": "C:\\Users\\Daniel\\Desktop\\CapturedQrCode\\out.png"
+      "configValue": "C:\\Users\\User\\Desktop\\CapturedQrCode\\out.png"
     },
     {
       "configId": "GENERATED_QR_CODE_DIRECTORY",
-      "configValue": "C:\\Users\\Daniel\\Desktop\\GeneratedQrCodes"
+      "configValue": "C:\\Users\\User\\Desktop\\GeneratedQrCode\\"
     },
     {
       "configId": "EDIT_BUTTON",
-      "configValue": "C:\\Devtools\\git\\IPS\\src\\main\\resources\\config-ui\\IQWD-APP-RESOURCES\\Main\\check.png"
+      "configValue": "C:\\Users\\User\\Desktop\\IQWD-APP-RESOURCES\\Main\\check.png"
     },    {
       "configId": "DELETE_BUTTON",
-      "configValue": "C:\\Devtools\\git\\IPS\\src\\main\\resources\\config-ui\\IQWD-APP-RESOURCES\\Main\\trash.png"
+      "configValue": "C:\\Users\\User\\Desktop\\IQWD-APP-RESOURCES\\Main\\trash.png"
     },
     {
       "configId": "CUSTOMER_TYPES",
@@ -35,25 +35,25 @@
       "configId": "DEFAULT_CATEGORY_DATA",
       "configValue": "CONSTRUCTION MATERIALS"
     },
-    {
-      "configId": "SESSION_COOKIE_DATA",
-      "configValue": "15"
-    },
-    {
-      "configId": "SESSION_COOKIE_MM",
-      "configValue": "2"
-    },
-    {
-      "configId": "SESSION_COOKIE_DD",
-      "configValue": "8"
-    },
-    {
-      "configId": "SESSION_COOKIE_YYYY",
-      "configValue": "2023"
-    },
-    {
-      "configId": "INITIAL_LOGIN_SETTINGS",
-      "configValue": "Rundll32.exe user32.dll,LockWorkStation"
-    }
-  ]
+      {
+        "configId": "SESSION_COOKIE_DATA",
+        "configValue": "15"
+      },
+      {
+        "configId": "SESSION_COOKIE_MM",
+        "configValue": "2"
+      },
+      {
+        "configId": "SESSION_COOKIE_DD",
+        "configValue": "8"
+      },
+      {
+        "configId": "SESSION_COOKIE_YYYY",
+        "configValue": "2035"
+      },
+      {
+        "configId": "INITIAL_LOGIN_SETTINGS",
+        "configValue": "Rundll32.exe user32.dll,LockWorkStation"
+      }
+    ]
 }

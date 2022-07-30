@@ -64,9 +64,14 @@
 	<parameter name="SELECTED_MONTH" class="java.lang.String"/>
 	<parameter name="SELECTED_YEAR" class="java.lang.String"/>
 	<parameter name="BEGINNING_BALANCE_INVENTORY" class="java.lang.String"/>
-	<queryString>
-		<![CDATA[]]>
-	</queryString>
+	<parameter name="TOTAL_COST" class="java.lang.String"/>
+	<parameter name="TOTAL_ENDING_BALANCE" class="java.lang.String"/>
+	<parameter name="PREPARED_BY" class="java.lang.String"/>
+	<parameter name="PREPARED_BY_POSITION" class="java.lang.String"/>
+	<parameter name="CHECKED_BY" class="java.lang.String"/>
+	<parameter name="CHECKED_BY_POSITION" class="java.lang.String"/>
+	<parameter name="NOTED_BY" class="java.lang.String"/>
+	<parameter name="NOTED_BY_POSITION" class="java.lang.String"/>
 	<field name="REPORT_NAME" class="java.lang.String"/>
 	<field name="SELECTED_MONTH" class="java.lang.String"/>
 	<field name="SELECTED_YEAR" class="java.lang.String"/>
@@ -86,6 +91,7 @@
 	<field name="PREPARED_BY_POSITION" class="java.lang.String"/>
 	<field name="CHECKED_BY_POSITION" class="java.lang.String"/>
 	<field name="NOTED_BY_POSITION" class="java.lang.String"/>
+	<field name="RIS_TYPE_NAMES" class="java.lang.String"/>
 	<title>
 		<band height="134" splitType="Stretch">
 			<staticText>
@@ -174,21 +180,21 @@
 	<detail>
 		<band height="40">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="200" height="30" uuid="ac920e2b-c4a4-4ef6-84cd-2e7f20f9a1eb">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="884d4d1e-95ce-4c37-a2c2-9a4ba66ccf35"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{PURCHASE_LIST}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="230" y="2" width="100" height="30" uuid="49c5a777-42d9-4f11-815e-8c2199b04989">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ed2e0d28-469b-47b6-a3eb-26c5895a5016"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{SALES_INVOICE_NUMBER}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="409" y="0" width="140" height="30" uuid="69672ce5-0a6e-4acd-b149-4c36e283c132">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="74718ed9-eadc-48e4-97da-b2d9db1acb22"/>
 				</reportElement>
@@ -196,5 +202,149 @@
 				<textFieldExpression><![CDATA[$F{PURCHASED_AMOUNT}]]></textFieldExpression>
 			</textField>
 		</band>
+		<band height="51">
+			<line>
+				<reportElement x="-1" y="50" width="556" height="1" uuid="19cc339d-6a1b-4451-bd39-5fc192833645">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+		</band>
+		<band height="50">
+			<textField isBlankWhenNull="true">
+				<reportElement x="3" y="-20" width="228" height="40" isRemoveLineWhenBlank="true" uuid="e9f8cfd5-a59b-4c85-a955-755dd500d72e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1a1d69d1-024a-4d25-aa91-5fb4e3060081"/>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{RIS_TYPE_NAMES_LIST}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="357" y="-20" width="198" height="40" isRemoveLineWhenBlank="true" uuid="d3b96f67-32d9-4822-acb2-f5021b29bef3">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4d4fd8b5-def1-480e-acc9-c2366937e044"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_COST_OF_RIS}]]></textFieldExpression>
+			</textField>
+		</band>
 	</detail>
+	<lastPageFooter>
+		<band height="260">
+			<staticText>
+				<reportElement positionType="Float" mode="Opaque" x="4" y="240" width="556" height="20" backcolor="#E6E8E9" uuid="9fc2ffbb-8237-4cd5-a73b-df7ed6a3b9ea"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Serif" size="9" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[THIS REPORT IS SYSTEM GENERATED]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="4" y="150" width="100" height="20" uuid="ec04425a-ccae-49f2-ba4c-860e9f853b2d"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Prepared by:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="232" y="150" width="100" height="20" uuid="e627f270-be9c-48a5-9709-2151a1b3c29b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Checked by:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="-1" y="50" width="556" height="1" uuid="50a95ecb-34c5-4885-be2e-17a7b16536ca">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+			</line>
+			<staticText>
+				<reportElement x="409" y="150" width="144" height="20" uuid="9d7a65d3-f23c-41e1-a793-256b776f501d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Noted by:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="4" y="185" width="164" height="20" isRemoveLineWhenBlank="true" uuid="1350d268-c8ba-4cd1-b232-d33c3f0f5cd1"/>
+				<textElement textAlignment="Left">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="182" y="175" width="190" height="30" isRemoveLineWhenBlank="true" uuid="20d2283b-d84a-4d67-a992-226f1aebcba3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{CHECKED_BY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="384" y="175" width="163" height="30" isRemoveLineWhenBlank="true" uuid="1fe3618c-7961-4a5c-b207-0d7eaa09fb22">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1ccf250f-9488-49c0-a596-076b0e0bf4da"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{NOTED_BY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="3" y="202" width="164" height="30" isRemoveLineWhenBlank="true" uuid="d1f9bbf0-a400-450d-b154-8aa2ac33d01a"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{PREPARED_BY_POSITION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="188" y="200" width="188" height="30" isRemoveLineWhenBlank="true" uuid="443edd02-9403-44dd-b8bf-e0173d4e9d2f"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{CHECKED_BY_POSITION}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="389" y="200" width="161" height="30" isRemoveLineWhenBlank="true" uuid="16d813ea-d1dc-4df6-b7e8-17267f2ac228"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{NOTED_BY_POSITION}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="2" y="110" width="196" height="20" uuid="91dfc0a7-4fcb-4ab5-bed5-e672e701a199"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Ending Balance - Inventory]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="396" y="105" width="151" height="30" isRemoveLineWhenBlank="true" uuid="c6b6b968-97ae-49c3-890e-3ed42f76bb69"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{TOTAL_ENDING_BALANCE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="351" y="108" width="42" height="25" uuid="cf6bbd9c-1257-42ae-85b4-8ebd5eaf42f0">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PHP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="357" y="60" width="42" height="20" uuid="c4dcb94d-c67f-43a2-b0f3-e745c37324a0">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PHP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="55" width="196" height="20" uuid="bbfc062a-5042-4673-9c52-62388037db5a"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total materials Available for Use / Sale]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="396" y="55" width="153" height="30" isRemoveLineWhenBlank="true" uuid="6711a60c-33fb-4f10-8781-d6c2b700b297"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{TOTAL_COST}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
 </jasperReport>

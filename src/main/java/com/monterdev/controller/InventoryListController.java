@@ -199,6 +199,8 @@ public class InventoryListController implements Initializable {
         btnStockAdjustmentOnAction();
     }
 
+
+
     private void btnStockAdjustmentOnAction() {
         btnStockAdjustment.setOnAction(e -> {
             Stage newStage = (Stage) btnStockAdjustment.getScene().getWindow();
@@ -568,6 +570,7 @@ public class InventoryListController implements Initializable {
 
     private void exportItemsOnClick() {
         exportItemButton.setOnAction(onClick -> {
+
             if (Prompt.confirm("Are you sure you want to export all list of items?").get().getText().equalsIgnoreCase("OK")) {
                 Stage stage = (Stage) exportItemButton.getScene().getWindow();
                 FileChooser fileChooser = new FileChooser();
