@@ -1,5 +1,6 @@
 package com.monterdev.util;
 
+
 import com.monterdev.mapper.reports.construction.ReportsMapper;
 import com.monterdev.model.Balance;
 import com.monterdev.model.PurchaseOrder;
@@ -11,11 +12,8 @@ import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -25,9 +23,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.monterdev.constants.DateConstants.*;
 import static com.monterdev.configuration.GlobalConfiguration.*;
-import static com.monterdev.constants.InventoryTypeConstants.*;
+import static com.monterdev.constants.DateConstants.*;
+import static com.monterdev.constants.InventoryTypeConstants.ALL_CATEGORIES;
+import static com.monterdev.constants.InventoryTypeConstants.SUMMARY;
 import static com.monterdev.constants.ReportFieldsConstant.*;
 
 
@@ -98,12 +97,12 @@ public class ReportUtil {
 
         setReportMetadata(report);
         try {
-            if(getSelectedReportRisTypeCode().equalsIgnoreCase(SUMMARY)  ){
+            if (getSelectedReportRisTypeCode().equalsIgnoreCase(SUMMARY)) {
                 setBalanceCategory(risTypeNamesRepository.findRisNameByType(getSelectedReportRisTypeCode()).getInventorytype());
                 createSummaryReport();
-            } else if(getSelectedReportRisTypeCode().equalsIgnoreCase(ALL_CATEGORIES)  ){
+            } else if (getSelectedReportRisTypeCode().equalsIgnoreCase(ALL_CATEGORIES)) {
                 createTotalInventoryReport();
-            }else{
+            } else {
                 createReport();
             }
 
@@ -134,7 +133,7 @@ public class ReportUtil {
         String randomDate = selectedYear + "-" + convertedMonth + staticDateString;
         List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findPurchaseOrderByItemCategory(randomDate, getInventoryType());
 
-        if(ObjectUtils.isEmpty(purchaseOrders)){
+        if (ObjectUtils.isEmpty(purchaseOrders)) {
             PurchaseOrder purchaseOrder = new PurchaseOrder();
             purchaseOrder.setItem_category("empty");
             purchaseOrder.setPurchase_cost(0);
@@ -155,13 +154,13 @@ public class ReportUtil {
     private void setPurchaseOrderList(List<Map> mapList, List<PurchaseOrder> purchaseOrders) {
         purchaseOrders.stream().forEach(po -> {
             String purchaseOrderNumber = supplierRepository.getPurchaseOrderNumberBySkuAndDate(po.getSku(), po.getDatecreated());
-            if(ObjectUtils.isEmpty(purchaseOrderNumber)){
+            if (ObjectUtils.isEmpty(purchaseOrderNumber)) {
                 purchaseOrderNumber = "empty";
             }
             Map<String, Object> objectMap = new HashMap<>();
             objectMap.put("PURCHASE_LIST", po.getItem_name());
             objectMap.put("SALES_INVOICE_NUMBER", purchaseOrderNumber);
-            objectMap.put("PURCHASED_AMOUNT", String.format("%d",(long)po.getAmount()));
+            objectMap.put("PURCHASED_AMOUNT", String.format("%d", (long) po.getAmount()));
 
             mapList.add(objectMap);
             purchaseAmount += po.getAmount();
@@ -214,7 +213,7 @@ public class ReportUtil {
 
     private void getAllMaterialsIssuedForThisMonth(List<Map> mapList) {
         String randomDate = "01" + "-" + selectedMonth + "-" + selectedYear + "  01:01:01";
-       // List<String> risTypesList = risRepository.findAllRISTypeByCurrentMonthOfDateSpecifiedAndInventoryType(randomDate, getInventoryType());
+        // List<String> risTypesList = risRepository.findAllRISTypeByCurrentMonthOfDateSpecifiedAndInventoryType(randomDate, getInventoryType());
         List<String> risTypesList = risRepository.findAllRISTypeByInventoryType(getInventoryType());
         setRequisitionIssueSliplist(mapList, randomDate, risTypesList);
     }
@@ -222,16 +221,16 @@ public class ReportUtil {
     private void setRequisitionIssueSliplist(List<Map> mapList, String randomDate, List<String> risTypesList) {
         risTypesList.stream().forEach(ris -> {
             String totalCostPerRisType = salesRepository.computeTotalCostPerRISType(ris, randomDate);
-            if(!ObjectUtils.isEmpty(totalCostPerRisType)){
+            if (!ObjectUtils.isEmpty(totalCostPerRisType)) {
                 Map<String, Object> objectMap = new HashMap<>();
                 objectMap.put("RIS_TYPE_NAMES_LIST", ris);
-                objectMap.put("TOTAL_COST_OF_RIS",totalCostPerRisType);
+                objectMap.put("TOTAL_COST_OF_RIS", totalCostPerRisType);
                 mapList.add(objectMap);
                 totalMaterialsIssued += DataUtil.formatDouble(totalCostPerRisType);
-            }else{
+            } else {
                 Map<String, Object> objectMap = new HashMap<>();
                 objectMap.put("RIS_TYPE_NAMES_LIST", ris);
-                objectMap.put("TOTAL_COST_OF_RIS","0");
+                objectMap.put("TOTAL_COST_OF_RIS", "0");
                 mapList.add(objectMap);
                 totalMaterialsIssued = 0;
             }
@@ -286,23 +285,23 @@ public class ReportUtil {
         String previousMonth = new SimpleDateFormat("MMM").format(c.getTime());
         String year = new SimpleDateFormat("YYYY").format(c.getTime());
         double result = 0;
-        if(!getInventoryType().equalsIgnoreCase(ALL_CATEGORIES) || !getInventoryType().equalsIgnoreCase(SUMMARY)){
+        if (!getInventoryType().equalsIgnoreCase(ALL_CATEGORIES) || !getInventoryType().equalsIgnoreCase(SUMMARY)) {
             result = balanceRepository.getBeginningBalanceInventoryByCategory(getInventoryType(), previousMonth, year);
-        }else{
-            result = balanceRepository.getTotalBeginningBalanceForThisMonth( previousMonth, year,getBalanceCategory());
+        } else {
+            result = balanceRepository.getTotalBeginningBalanceForThisMonth(previousMonth, year, getBalanceCategory());
         }
 
-        return String.format("%d",(long)result);
+        return String.format("%d", (long) result);
     }
 
-    private void createTotalInventoryReport() throws JRException{
+    private void createTotalInventoryReport() throws JRException {
         JasperReport totalInventoryReport = JasperCompileManager.compileReport(FILE_UPPER_PART);
-        List<Balance> totalBalanceListForThisMonth = balanceRepository.getTotalBalancesForThisMonth(selectedMonth,selectedYear);
+        List<Balance> totalBalanceListForThisMonth = balanceRepository.getTotalBalancesForThisMonth(selectedMonth, selectedYear);
         List<Map> inventoryListAndEndingBalances = new ArrayList<>();
-        totalBalanceListForThisMonth.stream().forEach(e->{
-            Map<String,Object> map = new HashMap<>();
-            map.put("INVENTORY_NAME",e.getCategory());
-            map.put("INVENTORY_END_BALANCE",String.format("%d",(long)e.getEndbalance()));
+        totalBalanceListForThisMonth.stream().forEach(e -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("INVENTORY_NAME", e.getCategory());
+            map.put("INVENTORY_END_BALANCE", String.format("%d", (long) e.getEndbalance()));
             inventoryListAndEndingBalances.add(map);
         });
         JRBeanCollectionDataSource totalInventoryDatasource = new JRBeanCollectionDataSource(inventoryListAndEndingBalances);
@@ -316,7 +315,7 @@ public class ReportUtil {
 
 
         double totalEndingBalance = totalBalanceListForThisMonth.stream().mapToDouble(Balance::getEndbalance).sum();
-        titleParams.put(TOTAL_COST_FIELD,String.format("%d",(long)totalEndingBalance));
+        titleParams.put(TOTAL_COST_FIELD, String.format("%d", (long) totalEndingBalance));
 
 
         this.setReportPreparedBy(signatoryRepository.findSignatoryByRole(PREPARED_BY_ROLE_FIELD, reportId).getSignatory());
@@ -349,9 +348,15 @@ public class ReportUtil {
         JasperReport purchaseOrderJasperReport = JasperCompileManager.compileReport(FILE_UPPER_PART);
         //JasperReport salesJasperReport = JasperCompileManager.compileReport(FILE_LOWER_PART);
 
-        List<Map> combinedPurchaseOrderAndSalesOrders = Stream.of(purchaseOrderAndHeaderList,salesAndFooterList)
+        List<Map> combinedPurchaseOrderAndSalesOrders = Stream.of(purchaseOrderAndHeaderList, salesAndFooterList)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
+
+        combinedPurchaseOrderAndSalesOrders.stream().forEach(data->{
+
+            System.out.println(data);
+            System.out.println("**********************");
+        });
 
         JRBeanCollectionDataSource purchaseOrderDatasource = new JRBeanCollectionDataSource(combinedPurchaseOrderAndSalesOrders);
         JRBeanCollectionDataSource saleDatasource = new JRBeanCollectionDataSource(salesAndFooterList);
@@ -393,6 +398,7 @@ public class ReportUtil {
         JasperPrint purchaseOrderJasperPrint = JasperFillManager.fillReport(purchaseOrderJasperReport, titleParams, purchaseOrderDatasource);
         //JasperPrint salesJasperPrint = JasperFillManager.fillReport(salesJasperReport, titleParams, saleDatasource);
 
+        // new JasperViewerFX().viewReport("Test ",purchaseOrderJasperPrint);
         JasperExportManager.exportReportToPdfFile(purchaseOrderJasperPrint, report.getReport_location());
         String purchaseOrderReportLocation = report.getReport_location();
         saveReport();
@@ -401,7 +407,7 @@ public class ReportUtil {
         String salesReportLocation = report.getReport_location();
         //JasperExportManager.exportReportToPdfFile(salesJasperPrint, report.getReport_location());
         //saveReport();
-        Prompt.success("Done saving report to " + purchaseOrderReportLocation );
+        //Prompt.success("Done saving report to " + purchaseOrderReportLocation );
         purchaseOrderReportLocation = null;
         salesReportLocation = null;
     }
@@ -461,9 +467,9 @@ public class ReportUtil {
         if (reports == null) {
             reports = new Reports();
         }
-        reports.setReport_name(selectedMonth + "_" + selectedYear + "_" + selectedReport + "_"+ UUID.randomUUID() + ".pdf");
-                reports.setMonth_of_report(selectedMonth);
-        reports.setReport_location(FileUtils.getUserDirectoryPath()+"\\"+getSystemLocationOfReport() + reports.getReport_name());
+        reports.setReport_name(selectedMonth + "_" + selectedYear + "_" + selectedReport + "_" + UUID.randomUUID() + ".pdf");
+        reports.setMonth_of_report(selectedMonth);
+        reports.setReport_location(FileUtils.getUserDirectoryPath() + "\\" + getSystemLocationOfReport() + reports.getReport_name());
         reports.setYear_of_report(selectedYear);
         reports.setDay_of_report(Integer.toString(LocalDateTime.now().getDayOfMonth()));
         reports.setChecked_by(this.getReportCheckedBy());

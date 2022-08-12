@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SINGLE_INVENTORY_SUMMARY_UPPER_PART" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4eedbb89-b4f6-4469-9ab6-f642a1688cf7">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SINGLE_INVENTORY_SUMMARY_UPPER_PART" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty" uuid="4eedbb89-b4f6-4469-9ab6-f642a1688cf7">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="com.jaspersoft.studio.report.description" value=""/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
@@ -181,51 +181,56 @@
 		<band height="40">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="200" height="30" uuid="ac920e2b-c4a4-4ef6-84cd-2e7f20f9a1eb">
+				<reportElement isPrintRepeatedValues="false" x="0" y="0" width="200" height="30" isRemoveLineWhenBlank="true" uuid="ac920e2b-c4a4-4ef6-84cd-2e7f20f9a1eb">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="884d4d1e-95ce-4c37-a2c2-9a4ba66ccf35"/>
 				</reportElement>
-				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<box padding="0"/>
+				<textElement textAlignment="Left" verticalAlignment="Top">
+					<font size="10"/>
+					<paragraph lineSpacing="Single" lineSpacingSize="0.0"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{PURCHASE_LIST}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="230" y="2" width="100" height="30" uuid="49c5a777-42d9-4f11-815e-8c2199b04989">
+				<reportElement isPrintRepeatedValues="false" x="230" y="2" width="100" height="30" isRemoveLineWhenBlank="true" uuid="49c5a777-42d9-4f11-815e-8c2199b04989">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ed2e0d28-469b-47b6-a3eb-26c5895a5016"/>
 				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font size="10"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{SALES_INVOICE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="409" y="0" width="140" height="30" uuid="69672ce5-0a6e-4acd-b149-4c36e283c132">
+				<reportElement isPrintRepeatedValues="false" x="409" y="0" width="140" height="30" isRemoveLineWhenBlank="true" uuid="69672ce5-0a6e-4acd-b149-4c36e283c132">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="74718ed9-eadc-48e4-97da-b2d9db1acb22"/>
 				</reportElement>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<paragraph lineSpacingSize="0.0"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$F{PURCHASED_AMOUNT}]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="51">
-			<line>
-				<reportElement x="-1" y="50" width="556" height="1" uuid="19cc339d-6a1b-4451-bd39-5fc192833645">
-					<property name="local_mesure_unitheight" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-			</line>
-		</band>
 		<band height="50">
 			<textField isBlankWhenNull="true">
-				<reportElement x="3" y="-20" width="228" height="40" isRemoveLineWhenBlank="true" uuid="e9f8cfd5-a59b-4c85-a955-755dd500d72e">
+				<reportElement isPrintRepeatedValues="false" x="3" y="-20" width="228" height="30" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true" uuid="e9f8cfd5-a59b-4c85-a955-755dd500d72e">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1a1d69d1-024a-4d25-aa91-5fb4e3060081"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font size="10"/>
+					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{RIS_TYPE_NAMES_LIST}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="357" y="-20" width="198" height="40" isRemoveLineWhenBlank="true" uuid="d3b96f67-32d9-4822-acb2-f5021b29bef3">
+				<reportElement isPrintRepeatedValues="false" x="357" y="-20" width="198" height="30" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true" uuid="d3b96f67-32d9-4822-acb2-f5021b29bef3">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="4d4fd8b5-def1-480e-acc9-c2366937e044"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Bottom">
 					<font size="10"/>
+					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{TOTAL_COST_OF_RIS}]]></textFieldExpression>
 			</textField>
