@@ -13,11 +13,18 @@ import java.util.List;
 
 import static sun.misc.MessageUtils.where;
 
-@Component
 public class SearchUtil {
 
     @Autowired
     private ItemsRepository itemsRepository;
+
+    public SearchUtil(){
+
+    }
+
+    public SearchUtil(ItemsRepository itemsRepository) {
+        this.itemsRepository = itemsRepository;
+    }
 
     public void searchItem(String text, List<Item> resultsList, List<String> responseList, String searchType) {
         responseList.clear();

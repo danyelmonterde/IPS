@@ -31,5 +31,9 @@ public class History {
 
     private int stock_after;
 
+    private int stock_before;
+
+    private String updated_by;
+
 
 }

@@ -72,9 +72,9 @@ public class BalanceSettingsController implements Initializable {
     }
 
     private void btnCancelOnAction() {
-        btnCancel.setOnAction(e->{
+        btnCancel.setOnAction(e -> {
             Stage currentStage = (Stage) btnCancel.getScene().getWindow();
-            new StageLoader().load(MainDashboardController.class, applicationContext,currentStage);
+            new StageLoader().load(MainDashboardController.class, applicationContext, currentStage);
 
         });
 
@@ -83,25 +83,25 @@ public class BalanceSettingsController implements Initializable {
     private void btnSaveOnAction() {
         btnSave.setOnAction(e -> {
             Balance balance = createBalanceObject();
-            if(!balanceId.getText().equalsIgnoreCase("0")){
+            if (!balanceId.getText().equalsIgnoreCase("0")) {
                 balance.setId(Integer.parseInt(balanceId.getText()));
-                saveUpdateBalance(balance,false);
-            }else{
+                saveUpdateBalance(balance, false);
+            } else {
                 balance.setId(0);
-                saveUpdateBalance(balance,true);
+                saveUpdateBalance(balance, true);
             }
         });
     }
 
     private void saveUpdateBalance(Balance balance, boolean isNew) {
         Balance savedBalance = balanceRepository.save(balance);
-        if(!ObjectUtils.isEmpty(savedBalance)){
-            if(isNew){
+        if (!ObjectUtils.isEmpty(savedBalance)) {
+            if (isNew) {
                 Prompt.success("New Balances were saved!");
-            }else{
+            } else {
                 Prompt.success("Balances Updated!");
             }
-        }else{
+        } else {
             Prompt.failed("Failed Updating/Saving Balance!");
         }
         balanceId.setText(String.valueOf(savedBalance.getId()));

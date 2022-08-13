@@ -86,22 +86,22 @@
                </VBox.margin></HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <JFXTextField fx:id="requestedBy" labelFloat="true" promptText="REQUESTED BY">
+                  <JFXComboBox fx:id="requestedBy" labelFloat="true" promptText="REQUESTED BY">
+                     <HBox.margin>
+                        <Insets left="20.0" right="20.0" top="20.0" />
+                     </HBox.margin>
+                  </JFXComboBox>
+                  <JFXTextField fx:id="txtDesignation" editable="false" labelFloat="true" promptText="DESIGNATION">
                      <HBox.margin>
                         <Insets left="20.0" right="20.0" top="20.0" />
                      </HBox.margin>
                   </JFXTextField>
-                  <JFXTextField fx:id="txtDesignation" labelFloat="true" promptText="DESIGNATION">
-                     <HBox.margin>
-                        <Insets left="20.0" right="20.0" top="20.0" />
-                     </HBox.margin>
-                  </JFXTextField>
-                  <JFXTextField fx:id="division" labelFloat="true" promptText="DIVISION">
+                  <JFXTextField fx:id="division" editable="false" labelFloat="true" promptText="DIVISION">
                      <HBox.margin>
                         <Insets left="20.0" top="20.0" />
                      </HBox.margin>
                   </JFXTextField>
-                  <JFXTextField fx:id="unit" labelFloat="true" promptText="UNIT">
+                  <JFXTextField fx:id="unit" editable="false" labelFloat="true" promptText="UNIT">
                      <HBox.margin>
                         <Insets left="20.0" right="20.0" top="20.0" />
                      </HBox.margin>

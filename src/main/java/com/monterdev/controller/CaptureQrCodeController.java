@@ -73,7 +73,7 @@ public class CaptureQrCodeController {
     public void cancelCapture(ActionEvent actionEvent) {
         stopAcquisition();
         Stage stage = (Stage) cancelButton.getScene().getWindow();
-        new StageLoader().load(MainDashboardController.class, applicationContext,stage);
+        new StageLoader().load(MainDashboardController.class, applicationContext, stage);
     }
 
     public void startCamera(ActionEvent actionEvent) {
@@ -81,7 +81,6 @@ public class CaptureQrCodeController {
         if (!this.cameraActive) {
             // start the video capture
             this.capture.open(cameraId);
-
 
 
             // is the video stream available?

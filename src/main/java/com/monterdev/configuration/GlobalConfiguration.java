@@ -4,7 +4,6 @@ package com.monterdev.configuration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.monterdev.configuration.JsonFileConfiguration;
 import com.monterdev.constants.ErrorConstants;
 import com.monterdev.exception.IqwdException;
 import com.monterdev.model.CustomConfig;
@@ -78,7 +77,10 @@ public class GlobalConfiguration {
     public static String getReportJrxmlLocation() {
         return getConfigValue(reportJrxmlLocation);
     }
-    public static String getSystemReportLocation(){ return getConfigValue(systemReportLocation);}
+
+    public static String getSystemReportLocation() {
+        return getConfigValue(systemReportLocation);
+    }
 
     public static String getDefaultCategoryData() {
         return getConfigValue(defaultCategoryData);
@@ -87,6 +89,7 @@ public class GlobalConfiguration {
     public static String getSignatoryRole() {
         return getConfigValue(signatoryRole);
     }
+
     public static String getHomePage() {
         return getConfigValue(homePage);
     }
@@ -114,9 +117,11 @@ public class GlobalConfiguration {
     public static String getCalenderYears() {
         return getConfigValue(years);
     }
+
     public static String getMonthsofCalender() {
         return getConfigValue(months);
     }
+
     public static String getRisFieldTypes() {
         return getConfigValue(risFieldTypes);
     }
@@ -141,6 +146,7 @@ public class GlobalConfiguration {
     //On-startup setting of the Global json configuration
     public void setJsonFileConfiguration(JsonFileConfiguration jsonFileConfiguration) throws IqwdException {
         ObjectMapper objectMapper = new ObjectMapper();
+        // System.out.println(jsonFileConfiguration.getCustomConfigurations().get(0).getConfigId());
         try {
             customConfigs = objectMapper.readValue(objectMapper.writeValueAsString(jsonFileConfiguration.getCustomConfigurations()), new TypeReference<List<CustomConfig>>() {
             });

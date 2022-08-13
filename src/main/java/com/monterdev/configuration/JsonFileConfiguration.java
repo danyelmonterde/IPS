@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @Component
 @PropertySource(
-        value= "classpath:global-config.json",
+        value = "classpath:global-config.json",
         factory = JsonFileConfigurationSourceFactory.class
 )
 public class JsonFileConfiguration {

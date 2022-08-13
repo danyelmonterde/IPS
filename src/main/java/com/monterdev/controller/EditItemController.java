@@ -21,7 +21,6 @@ import lombok.Setter;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
@@ -122,10 +121,6 @@ public class EditItemController implements Initializable {
     private DeletedItemsRepository deletedItemsRepository;
 
     @Autowired
-    @Qualifier("itemLists")
-    private List<Item> itemLists;
-
-    @Autowired
     private PurchaseOrderRepository purchaseOrderRepository;
 
     @Autowired
@@ -135,37 +130,45 @@ public class EditItemController implements Initializable {
     private QrcodeRepository qrcodeRepository;
 
     @Autowired
-    private SearchUtil searchUtil;
-
-    @Autowired
     private UnitRepository unitRepository;
 
     @Autowired
     private HistoryRepository historyRepository;
 
+    @Autowired
+    private User user;
+
     private List<Item> resultsList = new ArrayList<>();
 
     private List<String> responseList = new ArrayList<>();
+
+    private List<Item> itemLists;
 
     private ScheduledExecutorService timer;
 
     private static String NO_CATEGORY_ON_MASTER_DATA = "You don't have any Category / Inventory type yet! Please add it to Master data. ";
 
+    @Autowired
+    private SearchUtil searchUtil;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        if (ObjectUtils.isEmpty(itemLists)) {
+            itemLists = itemsRepository.findAll();
+        }
+
         selectedItem = applicationContext.getBean(Item.class);
 
-        if(!ObjectUtils.isEmpty(selectedItem.getItem_name()) && selectedItem.getSku()!=0){
+        if (!ObjectUtils.isEmpty(selectedItem.getItem_name()) && selectedItem.getSku() != 0) {
             averageCost.setText(Double.toString(selectedItem.getCost()));
             sku.setText(Integer.toString(selectedItem.getSku()));
             inStock.setText(Integer.toString(selectedItem.getIn_stock()));
             lowStock.setText(Integer.toString(selectedItem.getLow_stock()));
             name.setText(selectedItem.getItem_name());
             comboUnit.setValue(selectedItem.getUnit());
-        }else{
-        resetFields();
+        } else {
+            resetFields();
         }
 
         quantity.setText("0");
@@ -208,7 +211,7 @@ public class EditItemController implements Initializable {
     }
 
     private void checkItemIfUpdated() {
-        if(!ObjectUtils.isEmpty(selectedItem.getSku())){
+        if (!ObjectUtils.isEmpty(selectedItem.getSku())) {
             Optional<Item> optionalUpdatedItem = itemsRepository.findById(selectedItem.getSku());
             if (optionalUpdatedItem.isPresent()) {
                 Item updatedItem = optionalUpdatedItem.get();
@@ -221,8 +224,8 @@ public class EditItemController implements Initializable {
                     Optional<ButtonType> optionalButtonType = Prompt.confirm("Are you sure you want to update this item with your changes?");
                     if (optionalButtonType.isPresent()) {
                         if (optionalButtonType.get().getText().equalsIgnoreCase("OK")) {
-                            return ;
-                        }else{
+                            return;
+                        } else {
                             //There might be updates on the selected item before you save this item
                             name.setText(updatedItem.getItem_name());
                             averageCost.setText(Double.toString(updatedItem.getCost()));
@@ -258,7 +261,7 @@ public class EditItemController implements Initializable {
         if (!ObjectUtils.isEmpty(name)) {
             if (name.getText().equalsIgnoreCase("")) {
                 delete.setText("CLEAR");
-            } else if(selectedItem.getSku()!=0) {
+            } else if (selectedItem.getSku() != 0) {
                 delete.setText("DELETE");
             }
         } else {
@@ -387,7 +390,7 @@ public class EditItemController implements Initializable {
             averageCost.setText(Double.toString(item.get().getCost()));
             itemCategoryCombo.setValue(item.get().getItem_category());
             comboUnit.setValue(item.get().getUnit());
-        }else{
+        } else {
             Prompt.failed("Item not found!");
         }
     }
@@ -396,7 +399,7 @@ public class EditItemController implements Initializable {
     private void quantityOnChange() {
 
         quantity.textProperty().addListener((observable, oldValue, newValue) -> {
-            try{
+            try {
                 if (NumberUtils.isParsable(quantity.getText()) && !ObjectUtils.isEmpty(quantity.getText())) {
                     //VALID TEXT FIELD
                     selectedItem.setQuantity(Integer.parseInt(quantity.getText()));
@@ -410,7 +413,7 @@ public class EditItemController implements Initializable {
                     quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                     quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
                 }
-            }catch (IllegalArgumentException exception){
+            } catch (IllegalArgumentException exception) {
                 quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                 quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
             }
@@ -439,39 +442,38 @@ public class EditItemController implements Initializable {
 
     public void delete(ActionEvent actionEvent) {
 
-            if (delete.getText().equalsIgnoreCase("DELETE")) {
-                if(selectedItem.getSku()!=0){
-                    Optional<ButtonType> buttonType = Prompt.confirm("Are you sure you want to delete " + selectedItem.getItem_name() + " ?");
-                    if (buttonType.isPresent()) {
-                        if (!buttonType.get().getButtonData().isCancelButton()) {
-                            DeletedItems deletedItems = new DeletedItems().builder()
-                                    .cost(selectedItem.getCost())
-                                    .quantity(Integer.parseInt(quantity.getText()))
-                                    .item_name(selectedItem.getItem_name())
-                                    .item_category(selectedItem.getItem_category())
-                                    .unit(selectedItem.getUnit())
-                                    .in_stock(selectedItem.getIn_stock())
-                                    .low_stock(selectedItem.getLow_stock())
-                                    .sku(selectedItem.getSku())
-                                    .tag(selectedItem.getTag())
-                                    .build();
-                            if (!ObjectUtils.isEmpty(deletedItemsRepository.save(deletedItems))) {
-                                itemsRepository.delete(selectedItem);
-                                History history = setHistory(selectedItem, "DELETED ITEM", false);
-                                historyRepository.save(history);
-                                cancel(new ActionEvent());
-                            }
+        if (delete.getText().equalsIgnoreCase("DELETE")) {
+            if (selectedItem.getSku() != 0) {
+                Optional<ButtonType> buttonType = Prompt.confirm("Are you sure you want to delete " + selectedItem.getItem_name() + " ?");
+                if (buttonType.isPresent()) {
+                    if (!buttonType.get().getButtonData().isCancelButton()) {
+                        DeletedItems deletedItems = new DeletedItems().builder()
+                                .cost(selectedItem.getCost())
+                                .quantity(Integer.parseInt(quantity.getText()))
+                                .item_name(selectedItem.getItem_name())
+                                .item_category(selectedItem.getItem_category())
+                                .unit(selectedItem.getUnit())
+                                .in_stock(selectedItem.getIn_stock())
+                                .low_stock(selectedItem.getLow_stock())
+                                .sku(selectedItem.getSku())
+                                .tag(selectedItem.getTag())
+                                .build();
+                        if (!ObjectUtils.isEmpty(deletedItemsRepository.save(deletedItems))) {
+                            itemsRepository.delete(selectedItem);
+                            History history = setHistory(selectedItem, "DELETED ITEM", false);
+                            historyRepository.save(history);
+                            cancel(new ActionEvent());
                         }
-
                     }
-                }else{
-                    Prompt.failed("You have not selected an item to delete!");
-                }
 
+                }
             } else {
-                resetFields();
+                Prompt.failed("You have not selected an item to delete!");
             }
 
+        } else {
+            resetFields();
+        }
 
 
     }
@@ -542,7 +544,7 @@ public class EditItemController implements Initializable {
                     double previousTotalAmount = previousQuantity * previousItemCostPerUnit;
 
                     int currentQuantity = Math.abs(Integer.parseInt(quantity.getText()));
-                    double currentItemCostPerUnit = Math.abs(DataUtil.formatDouble(purchaseCost.getText())) ;
+                    double currentItemCostPerUnit = Math.abs(DataUtil.formatDouble(purchaseCost.getText()));
                     double currentTotalAmount = currentQuantity * currentItemCostPerUnit;
 
                     double finalAverageCost = (previousTotalAmount + currentTotalAmount) / (previousQuantity + currentQuantity);
@@ -566,13 +568,15 @@ public class EditItemController implements Initializable {
                     SupplierGroup supplierGroup = setSupplierGroup(savedItem);
                     supplierRepository.save(supplierGroup);
                     History history = setHistory(savedItem);
+                    history.setStock_before(Integer.parseInt(inStock.getText()));
+                    history.setStock_after(savedItem.getIn_stock());
                     historyRepository.save(history);
 
                     try {
                         BarCodeUtil.saveBarCode(String.valueOf(savedItem.getSku()), String.valueOf(savedItem.getSku()));
                     } catch (Exception ioException) {
                         Prompt.failed("Error in Saving QR Code!");
-                    }finally {
+                    } finally {
                         resetSelectedItem();
                     }
 
@@ -581,9 +585,9 @@ public class EditItemController implements Initializable {
                     Stage stage = (Stage) save.getScene().getWindow();
                     new StageLoader().load(InventoryListController.class, applicationContext, stage);
                 } else if (!ObjectUtils.isEmpty(savedItem)) {
-                    if(sku.getText()=="0"){
+                    if (sku.getText() == "0") {
                         Prompt.success("Item added successfully!");
-                    }else if(selectedItem.getSku() == savedItem.getSku()){
+                    } else if (selectedItem.getSku() == savedItem.getSku()) {
                         //Updating details of current item without affecting purchase order history
                         Prompt.success("Item updated successfully!");
                     }
@@ -603,7 +607,7 @@ public class EditItemController implements Initializable {
                 Prompt.failed("Transaction Failed! Please Try again! Reason is: \n" + e.getMessage());
             }
 
-        }else{
+        } else {
             Prompt.failed("You have not selected an item to update or save!");
         }
 
@@ -617,6 +621,7 @@ public class EditItemController implements Initializable {
         history.setAdjustment(savedItem.getQuantity());
         history.setItem_category(savedItem.getItem_category());
         history.setItem_name(savedItem.getItem_name());
+        history.setUpdated_by(user.getUsername());
 
         return history;
     }
@@ -625,6 +630,8 @@ public class EditItemController implements Initializable {
         History history = new History();
         history.setDate(AppTime.now());
         history.setReason(reason);
+        history.setUpdated_by(user.getUsername());
+
         if (isPositive) {
             history.setAdjustment(savedItem.getQuantity());
             history.setStock_after(savedItem.getQuantity());
@@ -656,6 +663,7 @@ public class EditItemController implements Initializable {
         purchaseOrder.setItem_name(name.getText());
         purchaseOrder.setQuantity(Integer.parseInt(quantity.getText()));
         purchaseOrder.setSku(item.getSku());
+        purchaseOrder.setStock_before(Integer.parseInt(inStock.getText()));
         purchaseOrder.setIn_stock(item.getIn_stock());
         purchaseOrder.setItem_category(selectedItem.getItem_category());
         purchaseOrder.setAmount(Integer.parseInt(quantity.getText()) * DataUtil.formatDouble(purchaseCost.getText()));

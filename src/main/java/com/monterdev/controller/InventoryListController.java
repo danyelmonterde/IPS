@@ -5,7 +5,10 @@ import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.monterdev.model.*;
 import com.monterdev.repository.*;
-import com.monterdev.util.*;
+import com.monterdev.util.AppTime;
+import com.monterdev.util.DataUtil;
+import com.monterdev.util.Prompt;
+import com.monterdev.util.StageLoader;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.StatefulBeanToCsv;
@@ -146,8 +149,6 @@ public class InventoryListController implements Initializable {
     @Autowired
     private QrcodeRepository qrcodeRepository;
     @Autowired
-    private InventoryListUtil inventoryListUtil;
-    @Autowired
     private User user;
     @Autowired
     private BalanceRepository balanceRepository;
@@ -200,6 +201,7 @@ public class InventoryListController implements Initializable {
         indicatorsOnLoad();
         btnStockAdjustmentOnAction();
     }
+
 
     private void btnStockAdjustmentOnAction() {
         btnStockAdjustment.setOnAction(e -> {
@@ -474,11 +476,11 @@ public class InventoryListController implements Initializable {
             if (NumberUtils.isParsable(currentPageTextField.getText()) && !org.springframework.util.ObjectUtils.isEmpty(currentPageTextField.getText())) {
                 //VALID TEXT FIELD
                 currentPage = Integer.parseInt(nv);
-                if (currentPage <= maximumPage && currentPage!=0) {
+                if (currentPage <= maximumPage && currentPage != 0) {
                     loadTableViewFilteredByStockAlertsAndCategoryAndItemName(CURRENT_SELECTED_STOCK_ALERT, searchItemTextField.getText());
                 } else if (currentPage > maximumPage) {
                     currentPageTextField.setText(String.valueOf(maximumPage));
-                } else if(currentPage <= 0){
+                } else if (currentPage <= 0) {
                     currentPageTextField.setText("1");
                 }
 
@@ -486,10 +488,9 @@ public class InventoryListController implements Initializable {
                 //EMPTY TEXT FIELD
                 // currentPageTextField.setText(currentPageTextField.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                 currentPageTextField.setText("1");
-            }else if(currentPageTextField.getText().equalsIgnoreCase("0")){
+            } else if (currentPageTextField.getText().equalsIgnoreCase("0")) {
                 currentPageTextField.setText("1");
-            }
-            else {
+            } else {
                 //INVALID TEXT FIELD
                 currentPageTextField.setText(currentPageTextField.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                 currentPageTextField.setText(currentPageTextField.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
@@ -570,6 +571,7 @@ public class InventoryListController implements Initializable {
 
     private void exportItemsOnClick() {
         exportItemButton.setOnAction(onClick -> {
+
             if (Prompt.confirm("Are you sure you want to export all list of items?").get().getText().equalsIgnoreCase("OK")) {
                 Stage stage = (Stage) exportItemButton.getScene().getWindow();
                 FileChooser fileChooser = new FileChooser();
@@ -619,7 +621,7 @@ public class InventoryListController implements Initializable {
                     if (!ObjectUtils.isEmpty(importedItems)) {
                         if (Prompt.confirm("Are you sure you want to import this file? Existing items will be deleted.").get().getText().equalsIgnoreCase("OK")) {
                             Optional<String> result = Prompt.importConfirm("Please select and month and year. ");
-                            if(result.isPresent()){
+                            if (result.isPresent()) {
                                 String month = result.get().split("-")[0];
                                 String year = result.get().split("-")[1];
                                 itemsRepository.truncateItems();

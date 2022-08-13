@@ -63,4 +63,10 @@ public class Item implements Comparable<Item>{
     public int compareTo(Item o) {
         return this.getItem_name().compareTo(o.getItem_name());
     }
+
+    public double computeAmount(int quantity, double cost,boolean isCustomerNew){
+        return isCustomerNew ? (((cost * 0.2) + cost) * quantity) : (quantity * cost);
+    }
+
+
 }
