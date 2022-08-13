@@ -41,7 +41,7 @@ public class OnloadConfiguration {
     @Bean(name = "mysqlDatasource")
     public DataSource dataSource() {
         DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.url("jdbc:mysql://localhost:3306/iqwddbv2?&serverTimezone=UTC");
+        dataSourceBuilder.url("jdbc:mysql://localhost:3306/iqwddbv3?&serverTimezone=UTC");
         dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
         dataSourceBuilder.username("root");
         dataSourceBuilder.password(new Recovery().get());

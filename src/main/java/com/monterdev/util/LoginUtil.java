@@ -1,11 +1,7 @@
 package com.monterdev.util;
 
-import com.jfoenix.controls.JFXButton;
-import com.monterdev.configuration.GlobalConfiguration;
-import com.monterdev.controller.LoginController;
 import com.monterdev.model.User;
 import com.monterdev.repository.UserRepository;
-import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,6 +14,7 @@ import java.time.LocalDate;
 
 import static com.monterdev.configuration.GlobalConfiguration.*;
 
+@Component
 public class LoginUtil {
 
     @Autowired
@@ -56,7 +53,7 @@ public class LoginUtil {
                 user.setPassword(userData.getPassword());
                 user.setIsSuperAdmin(userData.getIsSuperAdmin());
                 user.setId(userData.getId());
-            }else if(!sessionCookieData.isBefore(cookieData)){
+            } else if (!sessionCookieData.isBefore(cookieData)) {
                 try {
                     isUserAuthenticated = false;
                     Process proc = Runtime.getRuntime().exec(getConfigValue(initialLoginSettings));
