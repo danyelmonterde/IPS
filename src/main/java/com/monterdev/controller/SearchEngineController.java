@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class SearchEngineController  {
+public class SearchEngineController {
 
     @Autowired
     private ItemsRepository itemsRepository;

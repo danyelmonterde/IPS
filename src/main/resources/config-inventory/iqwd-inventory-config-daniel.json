@@ -6,14 +6,14 @@
     },
     {
       "configId": "GENERATED_QR_CODE_DIRECTORY",
-      "configValue": "C:\\Users\\Ibang Tao\\Desktop\\GeneratedQrCodes"
+      "configValue": "C:\\Users\\Daniel\\Desktop\\GeneratedQrCodes"
     },
     {
       "configId": "EDIT_BUTTON",
-      "configValue": "C:\\Users\\Ibang Tao\\Desktop\\IPS\\src\\main\\resources\\config-ui\\IQWD-APP-RESOURCES\\Main\\check.png"
+      "configValue": "C:\\Devtools\\git\\IPS\\src\\main\\resources\\config-ui\\IQWD-APP-RESOURCES\\Main\\check.png"
     },    {
       "configId": "DELETE_BUTTON",
-      "configValue": "C:\\Users\\Ibang Tao\\Desktop\\IPS\\src\\main\\resources\\config-ui\\IQWD-APP-RESOURCES\\Main\\trash.png"
+      "configValue": "C:\\Devtools\\git\\IPS\\src\\main\\resources\\config-ui\\IQWD-APP-RESOURCES\\Main\\trash.png"
     },
     {
       "configId": "CUSTOMER_TYPES",
@@ -49,7 +49,7 @@
     },
     {
       "configId": "SESSION_COOKIE_YYYY",
-      "configValue": "2022"
+      "configValue": "2023"
     },
     {
       "configId": "INITIAL_LOGIN_SETTINGS",

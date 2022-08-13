@@ -8,7 +8,9 @@ import com.monterdev.model.InventoryType;
 import com.monterdev.model.RisType;
 import com.monterdev.model.RisTypeNames;
 import com.monterdev.model.SelectedRisTemplate;
+import com.monterdev.repository.InventoryTypeRepository;
 import com.monterdev.repository.RisFieldsRepository;
+import com.monterdev.repository.RisTypeNamesRepository;
 import com.monterdev.repository.RisTypeRepository;
 import com.monterdev.util.Prompt;
 import com.monterdev.util.StageLoader;
@@ -53,10 +55,7 @@ public class CreateRequisitionTemplateController implements Initializable {
     private RisTypeRepository risTypeRepository;
 
     @Autowired
-    private List<InventoryType> inventoryTypesList;
-
-    @Autowired
-    private List<RisTypeNames> risTemplates;
+    private RisTypeNamesRepository risTypeNamesRepository;
 
     @Autowired
     private RisFieldsRepository risFieldsRepository;
@@ -67,15 +66,28 @@ public class CreateRequisitionTemplateController implements Initializable {
     @Autowired
     private ConfigurableApplicationContext applicationContext;
 
+    @Autowired
+    private InventoryTypeRepository inventoryTypeRepository;
+
     private List<RisType> risTypeList;
 
     private String[] risFieldTypes = null;
+
+    private List<InventoryType> inventoryTypesList;
+
+    private List<RisTypeNames> risTemplates;
+
 
     private int counter = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        if (ObjectUtils.isEmpty(inventoryTypesList)) {
+            inventoryTypesList = inventoryTypeRepository.findAllInventoryType();
+        }
+        if (ObjectUtils.isEmpty(risTemplates)) {
+            risTemplates = risTypeNamesRepository.findAllRisTypeNames();
+        }
         risFieldTypes = GlobalConfiguration.getRisFieldTypes().split(",");
         risTypeList = new ArrayList<>();
 
@@ -90,6 +102,7 @@ public class CreateRequisitionTemplateController implements Initializable {
 
         JFXComboBox inventoryTypesCombo = new JFXComboBox();
         inventoryTypesCombo.setAccessibleText("INVENTORY_TYPE");
+
         inventoryTypesList.stream().forEach(d -> {
             inventoryTypesCombo.getItems().add(d.getInventory_type());
         });
@@ -183,11 +196,11 @@ public class CreateRequisitionTemplateController implements Initializable {
                     risTypeRepository.save(risTypeList.get(ctr));
                     Prompt.success("Newly Created Template was saved!");
                     Stage stage = (Stage) risTemplateContainer.getScene().getWindow();
-                    new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext,stage);
+                    new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext, stage);
                 } else {
                     risTypeRepository.save(risTypeList.get(ctr));
                     Stage stage = (Stage) risTemplateContainer.getScene().getWindow();
-                    new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext,stage);
+                    new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext, stage);
                 }
             } else {
                 Prompt.failed("Pls fill in all details!");

@@ -26,10 +26,10 @@ import java.util.ResourceBundle;
 public class UpdatePasswordController implements Initializable {
 
     @FXML
-    private JFXPasswordField  txtCurrentPassword;
+    private JFXPasswordField txtCurrentPassword;
 
     @FXML
-    private JFXPasswordField  txtNewPassword;
+    private JFXPasswordField txtNewPassword;
 
     @FXML
     private JFXButton btnUpdatePassword;
@@ -46,19 +46,20 @@ public class UpdatePasswordController implements Initializable {
     @Autowired
     private User user;
 
-    @Autowired
     private LoginUtil loginUtil;
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         btnCancelOnAction();
         btnUpdatePasswordOnAction();
     }
 
     private void btnUpdatePasswordOnAction() {
-        btnUpdatePassword.setOnAction(e->{
-            if(loginUtil.isPasswordEqual(txtCurrentPassword.getText(),user.getPassword())){
+        btnUpdatePassword.setOnAction(e -> {
+            loginUtil = new LoginUtil();
+            if (loginUtil.isPasswordEqual(txtCurrentPassword.getText(), user.getPassword())) {
                 User userUpdate = new User();
                 userUpdate.setId(user.getId());
                 userUpdate.setPassword(loginUtil.encryptPassword(txtNewPassword.getText()));
@@ -68,24 +69,24 @@ public class UpdatePasswordController implements Initializable {
 
                 //udpating below
                 User updatedUser = userRepository.save(userUpdate);
-                if(!ObjectUtils.isEmpty(updatedUser)){
+                if (!ObjectUtils.isEmpty(updatedUser)) {
                     user.setPassword(updatedUser.getPassword());
                     Prompt.success("Password was successfully updated!");
                     Stage currentStage = (Stage) btnCancel.getScene().getWindow();
-                    new StageLoader().load(MainDashboardController.class, applicationContext,currentStage);
-                }else{
+                    new StageLoader().load(MainDashboardController.class, applicationContext, currentStage);
+                } else {
                     Prompt.failed("Error saving new password!");
                 }
-            }else{
+            } else {
                 Prompt.failed("Current password doesn't match with your account credentials!");
             }
         });
     }
 
     private void btnCancelOnAction() {
-        btnCancel.setOnAction(e->{
+        btnCancel.setOnAction(e -> {
             Stage currentStage = (Stage) btnCancel.getScene().getWindow();
-            new StageLoader().load(MainDashboardController.class, applicationContext,currentStage);
+            new StageLoader().load(MainDashboardController.class, applicationContext, currentStage);
 
         });
     }

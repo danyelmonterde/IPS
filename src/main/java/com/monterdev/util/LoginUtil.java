@@ -18,7 +18,6 @@ import java.time.LocalDate;
 
 import static com.monterdev.configuration.GlobalConfiguration.*;
 
-@Component
 public class LoginUtil {
 
     @Autowired
@@ -78,15 +77,15 @@ public class LoginUtil {
         return encoder.matches(currentPassword, encryptedPassword);
     }
 
-    public void isValid(JFXButton jfxButton) {
-        if (ObjectUtils.isEmpty(user.getUsername()) || ObjectUtils.isEmpty(user.getPassword())) {
-            user.setUsername(null);
-            user.setIsAdmin(null);
-            user.setIsSuperAdmin(null);
-            user.setPassword(null);
-            user.setId(0);
-            Stage currentStage = (Stage) jfxButton.getScene().getWindow();
-            new StageLoader().load(LoginController.class, applicationContext, currentStage);
-        }
-    }
+//    public void isValid(JFXButton jfxButton) {
+//        if (ObjectUtils.isEmpty(user.getUsername()) || ObjectUtils.isEmpty(user.getPassword())) {
+//            user.setUsername(null);
+//            user.setIsAdmin(null);
+//            user.setIsSuperAdmin(null);
+//            user.setPassword(null);
+//            user.setId(0);
+//            Stage currentStage = (Stage) jfxButton.getScene().getWindow();
+//            new StageLoader().load(LoginController.class, applicationContext, currentStage);
+//        }
+//    }
 }
