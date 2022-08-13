@@ -105,32 +105,31 @@ public class AddItemController implements Initializable {
                     Item savedItem = itemsRepository.save(item);
                     if (!ObjectUtils.isEmpty(savedItem)) {
                         Balance balance = new Balance();
-                            //Balance is being adjusted every new item being added 
-                            Balance bal = balanceRepository.getBalanceOfCurrentInventoryMonth(AppTime.getMonth(), String.valueOf(AppTime.getYear()), savedItem.getItem_category());
-                            if (!(savedItem.getItem_category().equalsIgnoreCase(ALL_CATEGORIES))) {
-                                if (!ObjectUtils.isEmpty(bal)) {
-                                    balance.setYear(String.valueOf(AppTime.getYear()));
-                                    balance.setMonth(AppTime.getMonth());
-                                    balance.setDatecreated(String.valueOf(AppTime.now()));
-                                    balance.setId(bal.getId());
-                                    balance.setBeginbalance(bal.getBeginbalance());
-                                    balance.setCategory(bal.getCategory());
-                                    String x = itemsRepository.getEndBalanceByInventoryType(savedItem.getItem_category());
-                                    balance.setEndbalance(ObjectUtils.isEmpty(x) ? 0 : DataUtil.formatDouble(x));
-                                    balanceRepository.save(balance);//lagay sa loop
-                                } else {
-                                    balance.setYear(String.valueOf(AppTime.getYear()));
-                                    balance.setMonth(AppTime.getMonth());
-                                    balance.setDatecreated(String.valueOf(AppTime.now()));
-                                    balance.setId(0);
-                                    String b = itemsRepository.getEndBalanceByInventoryType(savedItem.getItem_category());
-                                    balance.setBeginbalance(ObjectUtils.isEmpty(b) ? 0 : DataUtil.formatDouble(b));
-                                    balance.setCategory(savedItem.getItem_category());
-                                    balance.setEndbalance(ObjectUtils.isEmpty(b) ? 0 : DataUtil.formatDouble(b));
-                                    balanceRepository.save(balance);//lagay sa loop
-                                }
+                        //Balance is being adjusted every new item being added
+                        Balance bal = balanceRepository.getBalanceOfCurrentInventoryMonth(AppTime.getMonth(), String.valueOf(AppTime.getYear()), savedItem.getItem_category());
+                        if (!(savedItem.getItem_category().equalsIgnoreCase(ALL_CATEGORIES))) {
+                            if (!ObjectUtils.isEmpty(bal)) {
+                                balance.setYear(String.valueOf(AppTime.getYear()));
+                                balance.setMonth(AppTime.getMonth());
+                                balance.setDatecreated(String.valueOf(AppTime.now()));
+                                balance.setId(bal.getId());
+                                balance.setBeginbalance(bal.getBeginbalance());
+                                balance.setCategory(bal.getCategory());
+                                String x = itemsRepository.getEndBalanceByInventoryType(savedItem.getItem_category());
+                                balance.setEndbalance(ObjectUtils.isEmpty(x) ? 0 : DataUtil.formatDouble(x));
+                                balanceRepository.save(balance);//lagay sa loop
+                            } else {
+                                balance.setYear(String.valueOf(AppTime.getYear()));
+                                balance.setMonth(AppTime.getMonth());
+                                balance.setDatecreated(String.valueOf(AppTime.now()));
+                                balance.setId(0);
+                                String b = itemsRepository.getEndBalanceByInventoryType(savedItem.getItem_category());
+                                balance.setBeginbalance(ObjectUtils.isEmpty(b) ? 0 : DataUtil.formatDouble(b));
+                                balance.setCategory(savedItem.getItem_category());
+                                balance.setEndbalance(ObjectUtils.isEmpty(b) ? 0 : DataUtil.formatDouble(b));
+                                balanceRepository.save(balance);//lagay sa loop
                             }
-
+                        }
 
 
                         Barcode barcode = setBarcodeData(item);
@@ -150,7 +149,7 @@ public class AddItemController implements Initializable {
                     }
                 } catch (DataIntegrityViolationException dataIntegrityViolationException) {
                     Prompt.failed("Item existed already!");
-                } catch (Exception exception){
+                } catch (Exception exception) {
                     Prompt.failed("An error occurred while saving item!");
                 }
 
@@ -331,7 +330,7 @@ public class AddItemController implements Initializable {
     }
 
     private void loadUnits() {
-        if(ObjectUtils.isEmpty(unitList)){
+        if (ObjectUtils.isEmpty(unitList)) {
             unitList = unitRepository.findAllItemUnits();
         }
         unitList.stream().forEach(unit -> {

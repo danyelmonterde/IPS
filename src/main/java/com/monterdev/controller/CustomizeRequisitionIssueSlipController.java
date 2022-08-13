@@ -8,7 +8,10 @@ import com.monterdev.model.*;
 import com.monterdev.repository.RISSignatoryRepository;
 import com.monterdev.repository.RisTypeNamesRepository;
 import com.monterdev.repository.RisTypeRepository;
-import com.monterdev.util.*;
+import com.monterdev.util.AppTime;
+import com.monterdev.util.ControlNumberGenerator;
+import com.monterdev.util.Prompt;
+import com.monterdev.util.StageLoader;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,7 +38,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import static com.monterdev.configuration.GlobalConfiguration.*;
+import static com.monterdev.configuration.GlobalConfiguration.getCustomerTypes;
+import static com.monterdev.configuration.GlobalConfiguration.getRisFieldTypes;
 import static com.monterdev.constants.DataTypeConstants.*;
 import static com.monterdev.constants.TextFieldValidatorConstants.*;
 
@@ -97,14 +101,14 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        if(ObjectUtils.isEmpty(risTemplates)){
+        if (ObjectUtils.isEmpty(risTemplates)) {
             risTemplates = risTypeNamesRepository.findAllRisTypeNames();
         }
-        if(ObjectUtils.isEmpty(requisitionIssueSlipSignatories)){
+        if (ObjectUtils.isEmpty(requisitionIssueSlipSignatories)) {
             requisitionIssueSlipSignatories = risSignatoryRepository.findAll();
         }
         requisitionIssueSlipSignatories.stream().forEach(d -> this.requestedBy.getItems().add(d.getRequested_by()));
-        if(ObjectUtils.isEmpty(controlNumberGenerator)){
+        if (ObjectUtils.isEmpty(controlNumberGenerator)) {
             controlNumberGenerator = new ControlNumberGenerator();
         }
 
@@ -121,8 +125,8 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     }
 
     private void unitOnChange() {
-        unit.textProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
+        unit.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
                 requisitionIssueSlip.setUnit(newValue);
             }
         });
@@ -160,10 +164,10 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
 
     private void setRequestedBy() {
         requestedBy.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if(oldValue!=newValue){
+            if (oldValue != newValue) {
                 Optional<RequisitionIssueSlipSignatories> optRisSignatory
-                        =requisitionIssueSlipSignatories.stream().filter(e->e.getRequested_by().equalsIgnoreCase((String) newValue)).findFirst();
-                if(optRisSignatory.isPresent()){
+                        = requisitionIssueSlipSignatories.stream().filter(e -> e.getRequested_by().equalsIgnoreCase((String) newValue)).findFirst();
+                if (optRisSignatory.isPresent()) {
                     txtDesignation.setText(optRisSignatory.get().getDesignation());
                     division.setText(optRisSignatory.get().getDivision());
                     unit.setText(optRisSignatory.get().getUnit());
@@ -179,12 +183,12 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
     public void customerTypeOnload() {
         String[] customerTypes = getCustomerTypes().split(",");
         Arrays.asList(customerTypes).stream().forEach(d -> this.customerType.getItems().add(d));
-        customerType.valueProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
+        customerType.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
                 String customerType = (String) newValue;
-                if(customerType.equals(customerTypes[0])){
+                if (customerType.equals(customerTypes[0])) {
                     requisitionIssueSlip.setIs_customer_new(0);
-                }else{
+                } else {
                     requisitionIssueSlip.setIs_customer_new(1);
                 }
             }
@@ -341,10 +345,10 @@ public class CustomizeRequisitionIssueSlipController implements Initializable {
             requisitionIssueSlip.setCustomer_name(customerName);
             requisitionIssueSlip.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT)));
             iterateRisTemplate();
-            if (successFields == numberOfFields && successFields!=0 && numberOfFields!=0) {
+            if (successFields == numberOfFields && successFields != 0 && numberOfFields != 0) {
                 //risContainer.getChildren().clear();
                 Prompt.success("All RIS details were successfully saved!");
-                currentIndex =0;
+                currentIndex = 0;
                 successFields = 0;
                 numberOfFields = 0;
                 Stage stage = (Stage) btnAddRIS.getScene().getWindow();

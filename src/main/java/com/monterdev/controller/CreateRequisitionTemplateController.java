@@ -82,10 +82,10 @@ public class CreateRequisitionTemplateController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        if(ObjectUtils.isEmpty(inventoryTypesList)){
+        if (ObjectUtils.isEmpty(inventoryTypesList)) {
             inventoryTypesList = inventoryTypeRepository.findAllInventoryType();
         }
-        if(ObjectUtils.isEmpty(risTemplates)){
+        if (ObjectUtils.isEmpty(risTemplates)) {
             risTemplates = risTypeNamesRepository.findAllRisTypeNames();
         }
         risFieldTypes = GlobalConfiguration.getRisFieldTypes().split(",");
@@ -196,11 +196,11 @@ public class CreateRequisitionTemplateController implements Initializable {
                     risTypeRepository.save(risTypeList.get(ctr));
                     Prompt.success("Newly Created Template was saved!");
                     Stage stage = (Stage) risTemplateContainer.getScene().getWindow();
-                    new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext,stage);
+                    new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext, stage);
                 } else {
                     risTypeRepository.save(risTypeList.get(ctr));
                     Stage stage = (Stage) risTemplateContainer.getScene().getWindow();
-                    new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext,stage);
+                    new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext, stage);
                 }
             } else {
                 Prompt.failed("Pls fill in all details!");

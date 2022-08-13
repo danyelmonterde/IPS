@@ -93,7 +93,7 @@ public class StockAdjustmentController implements Initializable {
     private String selectCellUnit;
     private String selectedQuantity;
     private List<String> stockAdjustmentReasonList = new ArrayList<>();
-    private boolean isPositiveNumber  = false;
+    private boolean isPositiveNumber = false;
     private String oldInStockValue;
 
 
@@ -110,23 +110,23 @@ public class StockAdjustmentController implements Initializable {
     }
 
     private void inStockOnChange() {
-        txtInStock.textProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
+        txtInStock.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
             }
         });
     }
 
     private void initializeStockAdjustmentReasons() {
-        stockAdjustmentReasonList=stockAdjustmentReasons();
-        stockAdjustmentReasonList.stream().forEach(e->{
+        stockAdjustmentReasonList = stockAdjustmentReasons();
+        stockAdjustmentReasonList.stream().forEach(e -> {
             comboReason.getItems().add(e);
         });
-        comboReason.valueProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
+        comboReason.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
                 String selectedReason = (String) newValue;
-                if(selectedReason.equalsIgnoreCase(stockAdjustmentReasonList.get(0))){
+                if (selectedReason.equalsIgnoreCase(stockAdjustmentReasonList.get(0))) {
                     isPositiveNumber = true;
-                }else{
+                } else {
                     isPositiveNumber = false;
                 }
             }
@@ -146,7 +146,7 @@ public class StockAdjustmentController implements Initializable {
         ObservableList<Item> cellData = FXCollections.observableArrayList();
         tableResult.setOnMouseClicked(cell -> {
             if (cell.getClickCount() == 2) {
-                try{
+                try {
                     selectedCellCategory = null;
                     selectCellUnit = null;
                     cellData.clear();
@@ -160,10 +160,10 @@ public class StockAdjustmentController implements Initializable {
                     selectCellUnit = cellData.get(0).getUnit();
                     oldInStockValue = String.valueOf(cellData.get(0).getIn_stock());
                     selectedQuantity = String.valueOf(cellData.get(0).getQuantity());
-                }catch (IndexOutOfBoundsException e){
+                } catch (IndexOutOfBoundsException e) {
                     clearFields();
                     Prompt.failed("Error getting data!");
-                }catch (NullPointerException e){
+                } catch (NullPointerException e) {
                     clearFields();
                     Prompt.failed("Error getting data!");
                 }
@@ -172,13 +172,13 @@ public class StockAdjustmentController implements Initializable {
         });
     }
 
-    private void clearFields(){
+    private void clearFields() {
         txtItemName.setText("");
         txtCost.setText("");
         txtInStock.setText("");
         txtLowStock.setText("");
         hiddenSku.setText("");
-        selectedCellCategory =null;
+        selectedCellCategory = null;
         selectCellUnit = null;
         isPositiveNumber = false;
         oldInStockValue = null;
@@ -198,7 +198,7 @@ public class StockAdjustmentController implements Initializable {
         itemList = initialItemPage.getContent();
     }
 
-    private void resetFields(){
+    private void resetFields() {
         txtSearchItem.setText("");
         txtItemName.setText("");
         txtCost.setText("");
@@ -209,16 +209,16 @@ public class StockAdjustmentController implements Initializable {
     }
 
     private void btnSaveOnAction() {
-        btnSave.setOnAction(e->{
-            if(isFieldsValid()){
+        btnSave.setOnAction(e -> {
+            if (isFieldsValid()) {
                 Item mappedItem = mapItem();
                 Item savedItem = itemsRepository.save(mappedItem);
-                if(!ObjectUtils.isEmpty(savedItem)){
+                if (!ObjectUtils.isEmpty(savedItem)) {
                     History mappedHistory = mapHistory(savedItem);
                     History savedHistory = historyRepository.save(mappedHistory);
-                    if(!ObjectUtils.isEmpty(savedHistory)){
+                    if (!ObjectUtils.isEmpty(savedHistory)) {
                         Prompt.success("Stock updated successfully!");
-                    }else{
+                    } else {
                         Prompt.failed("Some error occurred during saving!");
                     }
                     fillTableResult("");
@@ -232,23 +232,22 @@ public class StockAdjustmentController implements Initializable {
         History history = new History();
         history.setItem_name(savedItem.getItem_name());
         history.setItem_category(savedItem.getItem_category());
-        history.setReason((String)comboReason.getValue());
+        history.setReason((String) comboReason.getValue());
         history.setStock_after(savedItem.getIn_stock());
         history.setStock_before(Integer.parseInt(oldInStockValue));
         history.setDate(AppTime.now());
         history.setUpdated_by(user.getUsername());
-        if(isPositiveNumber){
+        if (isPositiveNumber) {
             history.setAdjustment(Integer.parseInt(txtInStock.getText()));
-        }else{
+        } else {
             int oldInStockIntegerValue = Integer.parseInt(oldInStockValue);
             int newInStockIntegerValue = Integer.parseInt(txtInStock.getText());
-            if(newInStockIntegerValue>oldInStockIntegerValue){
-                history.setAdjustment(newInStockIntegerValue-oldInStockIntegerValue);
-            }else if(newInStockIntegerValue==oldInStockIntegerValue){
+            if (newInStockIntegerValue > oldInStockIntegerValue) {
+                history.setAdjustment(newInStockIntegerValue - oldInStockIntegerValue);
+            } else if (newInStockIntegerValue == oldInStockIntegerValue) {
                 history.setAdjustment(0);
-            }
-            else{
-                history.setAdjustment((oldInStockIntegerValue-newInStockIntegerValue) * -1);
+            } else {
+                history.setAdjustment((oldInStockIntegerValue - newInStockIntegerValue) * -1);
             }
         }
         return history;
@@ -268,54 +267,54 @@ public class StockAdjustmentController implements Initializable {
     }
 
     private boolean isFieldsValid() {
-        int validFieldCounts=0;
-        if(ObjectUtils.isEmpty(txtItemName.getText())){
+        int validFieldCounts = 0;
+        if (ObjectUtils.isEmpty(txtItemName.getText())) {
             Prompt.failed("Item name is Empty!");
-        }else{
+        } else {
             validFieldCounts++;
         }
-        try{
+        try {
 
-            if(ObjectUtils.isEmpty(txtCost.getText())
-                    || DataUtil.formatDouble(txtCost.getText())<0){
+            if (ObjectUtils.isEmpty(txtCost.getText())
+                    || DataUtil.formatDouble(txtCost.getText()) < 0) {
                 Prompt.failed("Item Cost is not valid!");
-            }else{
+            } else {
                 validFieldCounts++;
             }
 
-            if(ObjectUtils.isEmpty(txtInStock.getText())
-                    || (Integer.parseInt(txtInStock.getText())<0)){
+            if (ObjectUtils.isEmpty(txtInStock.getText())
+                    || (Integer.parseInt(txtInStock.getText()) < 0)) {
                 Prompt.failed("Item In Stock is not valid!");
-            }else{
+            } else {
                 validFieldCounts++;
             }
 
-            if(ObjectUtils.isEmpty(txtLowStock.getText())
-            || (Integer.parseInt(txtLowStock.getText()))<0){
+            if (ObjectUtils.isEmpty(txtLowStock.getText())
+                    || (Integer.parseInt(txtLowStock.getText())) < 0) {
                 Prompt.failed("Item Low Stock is not valid!");
-            }else{
+            } else {
                 validFieldCounts++;
             }
-        }catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             Prompt.failed("Some number type fields are not valid!");
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             Prompt.failed("Some number type fields are not valid!");
-        }catch (Exception e){
+        } catch (Exception e) {
             Prompt.failed("Some number type fields are not valid!");
         }
 
 
-        if(ObjectUtils.isEmpty(comboReason.getValue())){
+        if (ObjectUtils.isEmpty(comboReason.getValue())) {
             Prompt.failed("Stock adjustment reason is Empty!");
-        }else{
+        } else {
             validFieldCounts++;
         }
-        return validFieldCounts==5?true:false;
+        return validFieldCounts == 5 ? true : false;
     }
 
     private void txtSearchItemOnAction() {
-        txtSearchItem.textProperty().addListener((observable,oldValue,newValue)->{
-            if(oldValue!=newValue){
+        txtSearchItem.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
                 fillTableResult(newValue);
             }
         });

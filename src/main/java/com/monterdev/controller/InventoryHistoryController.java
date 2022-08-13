@@ -113,7 +113,7 @@ public class InventoryHistoryController implements Initializable {
     private void btnExportCurrentView() {
         btnExportCurrentView.setOnAction(e -> {
             List<History> historyList = new ArrayList<>();
-            tableResult.getItems().stream().forEach(result->{
+            tableResult.getItems().stream().forEach(result -> {
                 History history = new History();
                 history.setDate(result.getDate());
                 history.setAdjustment(result.getAdjustment());
@@ -130,14 +130,14 @@ public class InventoryHistoryController implements Initializable {
     }
 
     private void btnCloseOnAction() {
-        btnClose.setOnAction(e->{
+        btnClose.setOnAction(e -> {
             Stage currentStage = (Stage) btnClose.getScene().getWindow();
             new StageLoader().load(InventoryListController.class, applicationContext, currentStage);
         });
     }
 
     private void btnExportOnAction() {
-        btnExport.setOnAction(e->{
+        btnExport.setOnAction(e -> {
             List<History> itemList = historyRepository.findAll();
             exportToCSV(itemList);
         });
@@ -180,11 +180,10 @@ public class InventoryHistoryController implements Initializable {
             if (currentPage < maximumPage && (currentPage > 0)) {
                 loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
                 currentPage++;
-            }else if(currentPage ==0){
+            } else if (currentPage == 0) {
                 loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
-            }
-            else{
-                currentPage = maximumPage-1;
+            } else {
+                currentPage = maximumPage - 1;
                 loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
             }
         });
@@ -232,13 +231,12 @@ public class InventoryHistoryController implements Initializable {
     }
 
     private void loadReasonType() {
-        comboReasonType.valueProperty().addListener((observable,oldValue,newValue)->{
-            if(newValue == ALL_REASON && comboItemCategory.getValue() == ALL_CATEGORY){
+        comboReasonType.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == ALL_REASON && comboItemCategory.getValue() == ALL_CATEGORY) {
                 loadTableView(where(hasReasonType("")).and(where(hasCategoryName(""))));
-            }else if(comboItemCategory.getValue() == ALL_CATEGORY){
+            } else if (comboItemCategory.getValue() == ALL_CATEGORY) {
                 loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName(""))));
-            }
-            else{
+            } else {
                 loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
             }
         });
@@ -253,14 +251,13 @@ public class InventoryHistoryController implements Initializable {
     }
 
     private void loadItemCategory() {
-        comboItemCategory.valueProperty().addListener((observable,oldValue,newValue)->{
-                if(newValue == ALL_CATEGORY && oldValue != newValue){
-                    loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName(""))));
-                }else if(newValue == ALL_CATEGORY && comboReasonType.getValue() == ALL_REASON){
-                    loadTableView(where(hasReasonType("")).and(where(hasCategoryName(""))));
-                }
-                else
-                    loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
+        comboItemCategory.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == ALL_CATEGORY && oldValue != newValue) {
+                loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName(""))));
+            } else if (newValue == ALL_CATEGORY && comboReasonType.getValue() == ALL_REASON) {
+                loadTableView(where(hasReasonType("")).and(where(hasCategoryName(""))));
+            } else
+                loadTableView(where(hasReasonType((String) comboReasonType.getValue())).and(where(hasCategoryName((String) comboItemCategory.getValue()))));
         });
         categoryRepository.findAll().stream().forEach(e -> {
             comboItemCategory.getItems().add(e.getCategory_name());

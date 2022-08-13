@@ -53,21 +53,21 @@ public class ItemsUIConfiguration extends GlobalConfiguration {
         ITEMS_LABEL_CATEGORY_NAME = "ITEMS_LABEL_CATEGORY_NAME";
         ITEMS_LABEL_STOCKALERT_NAME = "ITEMS_LABEL_STOCKALERT_NAME";
         ITEMS_DROP_DOWN_CLASS = "ITEMS_DROP_DOWN_CLASS";
-        ITEMS_VBOX_CLASSES ="ITEMS_VBOX_CLASSES";
-        ITEMS_DATATABLE_HEADER ="ITEMS_DATATABLE_HEADER";
-        ITEMS_DATATABLE_FOOTER ="ITEMS_DATATABLE_FOOTER";
-        ITEMS_DATABLE_FOOTER_LABELS ="ITEMS_DATABLE_FOOTER_LABELS";
+        ITEMS_VBOX_CLASSES = "ITEMS_VBOX_CLASSES";
+        ITEMS_DATATABLE_HEADER = "ITEMS_DATATABLE_HEADER";
+        ITEMS_DATATABLE_FOOTER = "ITEMS_DATATABLE_FOOTER";
+        ITEMS_DATABLE_FOOTER_LABELS = "ITEMS_DATABLE_FOOTER_LABELS";
         ITEMS_TOP_HBOX_SPACING = "ITEMS_TOP_HBOX_SPACING";
-        ITEMS_PREV_BUTTON_NAME="ITEMS_PREV_BUTTON_NAME";
-        ITEMS_NEXT_BUTTON_NAME="ITEMS_NEXT_BUTTON_NAME";
-        ITEMS_BOT_HBOX_FOOTER_ROWS_PER_PAGE_LABEL="ITEMS_BOT_HBOX_FOOTER_ROWS_PER_PAGE_LABEL";
-        ITEMS_BOT_HBOX_FOOTER_PAGE_LABEL="ITEMS_BOT_HBOX_FOOTER_PAGE_LABEL";
-        ITEMS_STOCK_ALERTS="ITEMS_STOCK_ALERTS";
-        ITEMS_SETTINGS_CONTEXT_MENU="ITEMS_SETTINGS_CONTEXT_MENU";
-        ITEMS_ROWS_PER_PAGE="ITEMS_ROWS_PER_PAGE";
-        DELETE_BUTTON="DELETE_BUTTON";
-        EDIT_BUTTON="EDIT_BUTTON";
-        ITEMS_STOCK_ADJUSTMENT_REASON="ITEMS_STOCK_ADJUSTMENT_REASON";
+        ITEMS_PREV_BUTTON_NAME = "ITEMS_PREV_BUTTON_NAME";
+        ITEMS_NEXT_BUTTON_NAME = "ITEMS_NEXT_BUTTON_NAME";
+        ITEMS_BOT_HBOX_FOOTER_ROWS_PER_PAGE_LABEL = "ITEMS_BOT_HBOX_FOOTER_ROWS_PER_PAGE_LABEL";
+        ITEMS_BOT_HBOX_FOOTER_PAGE_LABEL = "ITEMS_BOT_HBOX_FOOTER_PAGE_LABEL";
+        ITEMS_STOCK_ALERTS = "ITEMS_STOCK_ALERTS";
+        ITEMS_SETTINGS_CONTEXT_MENU = "ITEMS_SETTINGS_CONTEXT_MENU";
+        ITEMS_ROWS_PER_PAGE = "ITEMS_ROWS_PER_PAGE";
+        DELETE_BUTTON = "DELETE_BUTTON";
+        EDIT_BUTTON = "EDIT_BUTTON";
+        ITEMS_STOCK_ADJUSTMENT_REASON = "ITEMS_STOCK_ADJUSTMENT_REASON";
     }
 
     //Custom getters/////////////////////////////////////
@@ -75,48 +75,86 @@ public class ItemsUIConfiguration extends GlobalConfiguration {
     public static String getAddItemsButtonName() {
         return getConfigValue(ITEMS_ADD_ITEM_BUTTON_NAME);
     }
+
     public static String getItemsStockAdjustmentReason() {
         return getConfigValue(ITEMS_STOCK_ADJUSTMENT_REASON);
     }
+
     public static String getExportButtonName() {
         return getConfigValue(ITEMS_EXPORT_BUTTON_NAME);
     }
+
     public static String getImportButtonName() {
         return getConfigValue(ITEMS_IMPORT_BUTTON_NAME);
     }
+
     public static String getSettingsButtonName() {
         return getConfigValue(ITEMS_SETTINGS_BUTTON_NAME);
     }
+
     public static String getSearchButtonName() {
         return getConfigValue(ITEMS_SEARCH_BUTTON_NAME);
     }
+
     public static String[] getItemsButtonCssClasses() {
         return getConfigValue(ITEMS_BUTTON_CSS_CLASSES).split(",");
     }
+
     public static String[] getItemsDropdownCssClasses() {
         return getConfigValue(ITEMS_DROP_DOWN_CLASS).split(",");
     }
-    public static String getItemsAddItemCssClass() { return getConfigValue(ITEMS_ADD_ITEM_CSS_CLASS); }
-    public static String getItemsLabelCategoryName(){
+
+    public static String getItemsAddItemCssClass() {
+        return getConfigValue(ITEMS_ADD_ITEM_CSS_CLASS);
+    }
+
+    public static String getItemsLabelCategoryName() {
         return getConfigValue(ITEMS_LABEL_CATEGORY_NAME);
     }
-    public static String getItemsTopHboxSpacing(){ return getConfigValue(ITEMS_TOP_HBOX_SPACING); }
-    public static String getItemsLabelStockalertName(){ return getConfigValue(ITEMS_LABEL_STOCKALERT_NAME); }
+
+    public static String getItemsTopHboxSpacing() {
+        return getConfigValue(ITEMS_TOP_HBOX_SPACING);
+    }
+
+    public static String getItemsLabelStockalertName() {
+        return getConfigValue(ITEMS_LABEL_STOCKALERT_NAME);
+    }
+
     public static String getNextButtonName() {
         return getConfigValue(ITEMS_NEXT_BUTTON_NAME);
     }
+
     public static String getPrevButtonName() {
         return getConfigValue(ITEMS_PREV_BUTTON_NAME);
     }
-    public static String getItemsBotHboxFooterRowsPerPageLabel() { return getConfigValue(ITEMS_BOT_HBOX_FOOTER_ROWS_PER_PAGE_LABEL); }
+
+    public static String getItemsBotHboxFooterRowsPerPageLabel() {
+        return getConfigValue(ITEMS_BOT_HBOX_FOOTER_ROWS_PER_PAGE_LABEL);
+    }
+
     public static String getItemsBotHboxFooterPageLabel() {
         return getConfigValue(ITEMS_BOT_HBOX_FOOTER_PAGE_LABEL);
     }
-    public static String getItemsSettingsContextMenu() {return  getConfigValue(ITEMS_SETTINGS_CONTEXT_MENU);}
-    public static String getItemsRowsPerPage() {return  getConfigValue(ITEMS_ROWS_PER_PAGE);}
-    public static String getItemsStockAlerts() {return  getConfigValue(ITEMS_STOCK_ALERTS);}
-    public static String getEditButtonImage(){ return getConfigValue(EDIT_BUTTON);}
-    public static String getDeleteButtonImage(){ return getConfigValue(DELETE_BUTTON);}
+
+    public static String getItemsSettingsContextMenu() {
+        return getConfigValue(ITEMS_SETTINGS_CONTEXT_MENU);
+    }
+
+    public static String getItemsRowsPerPage() {
+        return getConfigValue(ITEMS_ROWS_PER_PAGE);
+    }
+
+    public static String getItemsStockAlerts() {
+        return getConfigValue(ITEMS_STOCK_ALERTS);
+    }
+
+    public static String getEditButtonImage() {
+        return getConfigValue(EDIT_BUTTON);
+    }
+
+    public static String getDeleteButtonImage() {
+        return getConfigValue(DELETE_BUTTON);
+    }
 
     //////////////////////////////////
     public String getButtonName(String function) {
@@ -129,6 +167,7 @@ public class ItemsUIConfiguration extends GlobalConfiguration {
         else if (function.equalsIgnoreCase(ITEMS_NEXT_BUTTON_NAME)) return getNextButtonName();
         else return null;
     }
+
     public Font getFont(String function) {
         if (function.equalsIgnoreCase(ITEMS_ADD_ITEM_BUTTON_NAME)) return getButtonFont();
         else if (function.equalsIgnoreCase(ITEMS_EXPORT_BUTTON_NAME)) return getButtonFont();
@@ -144,6 +183,7 @@ public class ItemsUIConfiguration extends GlobalConfiguration {
     private Font getButtonFont() {
         return new Font("Roboto Bold", 14.0);
     }
+
     private Font getLabelFont() {
         return new Font("Roboto Regular", 14.0);
     }
@@ -168,31 +208,32 @@ public class ItemsUIConfiguration extends GlobalConfiguration {
         else if (function.equalsIgnoreCase(ITEMS_IMPORT_BUTTON_NAME)) return new Insets(20);
         else if (function.equalsIgnoreCase(ITEMS_SETTINGS_BUTTON_NAME)) return new Insets(20);
         else if (function.equalsIgnoreCase(ITEMS_SEARCH_BUTTON_NAME)) return new Insets(20);
-        else if (function.equalsIgnoreCase(ITEMS_DATATABLE_FOOTER)) return new Insets(0,0,0,20);
-        else if (function.equalsIgnoreCase(ITEMS_DATABLE_FOOTER_LABELS)) return new Insets(0,0,0,20);
+        else if (function.equalsIgnoreCase(ITEMS_DATATABLE_FOOTER)) return new Insets(0, 0, 0, 20);
+        else if (function.equalsIgnoreCase(ITEMS_DATABLE_FOOTER_LABELS)) return new Insets(0, 0, 0, 20);
         else return new Insets(0);
     }
 
     public String getLabelName(String function) {
-        if(function.equalsIgnoreCase(ITEMS_LABEL_CATEGORY_NAME)) return getItemsLabelCategoryName();
-        else if(function.equalsIgnoreCase(ITEMS_LABEL_STOCKALERT_NAME)) return getItemsLabelStockalertName();
-        else if(function.equalsIgnoreCase(ITEMS_DATATABLE_HEADER)) return function;
-        else if(function.equalsIgnoreCase(ITEMS_BOT_HBOX_FOOTER_ROWS_PER_PAGE_LABEL)) return getItemsBotHboxFooterRowsPerPageLabel();
-        else if(function.equalsIgnoreCase(ITEMS_BOT_HBOX_FOOTER_PAGE_LABEL)) return getItemsBotHboxFooterPageLabel();
+        if (function.equalsIgnoreCase(ITEMS_LABEL_CATEGORY_NAME)) return getItemsLabelCategoryName();
+        else if (function.equalsIgnoreCase(ITEMS_LABEL_STOCKALERT_NAME)) return getItemsLabelStockalertName();
+        else if (function.equalsIgnoreCase(ITEMS_DATATABLE_HEADER)) return function;
+        else if (function.equalsIgnoreCase(ITEMS_BOT_HBOX_FOOTER_ROWS_PER_PAGE_LABEL))
+            return getItemsBotHboxFooterRowsPerPageLabel();
+        else if (function.equalsIgnoreCase(ITEMS_BOT_HBOX_FOOTER_PAGE_LABEL)) return getItemsBotHboxFooterPageLabel();
         else return function;
     }
 
-    public static List<String> stockAlerts(){
+    public static List<String> stockAlerts() {
         List<String> stockAlerts = Arrays.asList(getItemsStockAlerts().split(","));
         return stockAlerts;
     }
 
-    public static List<String> stockAdjustmentReasons(){
+    public static List<String> stockAdjustmentReasons() {
         List<String> stockAdjustments = Arrays.asList(getItemsStockAdjustmentReason().split(","));
         return stockAdjustments;
     }
 
-    public static List<String> rowsPerPage(){
+    public static List<String> rowsPerPage() {
         return Arrays.asList(getItemsRowsPerPage().split(","));
     }
 

@@ -483,7 +483,7 @@ public class MainDashboardController implements Initializable {
             } catch (IllegalArgumentException exception) {
                 quantity.setText(quantity.getText().replaceAll(WHOLE_NUMBERS_REGEX_EXCLUDE, ""));
                 quantity.setText(quantity.getText().replaceAll(PLUS_DOLLAR_REGEX_EXCLUDE, ""));
-            } catch (IndexOutOfBoundsException indexOutOfBoundsException){
+            } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
                 System.out.println("Index out of bounds");
             }
 
@@ -1061,8 +1061,8 @@ public class MainDashboardController implements Initializable {
     private void releaseItemsOnCart() {
 
         if (!ObjectUtils.isEmpty(itemCart) && selectedItem.getSku() != 0) {
-            ButtonType buttonType = Prompt.confirmItemsToRelease("Are you sure you want to release the following items?", requisitionIssueSlip,itemCart);
-            if(buttonType.getText().equalsIgnoreCase("OK")){
+            ButtonType buttonType = Prompt.confirmItemsToRelease("Are you sure you want to release the following items?", requisitionIssueSlip, itemCart);
+            if (buttonType.getText().equalsIgnoreCase("OK")) {
                 validNumberOfItemsInCart = 0;
                 int numberOfItemsInCart = itemCart.size();
                 List<History> historyList = new ArrayList<>();

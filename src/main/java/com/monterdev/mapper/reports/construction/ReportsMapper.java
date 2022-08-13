@@ -10,10 +10,8 @@ import com.monterdev.util.ReportUtil;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 import static com.monterdev.configuration.GlobalConfiguration.*;
@@ -50,7 +48,7 @@ public class ReportsMapper {
     @Autowired
     private ConfigurableApplicationContext applicationContext;
 
-    public ReportsMapper(){
+    public ReportsMapper() {
 
     }
 

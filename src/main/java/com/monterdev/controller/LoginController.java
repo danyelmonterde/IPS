@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -88,7 +87,7 @@ public class LoginController implements Initializable {
     }
 
     private void login() {
-        boolean isUserAuthenticated = new LoginUtil().isAuthenticated(txtUsername.getText(), txtPassword.getText(),applicationContext);
+        boolean isUserAuthenticated = new LoginUtil().isAuthenticated(txtUsername.getText(), txtPassword.getText(), applicationContext);
         if (isUserAuthenticated) {
             System.out.println(user.getUsername());
             Prompt.success("Welcome to IQWD Inventory System!");
