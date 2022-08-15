@@ -164,11 +164,18 @@ public class MasterDataController implements Initializable {
         tab5BtnSaveRisTypeOnAction();
         tab6BtnSaveSignatoryOnAction();
         tab7BtnSaveUnitOnAction();
+        setReportNamesComboBoxStringConverter(reportNamesList, tab6ComboReportName);
+        setInventoryTypesComboBoxStringConverter(inventoryTypeList, tab4ComboInventoryType);
+        setInventoryTypesComboBoxStringConverter(inventoryTypeList, tab2ComboInventoryType);
+        setInventoryTypesComboBoxStringConverter(inventoryTypeList, tab5ComboInventoryType);
+        setRisTypesNamesComboBoxStringConverter(risTypeNamesList, tab2ComboRisTypeName);
+        setRisFieldsComboBoxStringConverter(risFieldsList, tab5ComboRisField);
+        setRisTypesNamesComboBoxStringConverter(risTypeNamesList, tab5ComboRisType);
 
     }
 
 
-    private void refreshMasterDataList(){
+    private void refreshMasterDataList() {
         inventoryTypeList = inventoryTypeRepository.findAllInventoryType();
         reportNamesList = reportNamesRepository.findAllAvailableReports();
         risFieldsList = risFieldsRepository.findAll();
@@ -358,24 +365,6 @@ public class MasterDataController implements Initializable {
 
         tab7TxtUnit.setText("");
 
-//        tab2ComboInventoryType.setValue("");
-//
-//        tab2ComboRisTypeName.setValue("");
-//
-//        tab4ComboInventoryType.setValue("");
-//
-//        tab5ComboInventoryType.setValue("");
-//
-//        tab5ComboRisType.setValue("");
-//
-//        tab5ComboRisField.setValue("");
-//
-//        tab5ComboRisFieldType.setValue("");
-//
-//        tab6ComboRole.setValue("");
-//
-//        tab6ComboReportName.setValue("");
-
     }
 
     private void tabPaneOnAction() {
@@ -392,16 +381,8 @@ public class MasterDataController implements Initializable {
                     refreshTableResult(inventoryTypeList);
                 } else if (selectedTabPaneIndex == 1) {
                     refreshMasterDataList();
-
-                    ObservableList<InventoryType> inventoryTypeObservableList = FXCollections.observableArrayList(inventoryTypeList);
-                    tab2ComboInventoryType.setItems(inventoryTypeObservableList);
-                    StringConverter<InventoryType> inventoryTypeStringConverter = getInventoryTypeStringConverter(inventoryTypeObservableList);
-                    tab2ComboInventoryType.setConverter(inventoryTypeStringConverter);
-
-                    ObservableList<RisTypeNames> risTypeNamesObservableList = FXCollections.observableArrayList(risTypeNamesList);
-                    StringConverter<RisTypeNames> risTypeNamesStringConverter = getRisTypeNamesStringConverter(risTypeNamesObservableList);
-                    tab2ComboRisTypeName.setConverter(risTypeNamesStringConverter);
-
+                    tab2ComboInventoryType.setItems(FXCollections.observableArrayList(inventoryTypeList));
+                    tab2ComboRisTypeName.setItems(FXCollections.observableArrayList(risTypeNamesList));
                     labelList.setText("LIST OF EXISTING REPORT NAMES");
                     setTableView(selectedTabPaneIndex, ReportNames.class);
                     refreshTableResult(reportNamesList);
@@ -412,44 +393,21 @@ public class MasterDataController implements Initializable {
                     refreshTableResult(risFieldsList);
                 } else if (selectedTabPaneIndex == 3) {
                     refreshMasterDataList();
-
-                    ObservableList<InventoryType> inventoryTypeObservableList = FXCollections.observableArrayList(inventoryTypeList);
-                    tab4ComboInventoryType.setItems(inventoryTypeObservableList);
-                    StringConverter<InventoryType> inventoryTypeStringConverter = getInventoryTypeStringConverter(inventoryTypeObservableList);
-                    tab4ComboInventoryType.setConverter(inventoryTypeStringConverter);
-
+                    tab4ComboInventoryType.setItems(FXCollections.observableArrayList(inventoryTypeList));
                     labelList.setText("LIST OF EXISTING REQUISITION ISSUE SLIP TYPE NAMES");
                     setTableView(selectedTabPaneIndex, RisTypeNames.class);
                     refreshTableResult(risTypeNamesList);
                 } else if (selectedTabPaneIndex == 4) {
                     refreshMasterDataList();
-
-                    ObservableList<InventoryType> inventoryTypeObservableList = FXCollections.observableArrayList(inventoryTypeList);
-                    tab5ComboInventoryType.setItems(inventoryTypeObservableList);
-                    StringConverter<InventoryType> inventoryTypeStringConverter = getInventoryTypeStringConverter(inventoryTypeObservableList);
-                    tab5ComboInventoryType.setConverter(inventoryTypeStringConverter);
-
-                    ObservableList<RisType> risTypeObservableList = FXCollections.observableArrayList(risTypeList);
-                    tab5ComboRisType.setItems(risTypeObservableList);
-                    StringConverter<RisType> risTypeStringConverter = getRisTypeStringConverter(risTypeObservableList);
-                    tab5ComboRisType.setConverter(risTypeStringConverter);
-
-                    ObservableList<RisFields> risFieldsObservableList  = FXCollections.observableArrayList(risFieldsList);
-                    tab5ComboRisField.setItems(risFieldsObservableList);
-                    StringConverter<RisFields> risFieldsStringConverter = getRisFieldsStringConverter(risFieldsObservableList);
-                    tab5ComboRisField.setConverter(risFieldsStringConverter);
-
+                    tab5ComboInventoryType.setItems(FXCollections.observableArrayList(inventoryTypeList));
+                    tab5ComboRisType.setItems(FXCollections.observableArrayList(risTypeNamesList));
+                    tab5ComboRisField.setItems(FXCollections.observableArrayList(risFieldsList));
                     labelList.setText("LIST OF EXISTING REQUISITION ISSUE SLIP TYPES");
                     setTableView(selectedTabPaneIndex, RisType.class);
                     refreshTableResult(risTypeList);
                 } else if (selectedTabPaneIndex == 5) {
                     refreshMasterDataList();
-
-                    ObservableList<ReportNames> reportNamesObservableList = FXCollections.observableArrayList(reportNamesList);
-                    tab6ComboReportName.setItems(reportNamesObservableList);
-                    StringConverter<ReportNames> reportNamesStringConverter = getReportNamesStringConverter(reportNamesObservableList);
-                    tab6ComboReportName.setConverter(reportNamesStringConverter);
-
+                    tab6ComboReportName.setItems(FXCollections.observableArrayList(reportNamesList));
                     labelList.setText("LIST OF EXISTING SIGNATORIES");
                     setTableView(selectedTabPaneIndex, Signatory.class);
                     refreshTableResult(signatoryList);
@@ -462,6 +420,7 @@ public class MasterDataController implements Initializable {
             }
         });
     }
+
 
     private void tab1BtnRefreshInventoryTypesOnAction() {
         refreshMasterDataList();
@@ -487,21 +446,15 @@ public class MasterDataController implements Initializable {
     }
 
     private void tab2BtnSaveReportNameOnAction() {
-        categoryRepository.findAll().forEach(e -> {
-            tab2ComboInventoryType.getItems().add(e.getCategory_name());
-        });
-        risTypeNamesRepository.findAllRisTypeNames().stream().forEach(e -> {
-            tab2ComboRisTypeName.getItems().add(e.getName());
-        });
         tab2BtnSave.setOnAction(e -> {
             if (!ObjectUtils.isEmpty(tab2TxtReportName.getText()) && !ObjectUtils.isEmpty(tab2TxtDescription.getText())) {
                 ReportNames reportNames = new ReportNames();
                 reportNames.setId(sku);
-                reportNames.setRisTypeName((String) tab2ComboRisTypeName.getValue());
+                reportNames.setRisTypeName(((RisTypeNames) tab2ComboRisTypeName.getValue()).getName());
                 reportNames.setJrxmlReportFileName(tab2JrxmlReportFileName.getText());
                 reportNames.setName(tab2TxtReportName.getText());
                 reportNames.setDescription(tab2TxtDescription.getText());
-                reportNames.setInventorytype((String) tab2ComboInventoryType.getSelectionModel().getSelectedItem());
+                reportNames.setInventorytype(((InventoryType) tab2ComboInventoryType.getValue()).getInventory_type());
                 if (!ObjectUtils.isEmpty(reportNamesRepository.save(reportNames))) {
                     Prompt.success("Report name was successfully added!");
                 } else {
@@ -528,14 +481,11 @@ public class MasterDataController implements Initializable {
     }
 
     private void tab4BtnSaveRisTypeNameOnAction() {
-        categoryRepository.findAll().forEach(e -> {
-            tab4ComboInventoryType.getItems().add(e.getCategory_name());
-        });
         tab4BtnSave.setOnAction(e -> {
             if (!ObjectUtils.isEmpty(tab4TxtRisName.getText()) && !ObjectUtils.isEmpty(tab4TxtRisTypeName.getText())) {
                 RisTypeNames risTypeNames = new RisTypeNames();
                 risTypeNames.setId(sku);
-                risTypeNames.setInventorytype( tab4ComboInventoryType.getValue().toString());
+                risTypeNames.setInventorytype(((InventoryType) tab4ComboInventoryType.getValue()).getInventory_type());
                 risTypeNames.setName(tab4TxtRisName.getText());
                 risTypeNames.setRisname(tab4TxtRisTypeName.getText());
                 if (!ObjectUtils.isEmpty(risTypeNamesRepository.save(risTypeNames))) {
@@ -548,15 +498,6 @@ public class MasterDataController implements Initializable {
     }
 
     private void tab5BtnSaveRisTypeOnAction() {
-        categoryRepository.findAll().forEach(e -> {
-            tab5ComboInventoryType.getItems().add(e.getCategory_name());
-        });
-        risTypeNamesRepository.findAll().forEach(e -> {
-            tab5ComboRisType.getItems().add(e.getName());
-        });
-        risFieldsRepository.findAll().forEach(e -> {
-            tab5ComboRisField.getItems().add(e.getRis_field());
-        });
         List<String> risFieldTypeFormatList = Arrays.asList(getRisFieldTypes().split(","));
         risFieldTypeFormatList.stream().forEach(e -> {
             tab5ComboRisFieldType.getItems().add(e);
@@ -565,9 +506,9 @@ public class MasterDataController implements Initializable {
             if (!ObjectUtils.isEmpty(tab5TxtRisName.getText())) {
                 RisType risType = new RisType();
                 risType.setId(sku);
-                risType.setInventory_type((String) tab5ComboInventoryType.getSelectionModel().getSelectedItem());
-                risType.setRistype((String) tab5ComboRisType.getSelectionModel().getSelectedItem());
-                risType.setRisfield((String) tab5ComboRisField.getSelectionModel().getSelectedItem());
+                risType.setInventory_type(((InventoryType) tab5ComboInventoryType.getValue()).getInventory_type());
+                risType.setRistype(((RisTypeNames) tab5ComboRisType.getValue()).getName());
+                risType.setRisfield(((RisFields) tab5ComboRisField.getValue()).getRis_field());
                 risType.setRisfieldtype((String) tab5ComboRisFieldType.getSelectionModel().getSelectedItem());
                 risType.setRisname(tab5TxtRisName.getText());
                 if (!ObjectUtils.isEmpty(risTypeRepository.save(risType))) {
@@ -582,16 +523,14 @@ public class MasterDataController implements Initializable {
         signatoryRole.stream().forEach(e -> {
             tab6ComboRole.getItems().add(e);
         });
-        reportNamesRepository.findAll().forEach(e -> {
-            tab6ComboReportName.getItems().add(e.getId() + "-" + e.getName() + "-" + e.getDescription());
-        });
+
         tab6BtnSave.setOnAction(e -> {
             if (!ObjectUtils.isEmpty(tab6TxtSignatoryName.getText()) && !ObjectUtils.isEmpty(tab6TxtPosition.getText())) {
                 Signatory signatory = new Signatory();
                 signatory.setId(sku);
                 signatory.setSignatory(tab6TxtSignatoryName.getText());
                 signatory.setPosition(tab6TxtPosition.getText());
-                String reportName = (String) tab6ComboReportName.getSelectionModel().getSelectedItem();
+                String reportName = ((ReportNames) tab6ComboReportName.getValue()).getId() + "-" + ((ReportNames) tab6ComboReportName.getValue()).getName() + "-" + ((ReportNames) tab6ComboReportName.getValue()).getDescription();
                 signatory.setReportid(Integer.parseInt(reportName.split("-")[0]));
                 signatory.setRole((String) tab6ComboRole.getSelectionModel().getSelectedItem());
                 if (!ObjectUtils.isEmpty(signatoryRepository.save(signatory))) {
@@ -625,6 +564,41 @@ public class MasterDataController implements Initializable {
             new StageLoader().load(MainDashboardController.class, applicationContext, currentStage);
 
         });
+    }
+
+    private void setReportNamesComboBoxStringConverter(List<ReportNames> reportNamesList, JFXComboBox jfxComboBox) {
+        ObservableList<ReportNames> observableList = FXCollections.observableArrayList(reportNamesList);
+        jfxComboBox.setItems(observableList);
+        StringConverter<ReportNames> stringConverter = getReportNamesStringConverter(observableList);
+        jfxComboBox.setConverter(stringConverter);
+    }
+
+    private void setRisFieldsComboBoxStringConverter(List<RisFields> risFieldsList, JFXComboBox jfxComboBox) {
+        ObservableList<RisFields> observableList = FXCollections.observableArrayList(risFieldsList);
+        jfxComboBox.setItems(observableList);
+        StringConverter<RisFields> stringConverter = getRisFieldsStringConverter(observableList);
+        jfxComboBox.setConverter(stringConverter);
+    }
+
+    private void setInventoryTypesComboBoxStringConverter(List<InventoryType> inventoryTypeList, JFXComboBox jfxComboBox) {
+        ObservableList<InventoryType> observableList = FXCollections.observableArrayList(inventoryTypeList);
+        jfxComboBox.setItems(observableList);
+        StringConverter<InventoryType> stringConverter = getInventoryTypeStringConverter(observableList);
+        jfxComboBox.setConverter(stringConverter);
+    }
+
+    private void setRisTypesComboBoxStringConverter(List<RisType> risTypeList, JFXComboBox jfxComboBox) {
+        ObservableList<RisType> observableList = FXCollections.observableArrayList(risTypeList);
+        jfxComboBox.setItems(observableList);
+        StringConverter<RisType> stringConverter = getRisTypeStringConverter(observableList);
+        jfxComboBox.setConverter(stringConverter);
+    }
+
+    private void setRisTypesNamesComboBoxStringConverter(List<RisTypeNames> risTypeNamesList, JFXComboBox jfxComboBox) {
+        ObservableList<RisTypeNames> observableList = FXCollections.observableArrayList(risTypeNamesList);
+        jfxComboBox.setItems(observableList);
+        StringConverter<RisTypeNames> stringConverter = getRisTypeNamesStringConverter(observableList);
+        jfxComboBox.setConverter(stringConverter);
     }
 
     private StringConverter<InventoryType> getInventoryTypeStringConverter(ObservableList<InventoryType> inventoryTypeObservableList) {

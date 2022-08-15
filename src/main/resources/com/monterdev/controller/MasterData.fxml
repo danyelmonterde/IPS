@@ -148,7 +148,7 @@
                                     <Insets left="20.0" top="30.0" />
                                  </padding>
                                  <children>
-                                    <JFXTextField fx:id="tab4TxtRisTypeName" promptText="RIS TYPE NAME" HBox.hgrow="NEVER">
+                                    <JFXTextField fx:id="tab4TxtRisTypeName" prefHeight="23.0" prefWidth="283.0" promptText="RIS TYPE NAME" HBox.hgrow="NEVER">
                                        <font>
                                           <Font size="10.0" />
                                        </font>
@@ -158,7 +158,7 @@
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                     </JFXComboBox>
-                                    <JFXTextField fx:id="tab4TxtRisName" prefHeight="31.0" prefWidth="252.0" promptText="RIS NAME" HBox.hgrow="NEVER">
+                                    <JFXTextField fx:id="tab4TxtRisName" prefHeight="31.0" prefWidth="183.0" promptText="RIS NAME ACRONYM" HBox.hgrow="NEVER">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>

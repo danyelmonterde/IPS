@@ -621,7 +621,6 @@ public class MainDashboardController implements Initializable {
                 if (newValue.getRisTypeName().equalsIgnoreCase(SUMMARY)) {
                     try {
                         reportUtil.setFILE_LOWER_PART(resourceLoader.getResource(getReportJrxmlLocation() + "SINGLE_INVENTORY_SUMMARY_LOWER_PART.jrxml").getInputStream());
-                        //reportUtil.setFILE_LOWER_PART(resourceLoader.getResource(getReportJrxmlLocation() + "SINGLE_INVENTORY_SUMMARY_UPPER_PART - Copy.jrxml").getInputStream());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
