@@ -325,6 +325,7 @@ public class MasterDataController implements Initializable {
         tableColumn.setText(databaseColumn);
         tableColumn.setPrefWidth(111.0);
         tableColumn.setEditable(false);
+        tableColumn.setStyle("-fx-alignment: center; -fx-font-size: 14px;");
         return tableColumn;
     }
 
@@ -457,6 +458,8 @@ public class MasterDataController implements Initializable {
                 reportNames.setInventorytype(((InventoryType) tab2ComboInventoryType.getValue()).getInventory_type());
                 if (!ObjectUtils.isEmpty(reportNamesRepository.save(reportNames))) {
                     Prompt.success("Report name was successfully added!");
+                    refreshMasterDataList();
+                    refreshTableResult(reportNamesList);
                 } else {
                     Prompt.failed("Report name was NOT added!");
                 }
@@ -473,6 +476,8 @@ public class MasterDataController implements Initializable {
                 risField.setRis_field(tab3RisField.getText());
                 if (!ObjectUtils.isEmpty(risFieldsRepository.save(risField))) {
                     Prompt.success("Ris Field has been added successfully!");
+                    refreshMasterDataList();
+                    refreshTableResult(risFieldsList);
                 } else {
                     Prompt.failed("Ris field was NOT saved!");
                 }
@@ -490,6 +495,8 @@ public class MasterDataController implements Initializable {
                 risTypeNames.setRisname(tab4TxtRisTypeName.getText());
                 if (!ObjectUtils.isEmpty(risTypeNamesRepository.save(risTypeNames))) {
                     Prompt.success("Ris Type name has been added successfully!");
+                    refreshMasterDataList();
+                    refreshTableResult(risTypeNamesList);
                 } else {
                     Prompt.failed("Error saving RIS Type name!");
                 }
@@ -512,6 +519,8 @@ public class MasterDataController implements Initializable {
                 risType.setRisfieldtype((String) tab5ComboRisFieldType.getSelectionModel().getSelectedItem());
                 risType.setRisname(tab5TxtRisName.getText());
                 if (!ObjectUtils.isEmpty(risTypeRepository.save(risType))) {
+                    refreshMasterDataList();
+                    refreshTableResult(risTypeList);
                     Prompt.success("RIS Type has been added successfully!");
                 } else Prompt.failed("RIS Type was NOT saved!");
             }
@@ -534,6 +543,8 @@ public class MasterDataController implements Initializable {
                 signatory.setReportid(Integer.parseInt(reportName.split("-")[0]));
                 signatory.setRole((String) tab6ComboRole.getSelectionModel().getSelectedItem());
                 if (!ObjectUtils.isEmpty(signatoryRepository.save(signatory))) {
+                    refreshMasterDataList();
+                    refreshTableResult(signatoryList);
                     Prompt.success("Signatory has been added successfully!");
                 } else {
                     Prompt.failed("Error saving signatory!");
@@ -549,6 +560,8 @@ public class MasterDataController implements Initializable {
                 unit.setUnit(tab7TxtUnit.getText());
                 unit.setId(sku);
                 if (!ObjectUtils.isEmpty(unitRepository.save(unit))) {
+                    refreshMasterDataList();
+                    refreshTableResult(unitList);
                     Prompt.success("Unit has been added successfully!");
                 } else {
                     Prompt.failed("Unit was NOT saved!");
