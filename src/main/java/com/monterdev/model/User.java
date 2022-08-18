@@ -16,11 +16,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "username", columnDefinition = "VARCHAR(255)")
     private String username;
 
+    @Column(name = "password", columnDefinition = "VARCHAR(255)")
     private String password;
 
-    private String isAdmin;
+    @Column(name = "is_admin", columnDefinition = "TINYINT")
+    private boolean is_admin;
 
-    private String isSuperAdmin;
+    @Column(name = "is_super_admin", columnDefinition = "TINYINT")
+    private boolean is_super_admin;
 }

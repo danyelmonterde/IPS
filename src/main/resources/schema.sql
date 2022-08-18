@@ -244,10 +244,9 @@ CREATE TABLE `unit` (
 
 CREATE TABLE `user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(45) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `isAdmin` tinyint(4) NOT NULL,
-  `isSuperAdmin` tinyint(4) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username_UNIQUE` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+  `is_admin` tinyint(1) NOT NULL DEFAULT '0',
+  `is_super_admin` tinyint(1) NOT NULL DEFAULT '0',
+  `password` varchar(255) DEFAULT NULL,
+  `username` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

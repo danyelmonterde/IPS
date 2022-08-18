@@ -247,9 +247,9 @@ public class MasterDataController implements Initializable {
                 if (cell.getClickCount() == 2) {
                     cellData.clear();
                     cellData.add((RisTypeNames) tableResult.getSelectionModel().getSelectedItem());
-                    tab4TxtRisTypeName.setText(cellData.get(0).getName());
-                    tab4ComboInventoryType.setValue(cellData.get(0).getInventorytype());
-                    tab4TxtRisName.setText(cellData.get(0).getRisname());
+                    tab4TxtRisTypeName.setText(cellData.get(0).getRisname());
+                    tab4ComboInventoryType.setValue(inventoryTypeList.stream().filter(e->e.getInventory_type().equalsIgnoreCase(cellData.get(0).getInventorytype())).findFirst().get());
+                    tab4TxtRisName.setText(cellData.get(0).getName());
                     sku = cellData.get(0).getId();
                 }
             });
@@ -259,9 +259,9 @@ public class MasterDataController implements Initializable {
                 if (cell.getClickCount() == 2) {
                     cellData.clear();
                     cellData.add((RisType) tableResult.getSelectionModel().getSelectedItem());
-                    tab5ComboInventoryType.setValue(cellData.get(0).getInventory_type());
-                    tab5ComboRisType.setValue(cellData.get(0).getRistype());
-                    tab5ComboRisField.setValue(cellData.get(0).getRisfield());
+                    tab5ComboInventoryType.setValue(inventoryTypeList.stream().filter(e->e.getInventory_type().equalsIgnoreCase(cellData.get(0).getInventory_type())).findFirst().get());
+                    tab5ComboRisType.setValue(risTypeList.stream().filter(x->x.getRistype().equalsIgnoreCase(cellData.get(0).getRistype())).findFirst().get());
+                    tab5ComboRisField.setValue(risFieldsList.stream().filter(z->z.getRis_field().equalsIgnoreCase(cellData.get(0).getRisfield())).findFirst().get());
                     tab5ComboRisFieldType.setValue(cellData.get(0).getRisfieldtype());
                     tab5TxtRisName.setText(cellData.get(0).getRisname());
                     sku = cellData.get(0).getId();
@@ -276,7 +276,7 @@ public class MasterDataController implements Initializable {
                     tab6TxtSignatoryName.setText(cellData.get(0).getSignatory());
                     tab6TxtPosition.setText(cellData.get(0).getPosition());
                     tab6ComboRole.setValue(cellData.get(0).getRole());
-                    tab6ComboReportName.setValue(cellData.get(0).getReportid() + "-" + reportNamesRepository.findReportNameById(cellData.get(0).getReportid()).getName() + "-" + reportNamesRepository.findReportNameById(cellData.get(0).getReportid()).getDescription());
+                    tab6ComboReportName.setValue(reportNamesList.stream().filter(e->e.getId()==cellData.get(0).getReportid()).findFirst().get());
                     sku = cellData.get(0).getId();
                 }
             });

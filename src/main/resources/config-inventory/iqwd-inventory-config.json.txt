@@ -41,11 +41,11 @@
     },
     {
       "configId": "SESSION_COOKIE_MM",
-      "configValue": "2"
+      "configValue": "8"
     },
     {
       "configId": "SESSION_COOKIE_DD",
-      "configValue": "8"
+      "configValue": "1"
     },
     {
       "configId": "SESSION_COOKIE_YYYY",

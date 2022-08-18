@@ -48,10 +48,10 @@ public class LoginUtil {
         if (!ObjectUtils.isEmpty(userData)) {
             isUserAuthenticated = encoder.matches(password, userData.getPassword());
             if (isUserAuthenticated && sessionCookieData.isBefore(cookieData)) {
-                user.setIsAdmin(userData.getIsAdmin());
+                user.set_admin(userData.is_admin());
                 user.setUsername(userData.getUsername());
                 user.setPassword(userData.getPassword());
-                user.setIsSuperAdmin(userData.getIsSuperAdmin());
+                user.set_super_admin(userData.is_super_admin());
                 user.setId(userData.getId());
             } else if (!sessionCookieData.isBefore(cookieData)) {
                 try {
