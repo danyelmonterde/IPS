@@ -621,7 +621,6 @@ public class MainDashboardController implements Initializable {
                 if (newValue.getRisTypeName().equalsIgnoreCase(SUMMARY)) {
                     try {
                         reportUtil.setFILE_LOWER_PART(resourceLoader.getResource(getReportJrxmlLocation() + "SINGLE_INVENTORY_SUMMARY_LOWER_PART.jrxml").getInputStream());
-                        //reportUtil.setFILE_LOWER_PART(resourceLoader.getResource(getReportJrxmlLocation() + "SINGLE_INVENTORY_SUMMARY_UPPER_PART - Copy.jrxml").getInputStream());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -837,8 +836,8 @@ public class MainDashboardController implements Initializable {
         requisitionIssueSlip.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT)));
         resetSelectedItem();
         user.setUsername(null);
-        user.setIsAdmin(null);
-        user.setIsSuperAdmin(null);
+        user.set_admin(false);
+        user.set_super_admin(false);
         user.setPassword(null);
         user.setId(0);
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();

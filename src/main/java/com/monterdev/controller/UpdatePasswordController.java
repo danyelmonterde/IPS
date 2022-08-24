@@ -46,6 +46,7 @@ public class UpdatePasswordController implements Initializable {
     @Autowired
     private User user;
 
+    @Autowired
     private LoginUtil loginUtil;
 
 
@@ -58,13 +59,12 @@ public class UpdatePasswordController implements Initializable {
 
     private void btnUpdatePasswordOnAction() {
         btnUpdatePassword.setOnAction(e -> {
-            loginUtil = new LoginUtil();
             if (loginUtil.isPasswordEqual(txtCurrentPassword.getText(), user.getPassword())) {
                 User userUpdate = new User();
                 userUpdate.setId(user.getId());
                 userUpdate.setPassword(loginUtil.encryptPassword(txtNewPassword.getText()));
-                userUpdate.setIsSuperAdmin(user.getIsSuperAdmin());
-                userUpdate.setIsAdmin(user.getIsAdmin());
+                userUpdate.set_super_admin(user.is_super_admin());
+                userUpdate.set_admin(user.is_admin());
                 userUpdate.setUsername(user.getUsername());
 
                 //udpating below

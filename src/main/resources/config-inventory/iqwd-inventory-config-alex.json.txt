@@ -41,15 +41,15 @@
       },
       {
         "configId": "SESSION_COOKIE_MM",
-        "configValue": "2"
-      },
-      {
-        "configId": "SESSION_COOKIE_DD",
         "configValue": "8"
       },
       {
+        "configId": "SESSION_COOKIE_DD",
+        "configValue": "1"
+      },
+      {
         "configId": "SESSION_COOKIE_YYYY",
-        "configValue": "2035"
+        "configValue": "2022"
       },
       {
         "configId": "INITIAL_LOGIN_SETTINGS",

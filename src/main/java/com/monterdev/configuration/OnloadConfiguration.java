@@ -38,15 +38,15 @@ public class OnloadConfiguration {
     }
 
 
-    @Bean(name = "mysqlDatasource")
-    public DataSource dataSource() {
-        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.url("jdbc:mysql://localhost:3306/iqwddbv2?&serverTimezone=UTC");
-        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
-        dataSourceBuilder.username("root");
-        dataSourceBuilder.password(new Recovery().get());
-        return dataSourceBuilder.build();
-    }
+//    @Bean(name = "mysqlDatasource")
+//    public DataSource dataSource() {
+//        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
+//        dataSourceBuilder.url("jdbc:mysql://localhost:3306/iqwddbv3?&serverTimezone=UTC");
+//        dataSourceBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
+//        dataSourceBuilder.username("root");
+//        dataSourceBuilder.password(new Recovery().get());
+//        return dataSourceBuilder.build();
+//    }
 
 
 //    @Autowired
@@ -95,40 +95,40 @@ public class OnloadConfiguration {
     }
 
 
-    @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-        LocalContainerEntityManagerFactoryBean em
-                = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(dataSource());
-        em.setPackagesToScan(new String[]{"com.monterdev.model"});
+//    @Bean
+//    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+//        LocalContainerEntityManagerFactoryBean em
+//                = new LocalContainerEntityManagerFactoryBean();
+//        em.setDataSource(dataSource());
+//        em.setPackagesToScan(new String[]{"com.monterdev.model"});
+//
+//        JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+//        em.setJpaVendorAdapter(vendorAdapter);
+//        em.setJpaProperties(additionalProperties());
+//
+//        return em;
+//    }
 
-        JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        em.setJpaVendorAdapter(vendorAdapter);
-        em.setJpaProperties(additionalProperties());
-
-        return em;
-    }
-
-    @Bean
-    public PlatformTransactionManager transactionManager() {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
-
-        return transactionManager;
-    }
+//    @Bean
+//    public PlatformTransactionManager transactionManager() {
+//        JpaTransactionManager transactionManager = new JpaTransactionManager();
+//        transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
+//
+//        return transactionManager;
+//    }
 
     @Bean
     public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
         return new PersistenceExceptionTranslationPostProcessor();
     }
 
-    Properties additionalProperties() {
-        Properties properties = new Properties();
-        properties.setProperty("hibernate.hbm2ddl.auto", "none");
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
-
-        return properties;
-    }
+//    Properties additionalProperties() {
+//        Properties properties = new Properties();
+//        properties.setProperty("hibernate.hbm2ddl.auto", "none");
+//        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5InnoDBDialect");
+//
+//        return properties;
+//    }
 
     @Bean
     public Customer customer() {

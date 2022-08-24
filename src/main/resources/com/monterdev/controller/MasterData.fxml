@@ -28,7 +28,7 @@
                                  <children>
                                     <JFXTextField fx:id="tab1TxtInventoryType" labelFloat="true" prefHeight="39.0" prefWidth="405.0" promptText="INVENTORY TYPE">
                                        <font>
-                                          <Font size="15.0" />
+                                          <Font size="14.0" />
                                        </font>
                                     </JFXTextField>
                                     <JFXButton fx:id="tab1BtnSaveInventoryType" buttonType="RAISED" prefHeight="36.0" prefWidth="88.0" style="-fx-background-color: green;" text="SAVE" textFill="WHITE">
@@ -61,22 +61,22 @@
                                     <Insets left="20.0" top="30.0" />
                                  </padding>
                                  <children>
-                                    <JFXTextField fx:id="tab2TxtReportName" promptText="NAME">
+                                    <JFXTextField fx:id="tab2TxtReportName" labelFloat="true" promptText="NAME">
                                        <font>
-                                          <Font size="10.0" />
+                                          <Font size="14.0" />
                                        </font>
                                     </JFXTextField>
-                                    <JFXComboBox fx:id="tab2ComboInventoryType" promptText="INVENTORY TYPE" HBox.hgrow="ALWAYS">
+                                    <JFXComboBox fx:id="tab2ComboInventoryType" labelFloat="true" promptText="INVENTORY TYPE" HBox.hgrow="ALWAYS">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                     </JFXComboBox>
-                                    <JFXTextField fx:id="tab2TxtDescription" promptText="DESCRIPTION" HBox.hgrow="NEVER">
+                                    <JFXTextField fx:id="tab2TxtDescription" labelFloat="true" promptText="DESCRIPTION" HBox.hgrow="NEVER">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                        <font>
-                                          <Font size="10.0" />
+                                          <Font size="14.0" />
                                        </font>
                                     </JFXTextField>
                                     <JFXComboBox fx:id="tab2ComboRisTypeName" labelFloat="true" promptText="RIS TYPE NAME">
@@ -84,14 +84,17 @@
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                     </JFXComboBox>
-                                    <JFXTextField fx:id="tab2JrxmlReportFileName" promptText="JRXML REPORT FILE NAME">
+                                    <JFXTextField fx:id="tab2JrxmlReportFileName" labelFloat="true" promptText="JRXML REPORT FILE NAME">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
                                     </JFXTextField>
                                     <JFXButton fx:id="tab2BtnSave" buttonType="RAISED" style="-fx-background-color: green;" text="SAVE" textFill="WHITE">
                                        <font>
-                                          <Font name="System Bold" size="10.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                        <HBox.margin>
                                           <Insets left="20.0" />
@@ -99,7 +102,7 @@
                                     </JFXButton>
                                     <JFXButton fx:id="tab2BtnSave1" buttonType="RAISED" layoutX="563.0" layoutY="40.0" style="-fx-background-color: navy blue;" text="REFRESH" textFill="WHITE">
                                        <font>
-                                          <Font name="System Bold" size="10.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                        <HBox.margin>
                                           <Insets left="20.0" />
@@ -113,12 +116,12 @@
                            <content>
                               <HBox prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <JFXTextField fx:id="tab3RisField" promptText="RIS FIELD">
+                                    <JFXTextField fx:id="tab3RisField" labelFloat="true" promptText="RIS FIELD">
                                        <HBox.margin>
                                           <Insets left="20.0" top="20.0" />
                                        </HBox.margin>
                                        <font>
-                                          <Font size="10.0" />
+                                          <Font size="14.0" />
                                        </font>
                                     </JFXTextField>
                                     <JFXButton fx:id="tab3BtnSave" buttonType="RAISED" ripplerFill="#413e3e" style="-fx-background-color: green;" text="SAVE" textFill="WHITE">
@@ -126,12 +129,12 @@
                                           <Insets left="20.0" top="20.0" />
                                        </HBox.margin>
                                        <font>
-                                          <Font name="System Bold" size="10.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                     </JFXButton>
                                     <JFXButton fx:id="tab3BtnSave1" buttonType="RAISED" layoutX="219.0" layoutY="30.0" ripplerFill="#413e3e" style="-fx-background-color: navy blue;" text="REFRESH" textFill="WHITE">
                                        <font>
-                                          <Font name="System Bold" size="10.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                        <HBox.margin>
                                           <Insets left="20.0" top="20.0" />
@@ -148,27 +151,27 @@
                                     <Insets left="20.0" top="30.0" />
                                  </padding>
                                  <children>
-                                    <JFXTextField fx:id="tab4TxtRisTypeName" promptText="RIS TYPE NAME" HBox.hgrow="NEVER">
+                                    <JFXTextField fx:id="tab4TxtRisTypeName" labelFloat="true" prefHeight="23.0" prefWidth="283.0" promptText="RIS TYPE NAME" HBox.hgrow="NEVER">
                                        <font>
-                                          <Font size="10.0" />
+                                          <Font size="14.0" />
                                        </font>
                                     </JFXTextField>
-                                    <JFXComboBox fx:id="tab4ComboInventoryType" promptText="INVENTORY TYPE" HBox.hgrow="NEVER">
+                                    <JFXComboBox fx:id="tab4ComboInventoryType" labelFloat="true" promptText="INVENTORY TYPE" HBox.hgrow="NEVER">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                     </JFXComboBox>
-                                    <JFXTextField fx:id="tab4TxtRisName" prefHeight="31.0" prefWidth="252.0" promptText="RIS NAME" HBox.hgrow="NEVER">
+                                    <JFXTextField fx:id="tab4TxtRisName" labelFloat="true" prefHeight="31.0" prefWidth="183.0" promptText="RIS NAME ACRONYM" HBox.hgrow="NEVER">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                        <font>
-                                          <Font size="10.0" />
+                                          <Font size="14.0" />
                                        </font>
                                     </JFXTextField>
                                     <JFXButton fx:id="tab4BtnSave" style="-fx-background-color: green;" text="SAVE" textFill="WHITE">
                                        <font>
-                                          <Font name="System Bold" size="10.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                        <HBox.margin>
                                           <Insets left="20.0" />
@@ -176,7 +179,7 @@
                                     </JFXButton>
                                     <JFXButton fx:id="tab4BtnSave1" layoutX="563.0" layoutY="40.0" style="-fx-background-color: navy blue;" text="REFRESH" textFill="WHITE">
                                        <font>
-                                          <Font name="System Bold" size="10.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                        <HBox.margin>
                                           <Insets left="20.0" />
@@ -190,28 +193,28 @@
                            <content>
                               <HBox prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <JFXComboBox fx:id="tab5ComboInventoryType" promptText="INVENTORY TYPE" HBox.hgrow="NEVER" />
-                                    <JFXComboBox fx:id="tab5ComboRisType" promptText="RIS TYPE" HBox.hgrow="NEVER">
+                                    <JFXComboBox fx:id="tab5ComboInventoryType" labelFloat="true" promptText="INVENTORY TYPE" HBox.hgrow="NEVER" />
+                                    <JFXComboBox fx:id="tab5ComboRisType" labelFloat="true" promptText="RIS TYPE" HBox.hgrow="NEVER">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                     </JFXComboBox>
-                                    <JFXComboBox fx:id="tab5ComboRisField" promptText="RIS FIELD" HBox.hgrow="NEVER">
+                                    <JFXComboBox fx:id="tab5ComboRisField" labelFloat="true" promptText="RIS FIELD" HBox.hgrow="NEVER">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                     </JFXComboBox>
-                                    <JFXComboBox fx:id="tab5ComboRisFieldType" promptText="RIS FIELD TYPE" HBox.hgrow="NEVER">
+                                    <JFXComboBox fx:id="tab5ComboRisFieldType" labelFloat="true" promptText="RIS FIELD TYPE" HBox.hgrow="NEVER">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                     </JFXComboBox>
-                                    <JFXTextField fx:id="tab5TxtRisName" promptText="RIS NAME" HBox.hgrow="NEVER">
+                                    <JFXTextField fx:id="tab5TxtRisName" labelFloat="true" promptText="RIS NAME" HBox.hgrow="NEVER">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                        <font>
-                                          <Font size="10.0" />
+                                          <Font size="14.0" />
                                        </font>
                                     </JFXTextField>
                                     <JFXButton fx:id="tab5BtnSave" buttonType="RAISED" style="-fx-background-color: green;" text="SAVE" textFill="WHITE">
@@ -219,12 +222,12 @@
                                           <Insets left="20.0" right="20.0" />
                                        </HBox.margin>
                                        <font>
-                                          <Font name="System Bold" size="10.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                     </JFXButton>
                                     <JFXButton fx:id="tab5BtnSave1" buttonType="RAISED" layoutX="735.0" layoutY="30.0" style="-fx-background-color: navy blue;" text="REFRESH" textFill="WHITE">
                                        <font>
-                                          <Font name="System Bold" size="10.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                     </JFXButton>
                                  </children>
@@ -238,25 +241,25 @@
                            <content>
                               <HBox prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <JFXTextField fx:id="tab6TxtSignatoryName" promptText="SIGNATORY NAME" HBox.hgrow="NEVER">
+                                    <JFXTextField fx:id="tab6TxtSignatoryName" labelFloat="true" promptText="SIGNATORY NAME" HBox.hgrow="NEVER">
                                        <font>
-                                          <Font size="10.0" />
+                                          <Font size="14.0" />
                                        </font>
                                     </JFXTextField>
-                                    <JFXTextField fx:id="tab6TxtPosition" promptText="POSITION" HBox.hgrow="NEVER">
+                                    <JFXTextField fx:id="tab6TxtPosition" labelFloat="true" promptText="POSITION" HBox.hgrow="NEVER">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                        <font>
-                                          <Font size="10.0" />
+                                          <Font size="14.0" />
                                        </font>
                                     </JFXTextField>
-                                    <JFXComboBox fx:id="tab6ComboRole" promptText="ROLE">
+                                    <JFXComboBox fx:id="tab6ComboRole" labelFloat="true" promptText="ROLE">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                     </JFXComboBox>
-                                    <JFXComboBox fx:id="tab6ComboReportName" promptText="REPORT NAME" HBox.hgrow="NEVER">
+                                    <JFXComboBox fx:id="tab6ComboReportName" labelFloat="true" promptText="REPORT NAME" HBox.hgrow="NEVER">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>
@@ -266,12 +269,12 @@
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                        <font>
-                                          <Font name="System Bold" size="10.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                     </JFXButton>
                                     <JFXButton fx:id="tab6BtnSave1" layoutX="640.0" layoutY="30.0" style="-fx-background-color: navy blue;" text="REFRESH" textFill="WHITE">
                                        <font>
-                                          <Font name="System Bold" size="10.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                        <HBox.margin>
                                           <Insets left="20.0" />
@@ -288,9 +291,9 @@
                            <content>
                               <HBox prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <JFXTextField fx:id="tab7TxtUnit" promptText="UNIT NAME">
+                                    <JFXTextField fx:id="tab7TxtUnit" labelFloat="true" promptText="UNIT NAME">
                                        <font>
-                                          <Font size="10.0" />
+                                          <Font size="14.0" />
                                        </font>
                                     </JFXTextField>
                                     <JFXButton fx:id="tab7BtnSave" style="-fx-background-color: green;" text="SAVE" textFill="WHITE">
@@ -298,12 +301,12 @@
                                           <Insets left="20.0" />
                                        </HBox.margin>
                                        <font>
-                                          <Font name="System Bold" size="10.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                     </JFXButton>
                                     <JFXButton fx:id="tab7BtnSave1" layoutX="219.0" layoutY="30.0" style="-fx-background-color: navy blue;" text="REFRESH" textFill="WHITE">
                                        <font>
-                                          <Font name="System Bold" size="10.0" />
+                                          <Font name="System Bold" size="14.0" />
                                        </font>
                                        <HBox.margin>
                                           <Insets left="20.0" />
