@@ -63,8 +63,8 @@ public class UpdatePasswordController implements Initializable {
                 User userUpdate = new User();
                 userUpdate.setId(user.getId());
                 userUpdate.setPassword(loginUtil.encryptPassword(txtNewPassword.getText()));
-                userUpdate.set_super_admin(user.is_super_admin());
-                userUpdate.set_admin(user.is_admin());
+                userUpdate.setIs_super_admin(user.getIs_super_admin());
+                userUpdate.setIs_admin(user.getIs_admin());
                 userUpdate.setUsername(user.getUsername());
 
                 //udpating below

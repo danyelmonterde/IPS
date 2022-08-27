@@ -1,3 +1,4 @@
+
 DROP TABLE IF EXISTS balance;
 DROP TABLE IF EXISTS barcode;
 DROP TABLE IF EXISTS customer;
