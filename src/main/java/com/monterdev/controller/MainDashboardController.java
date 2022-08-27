@@ -836,8 +836,8 @@ public class MainDashboardController implements Initializable {
         requisitionIssueSlip.setDate_transacted(AppTime.now().format(DateTimeFormatter.ofPattern(DATE_FORMAT)));
         resetSelectedItem();
         user.setUsername(null);
-        user.set_admin(false);
-        user.set_super_admin(false);
+        user.setIs_admin((byte) 0);
+        user.setIs_super_admin((byte) 0);
         user.setPassword(null);
         user.setId(0);
         Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
