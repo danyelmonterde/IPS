@@ -610,15 +610,15 @@ public class MainDashboardController implements Initializable {
             if (oldValue != newValue) {
                 reportUtil.setSelectedReport(newValue.getName());
                 reportUtil.setReportId(newValue.getId());
-                reportUtil.setSelectedReportRisTypeCode(newValue.getRisTypeName());//ex.CM-NEW CONNECTION
+                reportUtil.setSelectedReportRisTypeCode(newValue.getRis_type_name());//ex.CM-NEW CONNECTION
 
                 try {
-                    reportUtil.setFILE_UPPER_PART(resourceLoader.getResource(getReportJrxmlLocation() + newValue.getJrxmlReportFileName() + ".jrxml").getInputStream());
+                    reportUtil.setFILE_UPPER_PART(resourceLoader.getResource(getReportJrxmlLocation() + newValue.getJrxml_report_file_name() + ".jrxml").getInputStream());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 reportUtil.setInventoryType(newValue.getInventorytype());
-                if (newValue.getRisTypeName().equalsIgnoreCase(SUMMARY)) {
+                if (newValue.getRis_type_name().equalsIgnoreCase(SUMMARY)) {
                     try {
                         reportUtil.setFILE_LOWER_PART(resourceLoader.getResource(getReportJrxmlLocation() + "SINGLE_INVENTORY_SUMMARY_LOWER_PART.jrxml").getInputStream());
                     } catch (IOException e) {

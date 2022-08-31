@@ -213,7 +213,6 @@ public class ReportUtil {
 
     private void getAllMaterialsIssuedForThisMonth(List<Map> mapList) {
         String randomDate = "01" + "-" + selectedMonth + "-" + selectedYear + "  01:01:01";
-        // List<String> risTypesList = risRepository.findAllRISTypeByCurrentMonthOfDateSpecifiedAndInventoryType(randomDate, getInventoryType());
         List<String> risTypesList = risRepository.findAllRISTypeByInventoryType(getInventoryType());
         setRequisitionIssueSliplist(mapList, randomDate, risTypesList);
     }
@@ -346,20 +345,15 @@ public class ReportUtil {
 
     private void createInventoryReport(List<Map> purchaseOrderAndHeaderList, List<Map> salesAndFooterList) throws JRException {
         JasperReport purchaseOrderJasperReport = JasperCompileManager.compileReport(FILE_UPPER_PART);
-        //JasperReport salesJasperReport = JasperCompileManager.compileReport(FILE_LOWER_PART);
+        JasperReport subReport = JasperCompileManager.compileReport(FILE_LOWER_PART);
+
+
 
         List<Map> combinedPurchaseOrderAndSalesOrders = Stream.of(purchaseOrderAndHeaderList, salesAndFooterList)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
-        combinedPurchaseOrderAndSalesOrders.stream().forEach(data->{
-
-            System.out.println(data);
-            System.out.println("**********************");
-        });
-
         JRBeanCollectionDataSource purchaseOrderDatasource = new JRBeanCollectionDataSource(combinedPurchaseOrderAndSalesOrders);
-        JRBeanCollectionDataSource saleDatasource = new JRBeanCollectionDataSource(salesAndFooterList);
 
         Map<String, Object> titleParams = new HashMap<>();
         String beginningBalance = computeBeginningBalanceInventory();
@@ -373,6 +367,8 @@ public class ReportUtil {
         titleParams.put(TOTAL_COST_FIELD, String.valueOf(totalMaterialsForUse));
         double totalEndingBalance = totalMaterialsForUse - totalMaterialsIssued;
         titleParams.put(TOTAL_ENDING_BALANCE_FIELD, String.valueOf(totalEndingBalance));
+        titleParams.put("SUB_REPORT", subReport);
+
 
         purchaseAmount = 0;
         totalMaterialsForUse = 0;
@@ -396,20 +392,8 @@ public class ReportUtil {
 
 
         JasperPrint purchaseOrderJasperPrint = JasperFillManager.fillReport(purchaseOrderJasperReport, titleParams, purchaseOrderDatasource);
-        //JasperPrint salesJasperPrint = JasperFillManager.fillReport(salesJasperReport, titleParams, saleDatasource);
 
-        // new JasperViewerFX().viewReport("Test ",purchaseOrderJasperPrint);
         JasperExportManager.exportReportToPdfFile(purchaseOrderJasperPrint, report.getReport_location());
-        String purchaseOrderReportLocation = report.getReport_location();
-        saveReport();
-        this.report = null;
-        setReportMetadata(report);
-        String salesReportLocation = report.getReport_location();
-        //JasperExportManager.exportReportToPdfFile(salesJasperPrint, report.getReport_location());
-        //saveReport();
-        //Prompt.success("Done saving report to " + purchaseOrderReportLocation );
-        purchaseOrderReportLocation = null;
-        salesReportLocation = null;
     }
 
     private void singleInventoryReport(List<Map> purchaseOrderAndHeaderList) throws JRException {
