@@ -72,6 +72,7 @@
 	<parameter name="CHECKED_BY_POSITION" class="java.lang.String"/>
 	<parameter name="NOTED_BY" class="java.lang.String"/>
 	<parameter name="NOTED_BY_POSITION" class="java.lang.String"/>
+	<parameter name="SUB_REPORT" class="java.lang.String"/>
 	<field name="REPORT_NAME" class="java.lang.String"/>
 	<field name="SELECTED_MONTH" class="java.lang.String"/>
 	<field name="SELECTED_YEAR" class="java.lang.String"/>
@@ -352,4 +353,55 @@
 			</textField>
 		</band>
 	</lastPageFooter>
+	<summary>
+		<band height="230">
+			<subreport>
+				<reportElement x="187" y="30" width="200" height="200" uuid="183a21cd-ab20-46a8-90ed-64b7c181c01b"/>
+				<subreportParameter name="COMPANY_NAME">
+					<subreportParameterExpression><![CDATA[$P{COMPANY_NAME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="STREET_ADDRESS">
+					<subreportParameterExpression><![CDATA[$P{STREET_ADDRESS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REPORT_NAME">
+					<subreportParameterExpression><![CDATA[$P{REPORT_NAME}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SELECTED_MONTH">
+					<subreportParameterExpression><![CDATA[$P{SELECTED_MONTH}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SELECTED_YEAR">
+					<subreportParameterExpression><![CDATA[$P{SELECTED_YEAR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="BEGINNING_BALANCE_INVENTORY">
+					<subreportParameterExpression><![CDATA[$P{BEGINNING_BALANCE_INVENTORY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TOTAL_COST">
+					<subreportParameterExpression><![CDATA[$P{TOTAL_COST}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TOTAL_ENDING_BALANCE">
+					<subreportParameterExpression><![CDATA[$P{TOTAL_ENDING_BALANCE}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PREPARED_BY">
+					<subreportParameterExpression><![CDATA[$P{PREPARED_BY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PREPARED_BY_POSITION">
+					<subreportParameterExpression><![CDATA[$P{PREPARED_BY_POSITION}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="CHECKED_BY">
+					<subreportParameterExpression><![CDATA[$P{CHECKED_BY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="CHECKED_BY_POSITION">
+					<subreportParameterExpression><![CDATA[$P{CHECKED_BY_POSITION}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOTED_BY">
+					<subreportParameterExpression><![CDATA[$P{NOTED_BY}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="NOTED_BY_POSITION">
+					<subreportParameterExpression><![CDATA[$P{NOTED_BY_POSITION}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[$P{SUB_REPORT}]]></dataSourceExpression>
+				<subreportExpression><![CDATA[""]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
 </jasperReport>

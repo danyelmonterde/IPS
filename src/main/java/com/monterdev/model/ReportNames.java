@@ -24,7 +24,7 @@ public class ReportNames {
 
     private String description;
 
-    private String risTypeName;
+    private String ris_type_name;
 
-    private String jrxmlReportFileName;
+    private String jrxml_report_file_name;
 }

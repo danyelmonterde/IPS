@@ -226,8 +226,8 @@ public class MasterDataController implements Initializable {
                     tab2TxtReportName.setText(cellData.get(0).getName());
                     tab2ComboInventoryType.setValue(cellData.get(0).getInventorytype());
                     tab2TxtDescription.setText(cellData.get(0).getDescription());
-                    tab2ComboRisTypeName.setValue(cellData.get(0).getRisTypeName());
-                    tab2JrxmlReportFileName.setText(cellData.get(0).getJrxmlReportFileName());
+                    tab2ComboRisTypeName.setValue(cellData.get(0).getRis_type_name());
+                    tab2JrxmlReportFileName.setText(cellData.get(0).getJrxml_report_file_name());
                     sku = cellData.get(0).getId();
                 }
             });
@@ -451,8 +451,8 @@ public class MasterDataController implements Initializable {
             if (!ObjectUtils.isEmpty(tab2TxtReportName.getText()) && !ObjectUtils.isEmpty(tab2TxtDescription.getText())) {
                 ReportNames reportNames = new ReportNames();
                 reportNames.setId(sku);
-                reportNames.setRisTypeName(((RisTypeNames) tab2ComboRisTypeName.getValue()).getName());
-                reportNames.setJrxmlReportFileName(tab2JrxmlReportFileName.getText());
+                reportNames.setRis_type_name(((RisTypeNames) tab2ComboRisTypeName.getValue()).getName());
+                reportNames.setJrxml_report_file_name(tab2JrxmlReportFileName.getText());
                 reportNames.setName(tab2TxtReportName.getText());
                 reportNames.setDescription(tab2TxtDescription.getText());
                 reportNames.setInventorytype(((InventoryType) tab2ComboInventoryType.getValue()).getInventory_type());
