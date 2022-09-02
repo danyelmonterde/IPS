@@ -325,6 +325,7 @@ public class ReportUtil {
         this.report.setChecked_by(this.getReportCheckedBy());
         this.report.setNoted_by(this.getReportNotedBy());
 
+
         titleParams.put(PREPARED_BY_FIELD, reportPreparedBy);
         titleParams.put(NOTED_BY_FIELD, reportNotedBy);
         titleParams.put(CHECKED_BY_FIELD, reportCheckedBy);
@@ -345,9 +346,6 @@ public class ReportUtil {
 
     private void createInventoryReport(List<Map> purchaseOrderAndHeaderList, List<Map> salesAndFooterList) throws JRException {
         JasperReport purchaseOrderJasperReport = JasperCompileManager.compileReport(FILE_UPPER_PART);
-        JasperReport subReport = JasperCompileManager.compileReport(FILE_LOWER_PART);
-
-
 
         List<Map> combinedPurchaseOrderAndSalesOrders = Stream.of(purchaseOrderAndHeaderList, salesAndFooterList)
                 .flatMap(Collection::stream)
@@ -367,7 +365,6 @@ public class ReportUtil {
         titleParams.put(TOTAL_COST_FIELD, String.valueOf(totalMaterialsForUse));
         double totalEndingBalance = totalMaterialsForUse - totalMaterialsIssued;
         titleParams.put(TOTAL_ENDING_BALANCE_FIELD, String.valueOf(totalEndingBalance));
-        titleParams.put("SUB_REPORT", subReport);
 
 
         purchaseAmount = 0;
