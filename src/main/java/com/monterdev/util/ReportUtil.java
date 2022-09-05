@@ -347,11 +347,13 @@ public class ReportUtil {
     private void createInventoryReport(List<Map> purchaseOrderAndHeaderList, List<Map> salesAndFooterList) throws JRException {
         JasperReport purchaseOrderJasperReport = JasperCompileManager.compileReport(FILE_UPPER_PART);
 
-        List<Map> combinedPurchaseOrderAndSalesOrders = Stream.of(purchaseOrderAndHeaderList, salesAndFooterList)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+//        List<Map> combinedPurchaseOrderAndSalesOrders = Stream.of(purchaseOrderAndHeaderList, salesAndFooterList)
+//                .flatMap(Collection::stream)
+//                .collect(Collectors.toList());
 
-        JRBeanCollectionDataSource purchaseOrderDatasource = new JRBeanCollectionDataSource(combinedPurchaseOrderAndSalesOrders);
+//        JRBeanCollectionDataSource purchaseOrderDatasource = new JRBeanCollectionDataSource(combinedPurchaseOrderAndSalesOrders);
+        JRBeanCollectionDataSource purchaseOrderDatasource = new JRBeanCollectionDataSource(purchaseOrderAndHeaderList);
+
 
         Map<String, Object> titleParams = new HashMap<>();
         String beginningBalance = computeBeginningBalanceInventory();
@@ -365,6 +367,7 @@ public class ReportUtil {
         titleParams.put(TOTAL_COST_FIELD, String.valueOf(totalMaterialsForUse));
         double totalEndingBalance = totalMaterialsForUse - totalMaterialsIssued;
         titleParams.put(TOTAL_ENDING_BALANCE_FIELD, String.valueOf(totalEndingBalance));
+        titleParams.put("SALES_DATA", salesAndFooterList);
 
 
         purchaseAmount = 0;
