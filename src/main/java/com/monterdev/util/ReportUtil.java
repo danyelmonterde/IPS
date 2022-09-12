@@ -3,6 +3,7 @@ package com.monterdev.util;
 
 import com.monterdev.mapper.reports.construction.ReportsMapper;
 import com.monterdev.model.Balance;
+import com.monterdev.model.History;
 import com.monterdev.model.PurchaseOrder;
 import com.monterdev.model.Reports;
 import com.monterdev.repository.*;
@@ -91,6 +92,29 @@ public class ReportUtil {
 
     public void generateReport() throws JRException, SQLException, FileNotFoundException {
         classifyReport();
+    }
+
+    public void generateCMIRR(List<History> historyList) throws JRException, FileNotFoundException {
+        this.setReportPreparedBy(signatoryRepository.findSignatoryByRole(PREPARED_BY_ROLE_FIELD, reportId).getSignatory());
+        this.setReportCheckedBy(signatoryRepository.findSignatoryByRole(CHECKED_BY_ROLE_FIELD, reportId).getSignatory());
+        this.setReportNotedBy(signatoryRepository.findSignatoryByRole(NOTED_BY_ROLE_FIELD, reportId).getSignatory());
+
+        this.report.setPrepared_by(this.getReportPreparedBy());
+        this.report.setChecked_by(this.getReportCheckedBy());
+        this.report.setNoted_by(this.getReportNotedBy());
+        setReportMetadata(report);
+        JasperReport jasperReport = JasperCompileManager.compileReport(FILE_UPPER_PART);
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put(COMPANY_NAME_FIELD, getConfigValue(companyName));
+        parameters.put(STREET_ADDRESS_FIELD, getConfigValue(companyAddress));
+        parameters.put(REPORT_NAME_FIELD, selectedReport);
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(historyList);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+        JasperExportManager.exportReportToPdfFile(jasperPrint, report.getReport_location());
+        saveReport();
+        Prompt.success("Done saving report to " + report.getReport_location());
     }
 
     private void classifyReport() throws FileNotFoundException {

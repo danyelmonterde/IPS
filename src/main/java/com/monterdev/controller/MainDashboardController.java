@@ -44,6 +44,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -503,6 +504,16 @@ public class MainDashboardController implements Initializable {
             }
         });
 
+        JFXTextField remarks = createTextField("REMARKS", "LIGHT GRAY");
+        remarks.setText(currentItem.getRemarks());
+        remarks.setPrefWidth(220.0);
+        remarks.setId(String.valueOf(currentIndex));
+        remarks.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!oldValue.equals(newValue)) {
+                currentItem.setRemarks(newValue);
+            }
+        });
+
         amount.setText(String.format("%.2f", currentItem.getQuantity() * currentItem.getCost()));
 
 
@@ -512,9 +523,10 @@ public class MainDashboardController implements Initializable {
         HBox.setMargin(inStockQuantity, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(cost, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(amount, new Insets(50.0, 0.0, 0.0, 20.0));
+        HBox.setMargin(remarks, new Insets(50.0, 0.0, 0.0, 20.0));
         HBox.setMargin(delete, new Insets(50.0, 0.0, 0.0, 20.0));
 
-        hBox.getChildren().addAll(name, quantity, inStockQuantity, cost, amount, delete);
+        hBox.getChildren().addAll(name, quantity, inStockQuantity, cost, amount, remarks, delete);
 
         return hBox;
 
@@ -1083,6 +1095,10 @@ public class MainDashboardController implements Initializable {
                     history.setItem_category(itemCart.get(counter).getItem_category());
                     history.setUpdated_by(user.getUsername());
                     history.setStock_after(itemCart.get(counter).getIn_stock() - itemCart.get(counter).getQuantity());
+                    history.setRemarks(itemCart.get(counter).getRemarks());
+                    history.setUnit(itemCart.get(counter).getUnit());
+                    history.setCost(itemCart.get(counter).getCost());
+                    history.setControl_number(requisitionIssueSlip.getControl_number());
 
                     if (requisitionIssueSlip.getIs_customer_new() == 1) {
                         totalCost += itemCart.get(counter).getCost() * itemCart.get(counter).getQuantity();
@@ -1137,7 +1153,20 @@ public class MainDashboardController implements Initializable {
 
                             if (!ObjectUtils.isEmpty(salesRepository.save(sales))) {
                                 if (!ObjectUtils.isEmpty(customerRepository.save(customer))) {
-                                    Prompt.success("Item released!");
+                                    try {
+                                        LocalDate currentdate = LocalDate.now();
+                                        ReportNames reportNames = reportNamesRepository.findReportNameById(25);
+
+                                        reportUtil.setReportId(25);
+                                        reportUtil.setSelectedReport(reportNames.getName());
+                                        reportUtil.setSelectedMonth(currentdate.getMonth().toString());
+                                        reportUtil.setSelectedYear(currentdate.getYear() + "");
+
+                                        reportUtil.setFILE_UPPER_PART(resourceLoader.getResource(getReportJrxmlLocation() + reportNames.getJrxml_report_file_name() + ".jrxml").getInputStream());
+                                        reportUtil.generateCMIRR(historyList);
+                                    } catch (Exception exception) {
+                                        System.out.println(exception.getLocalizedMessage());
+                                    }
                                     endTransaction();
                                 } else {
                                     Prompt.failed("Error saving customer!");

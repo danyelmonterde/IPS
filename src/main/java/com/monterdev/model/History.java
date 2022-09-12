@@ -35,5 +35,12 @@ public class History {
 
     private String updated_by;
 
+    private String remarks;
+
+    private  String unit;
+
+    private double cost;
+
+    private String control_number;
 
 }
