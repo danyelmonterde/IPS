@@ -109,6 +109,12 @@ public class ReportUtil {
         parameters.put(COMPANY_NAME_FIELD, getConfigValue(companyName));
         parameters.put(STREET_ADDRESS_FIELD, getConfigValue(companyAddress));
         parameters.put(REPORT_NAME_FIELD, selectedReport);
+        parameters.put(PREPARED_BY_FIELD, reportPreparedBy);
+        parameters.put(NOTED_BY_FIELD, reportNotedBy);
+        parameters.put(CHECKED_BY_FIELD, reportCheckedBy);
+        parameters.put(CHECKED_BY_POSITION_FIELD, signatoryRepository.findSignatoryByRole(CHECKED_BY_ROLE_FIELD, reportId).getPosition());
+        parameters.put(PREPARED_BY_POSITION_FIELD, signatoryRepository.findSignatoryByRole(PREPARED_BY_ROLE_FIELD, reportId).getPosition());
+        parameters.put(NOTED_BY_POSITION_FIELD, signatoryRepository.findSignatoryByRole(NOTED_BY_ROLE_FIELD, reportId).getPosition());
 
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(historyList);
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
