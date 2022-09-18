@@ -45,6 +45,9 @@ public class Item implements Comparable<Item>{
     @CsvBindByName(column = "item_category")
     private String item_category;
 
+    @Transient
+    private String remarks;
+
 
     @Override
     public boolean equals(Object o) {
