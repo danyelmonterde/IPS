@@ -201,10 +201,6 @@ public class MainDashboardController implements Initializable {
         }
 
 
-        if (!ObjectUtils.isEmpty(requisitionIssueSlip.getRequisition_and_issue_slip_number())) {
-            createRequisitionIssueSlip();
-        }
-
         Runnable timeUpdater = () -> Platform.runLater(() -> {
             if (capturedItem.getSku() != 0) {
                 selectedItem.setSku(capturedItem.getSku());
@@ -775,8 +771,9 @@ public class MainDashboardController implements Initializable {
     }
 
     private void getCustomizeRIS() {
-        Stage stage = (Stage) sidebarAnchorpane.getScene().getWindow();
-        new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext, stage);
+        Stage currentStage = (Stage) sidebarAnchorpane.getScene().getWindow();
+        //new StageLoader().loadTest(CustomizeRequisitionIssueSlipController.class, applicationContext, stage);
+        new StageLoader().loadTest(PointOfSaleController.class, applicationContext, currentStage);
     }
 
     public void getInventoryModule(ActionEvent actionEvent) {
@@ -856,201 +853,6 @@ public class MainDashboardController implements Initializable {
         currentStage.close();
         Stage newStage = new Stage();
         new StageLoader().load(LoginController.class, applicationContext, newStage);
-    }
-
-    public void createRequisitionIssueSlip() {
-        resetHboxes();
-        topHbox.setAlignment(Pos.BOTTOM_LEFT);
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setPrefHeight(500);
-        scrollPane.setPrefWidth(600);
-
-        AnchorPane anchorPane = new AnchorPane();
-        anchorPane.setPrefWidth(600);
-        anchorPane.setPrefHeight(600);
-
-
-        VBox vbox = new VBox();
-
-        anchorPane.getChildren().add(vbox);
-        AnchorPane.setLeftAnchor(vbox, 0.0);
-        AnchorPane.setRightAnchor(vbox, 40.0);
-        AnchorPane.setTopAnchor(vbox, 0.0);
-        AnchorPane.setBottomAnchor(vbox, 0.0);
-
-        scrollPane.setContent(anchorPane);
-
-        midHbox.setAlignment(Pos.CENTER_RIGHT);
-        midHbox.setPadding(new Insets(0.0, 20.0, 0.0, 20.0));
-        HBox.setMargin(scrollPane, new Insets(0.0, 40.0, 20.0, 20.0));
-
-        JFXTextField itemName = new JFXTextField();
-        itemName.setPrefWidth(200.0);
-        HBox.setMargin(itemName, new Insets(20.0, 20.0, 20.0, 20.0));
-
-        ToggleGroup searchGroup = new ToggleGroup();
-
-        searchGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
-            RadioButton rb = (RadioButton) searchGroup.getSelectedToggle();
-            if (rb != null) {
-                System.out.println(rb.getText());
-            }
-        });
-
-
-        itemName.textProperty().addListener((observableValue, oldValue, newValue) -> {
-            if (oldValue != newValue) {
-
-                if (NumberUtils.isParsable(newValue)) {
-                    Optional<Item> item = itemsRepository.findById(Integer.parseInt(newValue));
-                    if (item.isPresent()) {
-                        itemName.setText(item.get().getItem_name());
-                    }
-                }
-
-                if (isFirstCharacter && itemName.getText().length() == 1) {
-                    // midHbox.getChildren().add(0,listView);
-                    isFirstCharacter = false;
-                }
-                itemLists = itemsRepository.findAll();
-                searchUtil.searchItem(itemName.getText(), itemLists, responseList, "NAME");
-                if (responseList.size() > 0) {
-
-                    listView.setPrefWidth(400);
-
-                    HBox.setMargin(listView, new Insets(20.0, 0.0, 20.0, 0.0));
-                    listView.getItems().clear();
-                    responseList.stream().forEach(data -> {
-
-                        listView.getItems().add(data);
-
-                    });
-                    listView.setOnMouseClicked(e -> {
-                        if (e.getClickCount() == 2) {
-                            List<Item> updatedItemList = itemsRepository.findAll();
-                            Optional<Item> optionalItem = updatedItemList.stream().filter(f -> String.valueOf(f.getItem_name()).equalsIgnoreCase(listView.getSelectionModel().getSelectedItem().toString())).findFirst();
-                            isItemOnCart = false;
-                            itemCart.stream().forEach(x -> {
-                                if (x.getItem_name().equalsIgnoreCase(optionalItem.get().getItem_name())) {
-                                    Prompt.failed("Item already in cart!");
-                                    isItemOnCart = true;
-                                }
-                            });
-                            if (optionalItem.get().getIn_stock() == 0) {
-                                Prompt.failed("Item is out of Stock");
-                            } else if ((optionalItem.get().getIn_stock() == optionalItem.get().getLow_stock()) && (isItemOnCart == false)) {
-                                Prompt.failed("Item is Low Stock!");
-                                selectedItem.setSku(optionalItem.isPresent() ? optionalItem.get().getSku() : 0);
-                                sku.setText(String.valueOf(optionalItem.isPresent() ? optionalItem.get().getSku() : 0));
-                            } else if (isItemOnCart == false) {
-                                selectedItem.setSku(optionalItem.isPresent() ? optionalItem.get().getSku() : 0);
-                                sku.setText(String.valueOf(optionalItem.isPresent() ? optionalItem.get().getSku() : 0));
-                            }
-
-
-                        }
-                    });
-
-
-                }
-
-                if (ObjectUtils.isEmpty(newValue)) {
-                    responseList.clear();
-                    selectedItem.setSku(0);
-                    sku.setText("");
-                    rowIndex = 0;
-                    try {
-
-                    } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
-
-                    }
-
-                }
-            }
-        });
-
-        itemName.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.BACK_SPACE) {
-                try {
-                    isFirstCharacter = true;
-                    responseList.clear();
-                    selectedItem.setSku(0);
-                } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
-
-                }
-            }
-        });
-
-
-        topHbox.getChildren().addAll(itemName);
-        midHbox.getChildren().addAll(listView, scrollPane);
-        midHbox.setPrefHeight(500.0);
-
-        HBox.setMargin(listView, new Insets(20.0, 20.0, 20.0, 0.0));
-        HBox.setMargin(scrollPane, new Insets(20.0, 20.0, 20.0, 20.0));
-
-
-        JFXButton releaseItem = new JFXButton("RELEASE ITEM");
-        releaseItem.setButtonType(JFXButton.ButtonType.RAISED);
-        releaseItem.setStyle("-fx-background-color: GREEN;");
-        releaseItem.setTextAlignment(TextAlignment.CENTER);
-        releaseItem.setTextFill(Paint.valueOf("WHITE"));
-        releaseItem.setFont(Font.font("System Bold", 14.0));
-
-        JFXButton cancelButton = new JFXButton("CANCEL");
-        cancelButton.setButtonType(JFXButton.ButtonType.RAISED);
-        cancelButton.setStyle("-fx-background-color: RED;");
-        cancelButton.setTextAlignment(TextAlignment.CENTER);
-        cancelButton.setTextFill(Paint.valueOf("WHITE"));
-        cancelButton.setFont(Font.font("System Bold", 14.0));
-
-        JFXButton deleteAllButton = new JFXButton("DELETE ALL ITEMS ON CART");
-        deleteAllButton.setButtonType(JFXButton.ButtonType.RAISED);
-        deleteAllButton.setStyle("-fx-background-color: black;");
-        deleteAllButton.setTextAlignment(TextAlignment.CENTER);
-        deleteAllButton.setTextFill(Paint.valueOf("WHITE"));
-        deleteAllButton.setFont(Font.font("System Bold", 14.0));
-
-
-        releaseItem.setOnAction(x -> {
-            releaseItemsOnCart();
-        });
-
-        cancelButton.setOnAction(v -> {
-            endTransaction();
-        });
-
-        deleteAllButton.setOnAction(e -> {
-            selectedItem.setSku(0);
-            itemCart.clear();
-            sku.setText("0");
-            rowIndex = 0;
-            validNumberOfItemsInCart = 0;
-
-            ObservableList<Node> nodeStream = midHbox.getChildren();
-            for (Node node : nodeStream) {
-                if (node instanceof ScrollPane) {
-                    Node node2 = ((ScrollPane) node).getContent();
-                    if (node2 instanceof AnchorPane) {
-                        for (Node node3 : ((AnchorPane) node2).getChildren()) {
-                            if (node3 instanceof VBox) {
-                                VBox vBox = (VBox) node3;
-                                vBox.getChildren().clear();
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        bottomHbox.getChildren().addAll(releaseItem, cancelButton, deleteAllButton);
-
-        HBox.setMargin(scrollPane, new Insets(20.0, 0.0, 20.0, 20.0));
-        HBox.setMargin(cancelButton, new Insets(20.0, 0.0, 20.0, 20.0));
-        HBox.setMargin(deleteAllButton, new Insets(20.0, 0.0, 20.0, 20.0));
-        HBox.setMargin(releaseItem, new Insets(20.0, 0.0, 20.0, 20.0));
-
-        currentLocationBanner.setText("RELEASE ITEMS");
     }
 
 
@@ -1202,7 +1004,6 @@ public class MainDashboardController implements Initializable {
 
     public void openRISModule(ActionEvent actionEvent) {
         getCustomizeRIS();
-        createRequisitionIssueSlip();
     }
 
     public void searchItemOnDashboard() {
